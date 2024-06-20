@@ -587,7 +587,7 @@ right_column.header('_')
 
 # Cache creation of flags dataframe
 @st.cache_data
-def flags():
+def flags(product_name):
     # Create flags for selecting variable
     dict_flags = {   # Formatted as 'override_parameter': 'parameter name', 'unit', 'variable name', 'default value', 'minimum value', 'maximum value', 
         'override_cell_voltage': [ 'Cell voltage', 'V', 'cell_E_V',                                   cell_E_V, 1.34, 5 ],
@@ -694,8 +694,7 @@ def updated_radio_state(df_flags):
     st.session_state.minimum_value_input = str(df_flags.loc[vbl_name, 'Range min'])
     st.session_state.maximum_value_input = str(df_flags.loc[vbl_name, 'Range max'])
 
-df_flags = flags()
-st.write(df_flags)
+df_flags = flags(product_name)
     
 with st.sidebar:
     ## Initialize overridden_vbl_radio widget
