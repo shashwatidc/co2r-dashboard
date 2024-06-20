@@ -18,6 +18,8 @@
 # %run "20240611_1_DownstreamProcessModel.ipynb"
 # %run "20240611_2_ProcessEconomics.ipynb"
 
+import streamlit as st
+
 from ElectrolyzerModel import *
 from DownstreamProcessModel import *
 from ProcessEconomics import *
