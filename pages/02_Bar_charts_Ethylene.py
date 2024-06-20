@@ -530,6 +530,9 @@ product_name = 'Ethylene' # default
 range_selection = 'Linear' # default
 override_vbl_selection = 'Total current density' # default
 vbl_name = 'Current density' # default
+vbl_min = 25
+vbl_max = 1275
+vbl_num = 11
 
 ########## OTHER FIXED VALUES
 # PRODUCT COSTS
