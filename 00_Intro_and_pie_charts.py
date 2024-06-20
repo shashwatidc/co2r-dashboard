@@ -21,6 +21,7 @@ from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import animation
+from matplotlib import font_manager as fm
 
 # import csv
 
