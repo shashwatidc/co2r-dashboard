@@ -530,8 +530,8 @@ product_name = 'Ethylene' # default
 range_selection = 'Linear' # default
 override_vbl_selection = 'Total current density' # default
 vbl_name = 'Current density' # default
-vbl_min = 25
-vbl_max = 1275
+vbl_min = 25.0
+vbl_max = 1275.0
 vbl_num = 11
 
 ########## OTHER FIXED VALUES
@@ -736,7 +736,7 @@ with st.sidebar:
         st.error('One of your x-variable values is invalid. Please check that they are all numbers and \
                   that the number of points is an integer.')
         st.session_state.is_active_error = True
-        st.header('*:red[There is an error in the model inputs..]*')
+        st.header('*:red[There is an error in the model inputs.]*')
 
     st.write('Spacing for points')
     range_selection = st.radio(label = 'Spacing for points', 
