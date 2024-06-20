@@ -550,7 +550,7 @@ def opex_seider(df_feedstocks,
     return df_opex, df_opex_totals   
 
 # %%
-@st.cache_data
+# @st.cache_data
 def opex_sinnott(C_ISBL, # currently C_TDC
                  df_feedstocks,
                  df_utilities,
