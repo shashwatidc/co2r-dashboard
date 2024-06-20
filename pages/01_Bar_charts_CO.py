@@ -278,7 +278,7 @@ def default_single_run(product_name,
 ###################################################################################
 
 # Streamlit page formatting
-st.set_page_config(page_title = 'CO2R Costing Dashboard - Bar charts', 
+st.set_page_config(page_title = 'CO2R Costing Dashboard - CO bar charts', 
                    page_icon = ":test_tube:",
                    initial_sidebar_state= 'expanded',
                    menu_items= {'Report a bug': 'mailto:shashwatidc@utexas.edu', },
