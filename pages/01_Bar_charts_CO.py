@@ -295,6 +295,8 @@ BIGGER_SIZE = 27 # set# trigger core fonts for PDF backend
 # for font in font_manager.findSystemFonts(font_dir):
 #     font_manager.fontManager.addfont(font)
 mp.rc('font', family = 'sans-serif') # 'Arial' # font group is sans-serif
+print(plt.rcParams["font.sans-serif"][:])
+plt.rcParams["font.sans-serif"] = ["Arial"]
 mp.rc('font', size=MEDIUM_SIZE)     # controls default text sizes if unspecified
 mp.rc('axes', titlesize=MEDIUM_SIZE)    # fontsize of the axes title; I think this is for subplots 
 mp.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
@@ -774,7 +776,7 @@ with st.sidebar:
                             value = vbl_max, label_visibility='collapsed')
         st.write('Number of x-ticks, including endpoints (integer)')
         x_axis_num = st.text_input(label = 'x-axis ticks',
-                            value = 6, label_visibility='collapsed')
+                            value = 4, label_visibility='collapsed')
         try:
             x_axis_min = float(x_axis_min)
             x_axis_max = float(x_axis_max)
@@ -1793,7 +1795,7 @@ if not st.session_state.is_active_error:
             y_axis_major_ticks = y_axis_formatting(y_axis_min_emissions, y_axis_max_emissions, y_axis_num_emissions)
 
             ## Axis labels
-            axs.set_ylabel('Emissions (kg CO$_2$ /kg {})'.format(product_name))
+            axs.set_ylabel('Emissions (kg$_{CO_2}$/kg$_{{{}}}$)'.format(product_name))
             axs.set_xlabel(x_axis_label)
 
             ## Draw axis ticks
