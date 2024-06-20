@@ -768,7 +768,7 @@ with st.sidebar:
                             value = vbl_max, label_visibility='collapsed')
         st.write('Number of x-ticks, including endpoints (integer)')
         x_axis_num = st.text_input(label = 'x-axis ticks',
-                            value = 7, label_visibility='collapsed')
+                            value = 6, label_visibility='collapsed')
         try:
             x_axis_min = float(x_axis_min)
             x_axis_max = float(x_axis_max)
