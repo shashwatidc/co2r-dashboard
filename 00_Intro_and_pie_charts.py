@@ -418,8 +418,8 @@ Blues = mp.colormaps['Blues']
 # from matplotlib.backends.backend_agg import RendererAgg
 # _lock = RendererAgg.lock # Lock figures so that concurrent users/threads can coexist independently
 
-st.title("CO$_2$R Costing Dashboard: Home")
-st.write('''This tool generates the capital and operating cost for a CO$_2$ reduction process converting captured CO$_2$ 
+st.title("CO₂R Costing Dashboard: Home")
+st.write('''This tool generates the capital and operating cost for a CO₂ reduction process converting captured CO₂
          into either CO or ethylene. :red[It is based on the model in our paper [__]()]. 
         ''')
 st.write("**Cite this work: __**")
@@ -445,7 +445,7 @@ with st.expander("**Help**", expanded = False):
 
 ###############################  IMPORT SOURCE DATA ###############################
 
-file_imports = r"Streamlit\DataForTEA.xlsx"
+file_imports = r"DataForTEA.xlsx"
 sheet_utility_imports = 'Utilities'
 sheet_constants =  'Constants and assumptions'
 sheet_products =  'Products'
@@ -526,13 +526,13 @@ middle_column.header('Results')
 right_column.header('_')
 
 with st.sidebar:
-    st.subheader('CO$_2$R product')
+    st.subheader('CO₂R product')
     ######## PRODUCT SELECTION
     # Choose a product
     product_name = st.radio(label = 'Reduction product', options= ['CO', 'Ethylene'], 
                     index = 0, # default option
                     label_visibility='collapsed',
-                    help = '''Choose the product that CO$_2$ is reduced into. 
+                    help = '''Choose the product that CO₂ is reduced into. 
                     The only byproduct made is hydrogen. 
                       \n Default product: CO'''
     )
@@ -596,7 +596,7 @@ with st.sidebar:
             overridden_unit = 'V'
         else:
             st.write('*Modeling cell voltage from simplified Butler-Volmer model*')
-            override_eta_cat = st.checkbox('Specify cathode (CO$_2$R) overpotential', value = False,
+            override_eta_cat = st.checkbox('Specify cathode (CO₂R) overpotential', value = False,
                                            disabled = override_cell_voltage)
             BV_eta_cat_V = st.slider(label = 'Cathodic overpotential (V)',
                             min_value = -10.0, 
@@ -634,7 +634,7 @@ with st.sidebar:
                 st.write('*Modeling anodic overpotential from Tafel slope, {:.0f} mV/dec*'.format(an_Tafel_slope))
             
             override_ohmic = st.checkbox('Specify full-cell area-specific resistance', value = False)
-            R_ohmcm2 = st.slider(label = 'Area-specific resistance ($ \Omega \cdot$ cm$^2$)',
+            R_ohmcm2 = st.slider(label = 'Area-specific resistance ($ \Omega \cdot$ cm$^2$',
                             min_value = 0.0, 
                             max_value = 25.0, 
                             step = 0.01, value = R_ohmcm2,
@@ -660,7 +660,7 @@ with st.sidebar:
 
         ##### FE-SPC TRADEOFF  
         option_1 = 'Plug flow in gas channel'
-        option_2 = 'Carbonate electrolyte supports CO$_2$ availability'
+        option_2 = 'Carbonate electrolyte supports CO₂ availability'
         option_3 = 'Manually specify $ FE_{{{}}}$ and single-pass conversion'.format(product_name)
         st.write('Model for selectivity tradeoff versus single-pass conversion')
         answer = st.radio(label = 'FE-SPC model',
@@ -692,7 +692,7 @@ with st.sidebar:
                             max_value = 1.0, 
                             step = 0.01, value = FE_CO2R_0,
                             format = '%.2f',
-                            help = r'''Maximum Faradaic efficiency achieved in the limit of 0 single-pass conversion or vast excess of CO$_2$,
+                            help = r'''Maximum Faradaic efficiency achieved in the limit of 0 single-pass conversion or vast excess of CO₂,
                             $$$
                             lim_{{\big X_{{CO_2}} → 0}} FE_{{\scriptsize CO_2R}}
                             $$$
@@ -716,11 +716,11 @@ with st.sidebar:
         st.latex(r'''
                  \footnotesize \implies  FE_{{{}}} = {:.2f}
                  '''.format(product_name, FE_product_checked))
-        crossover_ratio = st.slider(label = 'Crossover ratio (mol CO$_2$/mol e$^-$)',
+        crossover_ratio = st.slider(label = 'Crossover ratio (mol CO₂/mol e$^-$)',
                             min_value = 0.001, 
                             max_value = 1.0, 
                             step = 0.01, value = crossover_ratio,
-                            help = """The amount of CO$_2$ converted into carbonate ions that then crosses the membrane into the anode gas stream. 
+                            help = """The amount of CO₂ converted into carbonate ions that then crosses the membrane into the anode gas stream. 
                               \n Default crossover ratio: 0.5
                               \n This is based on the carbonate equilibrium: 
                             $$$
@@ -740,7 +740,7 @@ with st.sidebar:
                             max_value = 1.5e6 / 1000, 
                             step = 10.0, value = product_rate_kg_day / 1000,
                             format = '%i',
-                            help = '''Daily production rate. This is fixed for the entire plant lifetime and sets the total CO$_2$R current required.
+                            help = '''Daily production rate. This is fixed for the entire plant lifetime and sets the total CO₂R current required.
                               \n Default value: {} kg$ _{{{}}}$/day
                             '''.format(product_rate_kg_day, product_name))
         capacity_factor = st.slider(label = 'Capacity factor (days per 365 days)',
@@ -764,7 +764,7 @@ with st.sidebar:
                             max_value = 1.0, 
                             step = 0.01, value = PSA_second_law_efficiency,
                             format = '%.2f',
-                            help = '''Second-law efficiency of gas separations between CO$_2$/O$_2$, CO$_2$/CO, and CO/H$_2$.
+                            help = '''Second-law efficiency of gas separations between CO₂/O₂, CO₂/CO, and CO/H₂.
                             This adjusts the ideal work of binary separation, 
                             $$$
                              \\\  W_{{sep \: (j)}}^{{ideal}} = R \cdot T \cdot (\sum_i x_i\cdot ln(x_i)) \cdot \displaystyle \dot{{N}} \\
@@ -805,21 +805,21 @@ with st.sidebar:
                             help = '''Electricity cost.
                             \n Default value: \${}/kWh, based on average retail industrial electricity cost in April 2023 in the United States.
                             '''.format(default_electricity_cost_USD_kWh))
-        CO2_cost_USD_tCO2 = st.slider(label = 'CO$_2$ cost (\$/t CO$_2$)',
+        CO2_cost_USD_tCO2 = st.slider(label = 'CO₂ cost (\$/t CO₂)',
                             min_value = 0.0, 
                             max_value = 500.0, 
                             step = 1.0, value = CO2_cost_USD_tCO2,
                             format = '%i',
                             help = '''Default value: \${}/t$_{{CO_2}}$
                             '''.format(default_CO2_cost_USD_tCO2))
-        H2_cost_USD_tCO2 = st.slider(label = 'H$_2$ cost (\$/kg H$_2$)',
+        H2_cost_USD_tCO2 = st.slider(label = 'H₂ cost (\$/kg H₂)',
                             min_value = 0.0, 
                             max_value = 5.0, 
                             step = 0.1, value = H2_cost_USD_kgH2,
                             format = '%.1f',
                             help = '''Default value: \${}/kg
                             '''.format(default_H2_cost_USD_kgH2))
-        product_cost_USD_kgprod = st.slider(label = '{} cost (\$/kg {})'.format(product_name, product_name),
+        product_cost_USD_kgprod = st.slider(label = '{} cost (\$/kg$_{{{}}}$)'.format(product_name, product_name),
                             min_value = 0.0, 
                             max_value = 10.0, 
                             step = 0.1, value = product_cost_USD_kgprod,
@@ -851,7 +851,7 @@ with st.sidebar:
     
 with st.sidebar:
     st.subheader('Emissions assessment')
-    electricity_emissions_kgCO2_kWh = st.slider(label = 'Grid CO$_2$ intensity (kg$_{CO_2}$/kWh)',
+    electricity_emissions_kgCO2_kWh = st.slider(label = 'Grid CO₂ intensity (kg$_{CO_2}$/kWh)',
                         min_value = 0.0, 
                         max_value = 1.0, 
                         step = 0.01, value = electricity_emissions_kgCO2_kWh,
@@ -1095,8 +1095,8 @@ if not np.isnan(FE_product_checked):
     ###### ENERGY PIE CHART 
     with right_column.container(height = 455, border = False): 
         st.subheader('Process energy')
-        # st.write('Energy required: {:.0f} kJ/kg$_{{{}}}$'.format(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)], product_name) )
-        st.metric(label = 'Energy', value = r'{:.2f} kJ/kg {}'.format(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)], product_name),
+        # st.write('Energy required: {:.0f} kJ/kg$_{{{}}}}$'.format(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)], product_name) )
+        st.metric(label = 'Energy', value = r'{:.2f} MJ/kg {}'.format(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)]/1000, product_name),
                 delta = '{:.2f}%'.format(100*(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)] - energy_default)/energy_default),
                 delta_color = delta_color, label_visibility='collapsed') 
         # with _lock:
@@ -1113,7 +1113,7 @@ if not np.isnan(FE_product_checked):
                     # explode = 0.2*np.ones(len(df_opex.index),
                     )   
             axs.text(0, 0,  
-            'Energy: \n {:.0f} kJ/mol$_{{{}}}$'.format(sum((abs(df_energy.fillna(0).iloc[2:-2].loc[:, 'Energy (kJ/kg {})'.format(product_name)])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)']), product_name),
+            'Energy: \n {:.0f} kJ/mol$_{}$'.format(sum((abs(df_energy.fillna(0).iloc[2:-2].loc[:, 'Energy (kJ/kg {})'.format(product_name)])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)']), product_name),
             ha='center', va='center', 
             fontsize = MEDIUM_SIZE)  
             st.pyplot(energy_pie_fig, transparent = True, use_container_width = True)   
@@ -1122,7 +1122,7 @@ if not np.isnan(FE_product_checked):
     with middle_column.container(height = 455, border = False): 
         st.subheader('Emissions')
         if electricity_emissions_kgCO2_kWh > 0:
-            # st.write('Total emissions: {:.2f} kg$_{{CO_2}}$/kg$_{{{}}}$'.format(sum(df_energy.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)]), product_name ) )
+            # st.write('Total emissions: {:.2f} kg$_{CO_2}$/kg$_{{{}}}$'.format(sum(df_energy.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)]), product_name ) )
             st.metric(label = 'Emissions', value = r'{:.2f} kg CO2/kg {}'.format(sum(df_energy.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)]), product_name ) ,
                 delta = '{:.2f}%'.format(100*(sum(df_energy.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)])  - emissions_default)/emissions_default),
                 delta_color = delta_color, label_visibility='collapsed') 

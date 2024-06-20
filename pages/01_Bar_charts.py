@@ -449,7 +449,7 @@ with st.expander("**Help**", expanded = False):
 
 ###############################  IMPORT SOURCE DATA ###############################
 
-file_imports = r"Streamlit\DataForTEA.xlsx"
+file_imports = r"DataForTEA.xlsx"
 sheet_utility_imports = 'Utilities'
 sheet_constants =  'Constants and assumptions'
 sheet_products =  'Products'
