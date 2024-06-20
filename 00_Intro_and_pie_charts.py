@@ -295,7 +295,7 @@ BIGGER_SIZE = 27 # set
 # for font in font_manager.findSystemFonts(font_dir):
 #     font_manager.fontManager.addfont(font)
 mp.rc('font', family = 'sans-serif') # 'Arial' # font group is sans-serif
-print(plt.rcParams["font.sans-serif"][:])
+st.write(plt.rcParams["font.sans-serif"][:])
 plt.rcParams["font.sans-serif"] = ["Arial"]
 mp.rc('font', size=MEDIUM_SIZE)     # controls default text sizes if unspecified
 mp.rc('axes', titlesize=MEDIUM_SIZE)    # fontsize of the axes title; I think this is for subplots 

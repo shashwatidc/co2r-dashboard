@@ -295,7 +295,7 @@ BIGGER_SIZE = 27 # set
 # for font in font_manager.findSystemFonts(font_dir):
 #     font_manager.fontManager.addfont(font)
 mp.rc('font', family = 'sans-serif') # 'Arial' # font group is sans-serif
-print(plt.rcParams["font.sans-serif"][:])
+st.write(plt.rcParams["font.sans-serif"][:])
 plt.rcParams["font.sans-serif"] = ["Arial"]
 mp.rc('font', size=MEDIUM_SIZE)     # controls default text sizes if unspecified
 mp.rc('axes', titlesize=MEDIUM_SIZE)    # fontsize of the axes title; I think this is for subplots 
@@ -1795,7 +1795,7 @@ if not st.session_state.is_active_error:
             y_axis_major_ticks = y_axis_formatting(y_axis_min_emissions, y_axis_max_emissions, y_axis_num_emissions)
 
             ## Axis labels
-            axs.set_ylabel('Emissions \n (kg$_{CO_2}$/kg$_{{{}}}$)'.format(product_name))
+            axs.set_ylabel('Emissions \n (kg$_{{CO_2}}$/kg$_{{{}}}$)'.format(product_name))
             axs.set_xlabel(x_axis_label)
 
             ## Draw axis ticks
