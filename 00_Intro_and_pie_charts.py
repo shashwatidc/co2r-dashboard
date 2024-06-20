@@ -12,25 +12,16 @@ import pandas as pd
 import numpy as np
 
 import matplotlib as mp
-from matplotlib import ticker
-from matplotlib.ticker import AutoMinorLocator
+# from matplotlib import ticker
+# from matplotlib.ticker import AutoMinorLocator
 import matplotlib.pyplot as plt
-from matplotlib import cm
-from matplotlib import ticker
-from matplotlib.patches import Patch
-from matplotlib.lines import Line2D
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import animation
+# from matplotlib import cm
+# from matplotlib import ticker
+# from matplotlib.patches import Patch
+# from matplotlib.lines import Line2D
+# from mpl_toolkits.mplot3d import Axes3D
+# from matplotlib import animation
 from matplotlib import font_manager as fm
-
-import matplotlib.pyplot as plt
-from matplotlib import font_manager
-
-# font_path = '.streamlit/Arial.otf'  # Your font path goes here
-# font_manager.fontManager.addfont(font_path)
-# prop = font_manager.FontProperties(fname=font_path)
-# plt.rcParams['font.family'] = 'sans-serif'
-# plt.rcParams['font.sans-serif'] = prop.get_name()
 
 # import csv
 
@@ -300,6 +291,9 @@ st.set_page_config(page_title = 'CO2R Costing Dashboard - Home',
 SMALL_SIZE = 20 # set smallest font size
 MEDIUM_SIZE = 24 # set medium font size
 BIGGER_SIZE = 27 # set
+font_dir = ['/.streamlit/Arial']
+for font in font_manager.findSystemFonts(font_dir):
+    font_manager.fontManager.addfont(font)
 mp.rc('font', family = 'Arial') # font group is sans-serif
 mp.rc('font', size=MEDIUM_SIZE)     # controls default text sizes if unspecified
 mp.rc('axes', titlesize=MEDIUM_SIZE)    # fontsize of the axes title; I think this is for subplots 
