@@ -1,0 +1,9 @@
+[browser]
+gatherUsageStats = false
+
+[theme]
+base="light"
+primaryColor="#8f275d"
+
+[client]
+toolbarMode = "minimal"
