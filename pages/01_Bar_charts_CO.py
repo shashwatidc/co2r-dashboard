@@ -533,8 +533,10 @@ product_name = 'CO' # default
 range_selection = 'Linear' # default
 override_vbl_selection = 'Total current density' # default
 vbl_name = 'Current density' # default
-st.session_state.minimum_value_input = str(0.001)
-st.session_state.maximum_value_input = str(1500)
+if 'minimum_value_input' not in st.session_state:
+    st.session_state.minimum_value_input = str(0.001)
+if 'maximum_value_input' not in st.session_state:
+    st.session_state.maximum_value_input = str(1500)
 
 ########## OTHER FIXED VALUES
 # PRODUCT COSTS

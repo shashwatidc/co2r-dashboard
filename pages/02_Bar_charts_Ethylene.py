@@ -531,9 +531,10 @@ product_name = 'Ethylene' # default
 range_selection = 'Linear' # default
 override_vbl_selection = 'Total current density' # default
 vbl_name = 'Current density' # default
-st.session_state.minimum_value_input = str(0.001)
-st.session_state.maximum_value_input = str(1500)
-vbl_num = 11
+if 'minimum_value_input' not in st.session_state:
+    st.session_state.minimum_value_input = str(0.001)
+if 'maximum_value_input' not in st.session_state:
+    st.session_state.maximum_value_input = str(1500)
 
 ########## OTHER FIXED VALUES
 # PRODUCT COSTS
@@ -704,7 +705,7 @@ def updated_radio_state(df_flags):
     st.session_state.maximum_value_input = str(df_flags.loc[vbl_name, 'Range max'])
 
 df_flags = flags(product_name)
-    
+
 with st.sidebar:
     ## Initialize overridden_vbl_radio widget
 
@@ -721,11 +722,11 @@ with st.sidebar:
     try:
         st.write('Minimum value')
         vbl_max = float(st.text_input(label = 'Minimum value',
-                    key = 'minimum_value_input', # value = str(df_flags.loc[vbl_name, 'Range min']),  
+                    key = 'minimum_value_input', value = str(df_flags.loc[vbl_name, 'Range min']),  
                     label_visibility='collapsed'))
         st.write('Maximum value')
         vbl_min = float(st.text_input(label = 'Maximum value',
-                    key = 'maximum_value_input', # value = str(df_flags.loc[vbl_name, 'Range max']),
+                    key = 'maximum_value_input', value = str(df_flags.loc[vbl_name, 'Range max']),
                     label_visibility='collapsed'))
         
         st.write('Number of points (integer)')
