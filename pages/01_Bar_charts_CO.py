@@ -290,7 +290,10 @@ st.set_page_config(page_title = 'CO2R Costing Dashboard - CO bar charts',
 # All fonts and font sizes
 SMALL_SIZE = 20 # set smallest font size
 MEDIUM_SIZE = 24 # set medium font size
-BIGGER_SIZE = 27 # set
+BIGGER_SIZE = 27 # set# trigger core fonts for PDF backend
+mp.rcParams["pdf.use14corefonts"] = True
+# trigger core fonts for PS backend
+mp.rcParams["ps.useafm"] = True
 mp.rc('font', family = 'Arial') # font group is sans-serif
 mp.rc('font', size=MEDIUM_SIZE)     # controls default text sizes if unspecified
 mp.rc('axes', titlesize=MEDIUM_SIZE)    # fontsize of the axes title; I think this is for subplots 

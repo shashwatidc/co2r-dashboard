@@ -23,6 +23,15 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import animation
 from matplotlib import font_manager as fm
 
+import matplotlib.pyplot as plt
+from matplotlib import font_manager
+
+# font_path = '.streamlit/Arial.otf'  # Your font path goes here
+# font_manager.fontManager.addfont(font_path)
+# prop = font_manager.FontProperties(fname=font_path)
+# plt.rcParams['font.family'] = 'sans-serif'
+# plt.rcParams['font.sans-serif'] = prop.get_name()
+
 # import csv
 
 from datetime import datetime
@@ -291,6 +300,10 @@ st.set_page_config(page_title = 'CO2R Costing Dashboard - Home',
 SMALL_SIZE = 20 # set smallest font size
 MEDIUM_SIZE = 24 # set medium font size
 BIGGER_SIZE = 27 # set
+# trigger core fonts for PDF backend
+mp.rcParams["pdf.use14corefonts"] = True
+# trigger core fonts for PS backend
+mp.rcParams["ps.useafm"] = True
 mp.rc('font', family = 'Arial') # font group is sans-serif
 mp.rc('font', size=MEDIUM_SIZE)     # controls default text sizes if unspecified
 mp.rc('axes', titlesize=MEDIUM_SIZE)    # fontsize of the axes title; I think this is for subplots 
