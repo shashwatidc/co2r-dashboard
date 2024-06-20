@@ -291,9 +291,10 @@ st.set_page_config(page_title = 'CO2R Costing Dashboard - Home',
 SMALL_SIZE = 20 # set smallest font size
 MEDIUM_SIZE = 24 # set medium font size
 BIGGER_SIZE = 27 # set
-font_dir = ['/.streamlit/Arial']
-for font in font_manager.findSystemFonts(font_dir):
-    font_manager.fontManager.addfont(font)
+# font_dir = ['/.streamlit/Arial']
+# for font in font_manager.findSystemFonts(font_dir):
+#     font_manager.fontManager.addfont(font)
+mp.rc('font', family = 'sans-serif') # 'Arial' # font group is sans-serif
 mp.rc('font', family = 'Arial') # font group is sans-serif
 mp.rc('font', size=MEDIUM_SIZE)     # controls default text sizes if unspecified
 mp.rc('axes', titlesize=MEDIUM_SIZE)    # fontsize of the axes title; I think this is for subplots 
@@ -1117,7 +1118,7 @@ if not np.isnan(FE_product_checked):
                     # explode = 0.2*np.ones(len(df_opex.index),
                     )   
             axs.text(0, 0,  
-            'Energy: \n {:.0f} kJ/mol$_{}$'.format(sum((abs(df_energy.fillna(0).iloc[2:-2].loc[:, 'Energy (kJ/kg {})'.format(product_name)])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)']), product_name),
+            'Energy: \n {:.0f} kJ/mol$_{{{}}}$'.format(sum((abs(df_energy.fillna(0).iloc[2:-2].loc[:, 'Energy (kJ/kg {})'.format(product_name)])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)']), product_name),
             ha='center', va='center', 
             fontsize = MEDIUM_SIZE)  
             st.pyplot(energy_pie_fig, transparent = True, use_container_width = True)   

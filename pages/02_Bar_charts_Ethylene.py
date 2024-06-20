@@ -291,10 +291,10 @@ st.set_page_config(page_title = 'CO2R Costing Dashboard - CO bar charts',
 SMALL_SIZE = 20 # set smallest font size
 MEDIUM_SIZE = 24 # set medium font size
 BIGGER_SIZE = 27 # set
-font_dir = ['/.streamlit/Arial']
-for font in font_manager.findSystemFonts(font_dir):
-    font_manager.fontManager.addfont(font)
-mp.rc('font', family = 'Arial') # font group is sans-serif
+# font_dir = ['/.streamlit/Arial']
+# for font in font_manager.findSystemFonts(font_dir):
+#     font_manager.fontManager.addfont(font)
+mp.rc('font', family = 'sans-serif') # 'Arial' # font group is sans-serif
 mp.rc('font', size=MEDIUM_SIZE)     # controls default text sizes if unspecified
 mp.rc('axes', titlesize=MEDIUM_SIZE)    # fontsize of the axes title; I think this is for subplots 
 mp.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
@@ -862,7 +862,7 @@ with st.sidebar:
                             value = 5, label_visibility='collapsed')
         st.write('Number of potential y-ticks, including endpoints (integer)')
         y_axis_num_potential = st.text_input(label = 'E y-axis ticks',
-                            value = 5, label_visibility='collapsed')
+                            value = 6, label_visibility='collapsed')
         try:
             y_axis_min_potential = float(y_axis_min_potential)
             y_axis_max_potential = float(y_axis_max_potential)
@@ -881,10 +881,10 @@ with st.sidebar:
                             value = 0, label_visibility='collapsed',)
         st.write('Energy y-axis maximum')
         y_axis_max_energy = st.text_input(label = 'energy y-axis maximum',
-                            value = 2000, label_visibility='collapsed')
+                            value = 15000, label_visibility='collapsed')
         st.write('Number of energy y-ticks, including endpoints (integer)')
         y_axis_num_energy = st.text_input(label = 'energy y-axis ticks',
-                            value = 7, label_visibility='collapsed')
+                            value = 4, label_visibility='collapsed')
         try:
             y_axis_min_energy = float(y_axis_min_energy)
             y_axis_max_energy = float(y_axis_max_energy)
@@ -903,10 +903,10 @@ with st.sidebar:
                             value = 0, label_visibility='collapsed',)
         st.write('Emissions y-axis maximum')
         y_axis_max_emissions = st.text_input(label = 'emissions y-axis maximum',
-                            value = 6, label_visibility='collapsed')
+                            value = 50, label_visibility='collapsed')
         st.write('Number of emissions y-ticks, including endpoints (integer)')
         y_axis_num_emissions = st.text_input(label = 'emissions y-axis ticks',
-                            value = 7, label_visibility='collapsed')
+                            value = 6, label_visibility='collapsed')
         try:
             y_axis_min_emissions = float(y_axis_min_emissions)
             y_axis_max_emissions = float(y_axis_max_emissions)
