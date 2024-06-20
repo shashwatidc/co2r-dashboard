@@ -22,6 +22,7 @@
 # %%
 # UNCOMMENT TO RUN STANDALONE
 
+import streamlit as st
 import pandas as pd
 import numpy as np
 
@@ -32,6 +33,7 @@ import numpy as np
 # ### 1.1 Create blank stream table
 
 # %%
+@st.cache_data
 def blank_stream_table(product_name):
     """
     Generates a skeleton dataframe for streams and hard codes stream numbers. These are based on the assumed PFD
@@ -81,6 +83,7 @@ def blank_stream_table(product_name):
 # ### 1.2 Electrolyzer and separator units for mass balances
 
 # %%
+@st.cache_data
 def update_stream_table(product_name, 
                         df_products, # product data - MW 
                         df_streams, 
@@ -387,6 +390,7 @@ def update_stream_table(product_name,
 # #### 1.2.1 Ideal work of separation
 
 # %%
+@st.cache_data
 def work_of_sep_kJ(x, 
                    PSA_second_law_efficiency,
                    T_sep,
@@ -406,6 +410,7 @@ def work_of_sep_kJ(x,
     return real_work_of_sep
 
 # %%
+@st.cache_data
 def energy_table(product_name,
                  df_products,
                  df_potentials,

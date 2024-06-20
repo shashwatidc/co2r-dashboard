@@ -21,6 +21,7 @@
 # ### 0.1. Imports and styling
 
 # %%
+import streamlit as st
 import pandas as pd
 import numpy as np
 from scipy import optimize
@@ -33,7 +34,7 @@ from scipy import optimize
 
 # %%
 ### Other units
-
+@st.cache_data
 def kg_day_to_kg_s(rate_kg_day):
     """
     Convert mass flow rate in kg/day to kg/s
@@ -43,6 +44,7 @@ def kg_day_to_kg_s(rate_kg_day):
     
     return rate_kg_s
 
+@st.cache_data
 def kg_s_to_mol_s(rate_kg_s, MW):
     """
     Convert mass flow rate in kg/s to mole flow rate in mol/s
@@ -53,6 +55,7 @@ def kg_s_to_mol_s(rate_kg_s, MW):
     
     return rate_mol_s
 
+@st.cache_data
 def mol_s_to_sccm(rate_mol_s, R, P = 101325, T = 298.15):
     """
     Convert mole flow rate in mol/s to volumetric flow rate in standard cubic cm per minute
@@ -63,6 +66,7 @@ def mol_s_to_sccm(rate_mol_s, R, P = 101325, T = 298.15):
     
     return rate_sccm
 
+@st.cache_data
 def mol_s_to_mA(rate_mol_s, n, F):
     """
     Convert mole flow rate in mol/s to current in mA
@@ -77,6 +81,7 @@ def mol_s_to_mA(rate_mol_s, n, F):
 # ### 2.2 Electrolyzer area
 
 # %%
+@st.cache_data
 def electrolyzer_area(i_total_mA, j_total_mA_cm2):
     """
     Use maximum allowed current density and desired current to compute total area
@@ -92,6 +97,7 @@ def electrolyzer_area(i_total_mA, j_total_mA_cm2):
 # ### 2.3 Currents
 
 # %%
+@st.cache_data
 def currents(    
     product_rate_mol_s,
     FE_product,
@@ -124,6 +130,7 @@ def currents(
 # ## 3. Electrolyzer model
 
 # %%
+@st.cache_data
 def voltage_to_energy(E_V, i_total_mA, product_rate_kg_s, product_rate_mol_s):
     power_kW = (E_V * i_total_mA/1000)/1000 # P = IV
     energy_kJ_kgproduct = power_kW/product_rate_kg_s 
@@ -132,6 +139,7 @@ def voltage_to_energy(E_V, i_total_mA, product_rate_kg_s, product_rate_mol_s):
     return power_kW, energy_kJ_kgproduct, energy_kJ_molproduct
 
 # %%
+@st.cache_data
 def cell_voltage(
     product_name,    
     product_rate_kg_day,
@@ -325,6 +333,7 @@ def cell_voltage(
     return df_electrolyzer_assumptions, df_potentials
 
 # %%
+@st.cache_data
 def potential_to_energy(V, 
                         i, 
                         prod_rate):
@@ -343,6 +352,7 @@ def potential_to_energy(V,
 # ## 4. Stream compositions
 
 # %%
+@st.cache_data
 def eqn_known_SPC_jtotal(FE_product,
              j_total,
              FE_CO2R_0,
@@ -376,6 +386,7 @@ def eqn_known_SPC_jtotal(FE_product,
     return LHS
 
 # %%
+@st.cache_data
 def SPC_check(FE_product_specified,
               exponent, 
               scaling,
@@ -500,6 +511,7 @@ def SPC_check(FE_product_specified,
     return FE_product, SPC
 
 # %%
+@st.cache_data
 def electrolyzer_SS_mass_balance(
     product_name,
     product_rate_kg_day,

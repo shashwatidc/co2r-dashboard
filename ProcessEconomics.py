@@ -33,6 +33,7 @@ from scipy import optimize
 # %%
 ### Save costs to dataframe
 
+@st.cache_data
 def costing_assumptions(
     product_name,
     product_cost_USD_kgprod,
@@ -71,6 +72,7 @@ def costing_assumptions(
 # ### 1.1 Electrolyzer capex
 
 # %%
+@st.cache_data
 def capex(
     product_name,
     area_m2 , 
@@ -178,6 +180,7 @@ def capex(
 # ## 2. Sales
 
 # %%
+@st.cache_data
 def sales(
     product_name,
     df_streams,
@@ -222,6 +225,7 @@ def sales(
 # ### 3.1 Feedstocks
 
 # %%
+@st.cache_data
 def feedstocks(
     df_costing_assumptions,
     df_streams,
@@ -255,6 +259,7 @@ def feedstocks(
 # #### 3.2.1 Get utilities based on energy demands
 
 # %%
+@st.cache_data
 def utilities(df_energy,
               product_rate_kg_day,
               capacity_factor,
@@ -280,6 +285,7 @@ def utilities(df_energy,
 # ### 3.3 Operations
 
 # %%
+@st.cache_data
 def operations(
     capacity_factor,
 ):
@@ -314,6 +320,7 @@ def operations(
 # ### 3.4 Maintenance
 
 # %%
+@st.cache_data
 def maintenance(
     C_TDC
 ):
@@ -344,6 +351,7 @@ def maintenance(
 # ### 3.5 Operating overhead
 
 # %%
+@st.cache_data
 def overhead(df_maintenance,
             df_operations):
     
@@ -374,6 +382,7 @@ def overhead(df_maintenance,
 # ### 3.6 Property taxes and insurance
 
 # %%
+@st.cache_data
 def taxes(C_TDC):
     # Create dataframe
     df_taxes = pd.DataFrame(columns = [ 'Stage', 'Description', 'Cost ($/yr)']).astype({'Stage':'string', 
@@ -391,6 +400,7 @@ def taxes(C_TDC):
 # ### 3.7 Depreciation
 
 # %%
+@st.cache_data
 def depreciation(
     C_TDC,
     C_alloc
@@ -418,6 +428,7 @@ def depreciation(
 # ### 3.8 General expenses
 
 # %%
+@st.cache_data
 def general(
     df_sales
 ):
@@ -455,6 +466,7 @@ def general(
 # %%
 # For all subparts of opex, calculate totals 
 
+@st.cache_data
 def totals(df,
           product_name,
           product_rate_kg_day ,
@@ -474,6 +486,7 @@ def totals(df,
 # #### 3.9.2 Generate summary tables
 
 # %%
+@st.cache_data
 def opex_seider(df_feedstocks,
         df_capex_totals,
         df_utilities,
@@ -535,6 +548,7 @@ def opex_seider(df_feedstocks,
     return df_opex, df_opex_totals   
 
 # %%
+@st.cache_data
 def opex_sinnott(C_ISBL, # currently C_TDC
                  df_feedstocks,
                  df_utilities,
@@ -620,6 +634,7 @@ def opex_sinnott(C_ISBL, # currently C_TDC
 # ### 4.1 Generate cashflow table
 
 # %%
+@st.cache_data
 def cashflow_years(    
     plant_lifetime,
     depreciation_schedule, # 'MACRS' or 'linear'
@@ -692,6 +707,7 @@ def cashflow_years(
 # ### 4.2 Equation to determine the IRR
 
 # %%
+@st.cache_data
 def eqn_IRR(    
     x, # interest %
     plant_lifetime,
@@ -727,6 +743,7 @@ def eqn_IRR(
     return LHS
 
 # %%
+@st.cache_data
 def calculate_IRR(   
     plant_lifetime,
     depreciation_schedule, # 'MACRS' or 'linear'
@@ -767,6 +784,7 @@ def calculate_IRR(
 # ### 4.3 Calculate breakeven product price
 
 # %%
+@st.cache_data
 def eqn_breakeven_price(  
     x, # product price per kg
     plant_lifetime,
@@ -806,6 +824,7 @@ def eqn_breakeven_price(
     return LHS
 
 # %%
+@st.cache_data
 def calculate_breakeven_price(
     plant_lifetime,
     depreciation_schedule, # 'MACRS' or 'linear'
@@ -847,6 +866,7 @@ def calculate_breakeven_price(
     return breakeven_price_USD_kgprod
 
 # %%
+@st.cache_data
 def approx_ROI(
     S, # = df_sales.loc['Total', 'Earnings ($/yr)'],
     C, #= df_opex`_totals.loc['Production cost', 'Cost ($/yr)'], 
@@ -859,6 +879,7 @@ def approx_ROI(
     return ROI
 
 # %%
+@st.cache_data
 def approx_PBP(
         C_TDC,
         S, # = df_sales.loc['Total', 'Earnings ($/yr)'],

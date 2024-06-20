@@ -12,15 +12,15 @@ import pandas as pd
 import numpy as np
 
 import matplotlib as mp
-# from matplotlib import ticker
-# from matplotlib.ticker import AutoMinorLocator
+from matplotlib import ticker
+from matplotlib.ticker import AutoMinorLocator
 import matplotlib.pyplot as plt
 from matplotlib import cm
-# from matplotlib import ticker
-# from matplotlib.patches import Patch
-# from matplotlib.lines import Line2D
-# from mpl_toolkits.mplot3d import Axes3D
-# from matplotlib import animation
+from matplotlib import ticker
+from matplotlib.patches import Patch
+from matplotlib.lines import Line2D
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import animation
 
 # import csv
 
@@ -39,7 +39,7 @@ import openpyxl
 # import openpyxl.utils.cell
 # from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font
 
-# from scipy import optimize
+from scipy import optimize
 
 # from IPython.display import display, HTML, clear_output
 

@@ -12,15 +12,15 @@ import pandas as pd
 import numpy as np
 
 import matplotlib as mp
-# from matplotlib import ticker
+from matplotlib import ticker
 from matplotlib.ticker import AutoMinorLocator
 import matplotlib.pyplot as plt
 from matplotlib import cm
-# from matplotlib import ticker
-# from matplotlib.patches import Patch
-# from matplotlib.lines import Line2D
-# from mpl_toolkits.mplot3d import Axes3D
-# from matplotlib import animation
+from matplotlib import ticker
+from matplotlib.patches import Patch
+from matplotlib.lines import Line2D
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import animation
 
 # import csv
 
@@ -37,7 +37,7 @@ import openpyxl
 # import openpyxl.utils.cell
 # from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font
 
-# from scipy import optimize
+from scipy import optimize
 
 # from IPython.display import display, HTML, clear_output
 
@@ -419,9 +419,8 @@ Blues = mp.colormaps['Blues']
 # _lock = RendererAgg.lock # Lock figures so that concurrent users/threads can coexist independently
 
 st.title("CO$_2$R Costing Dashboard: Bar charts for CO$_2$R to Ethylene")
-st.write('''This tool generates the capital and operating cost for a CO$_2$ reduction process converting captured CO$_2$ 
-         into either CO or ethylene. :red[It is based on the model in our paper [__]()]. 
-        ''')
+st.write('''See how the capital and operating cost vary with changes in the process for CO$_2$ reduction to ethylene. 
+         :red[It is based on the model in our paper [__]()]. ''')
 st.write("**Cite this work: __**")
 st.write("Questions, collaborations, requests? Contact Shashwati da Cunha ([shashwatidc@utexas.edu](mailto:shashwatidc@utexas.edu)).")
 # st.write(
