@@ -42,6 +42,8 @@ import openpyxl
 
 from scipy import optimize
 
+from pathlib import Path
+
 # from IPython.display import display, HTML, clear_output
 
 # import import_ipynb
@@ -291,11 +293,11 @@ st.set_page_config(page_title = 'CO2R Costing Dashboard - Home',
 SMALL_SIZE = 20 # set smallest font size
 MEDIUM_SIZE = 24 # set medium font size
 BIGGER_SIZE = 27 # set
-# font_dir = ['/.streamlit/Arial/Arial']
-# for font in font_manager.findSystemFonts(font_dir):
-#     font_manager.fontManager.addfont(font)
+font_dir = Path(mpl.get_data_path(), r'/.streamlit/Arial')
+for font in font_manager.findSystemFonts(font_dir):
+    font_manager.fontManager.addfont(fontpaths = font)
 # mp.rc('font', family = 'sans-serif') # 'Arial' # font group is sans-serif
-plt.rcParams["font.family"] = "Arial"
+mp.rcParams["font.family"] = "Arial"
 st.write(mp.rcParams["font.sans-serif"][:])
 # mp.rcParams["font.sans-serif"] = ["Nimbus Sans"]
 mp.rc('font', size=MEDIUM_SIZE)     # controls default text sizes if unspecified
