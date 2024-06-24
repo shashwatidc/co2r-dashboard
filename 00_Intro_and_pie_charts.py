@@ -1202,14 +1202,18 @@ if not np.isnan(FE_product_checked):
                     label_properies = dict(arrowprops=dict(arrowstyle="-"),
                                         bbox=box_properties, zorder=0, va="center")
                     for i, wedge in enumerate(wedges):
-                        middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1
+                        middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1 # in radians
                         y_posn = np.sin(np.deg2rad(middle_angle))
                         x_posn = np.cos(np.deg2rad(middle_angle))
                         horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
-                        connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
-                        label_properies["arrowprops"].update({"connectionstyle": connectionstyle})
-                        axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), xytext=(2.5*np.sign(x_posn), 3.1*y_posn),
-                                    horizontalalignment=horizontalalignment, **label_properies)
+                        if middle_angle < np.pi/8:
+                            connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
+                            label_properies["arrowprops"].update({"connectionstyle": connectionstyle})
+                            axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), xytext=(2.5*np.sign(x_posn), 3.1*y_posn),
+                                        horizontalalignment=horizontalalignment, **label_properies)
+                        else:                            
+                            axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), xytext=(x_posn*2, y_posn*2),
+                                        horizontalalignment=horizontalalignment)
 
                     st.pyplot(emissions_pie_fig, transparent = True, use_container_width = True)   
 
