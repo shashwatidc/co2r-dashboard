@@ -1,3 +1,2 @@
-apt-get update
-apt-get install ttf-mscorefonts-installer
-apt-get install fontconfig
+ttf-mscorefonts-installer
+fontconfig
