@@ -291,13 +291,8 @@ st.set_page_config(page_title = 'CO2R Costing Dashboard - CO bar charts',
 SMALL_SIZE = 20 # set smallest font size
 MEDIUM_SIZE = 24 # set medium font size
 BIGGER_SIZE = 27 # set# trigger core fonts for PDF backend
-# font_dir = ['/.streamlit/Arial']
-# for font in font_manager.findSystemFonts(font_dir):
-#     font_manager.fontManager.addfont(font)
-mp.rc('font', family = 'sans-serif') # 'Arial' # font group is sans-serif
-# st.write(plt.rcParams["font.sans-serif"][:]) # [  "DejaVu Sans",   "Bitstream Vera Sans",   "Computer Modern Sans Serif",   
-# "Lucida Grande",   "Verdana",   "Geneva",   "Lucid",   "Arial",   "Helvetica",   "Avant Garde",   "sans-serif"]
-mp.rcParams["font.sans-serif"] = ["Arial"]
+mp.rcParams["font.family"] = "sans-serif"
+mp.rcParams["font.sans-serif"] = "Aerial"
 mp.rc('font', size=MEDIUM_SIZE)     # controls default text sizes if unspecified
 mp.rc('axes', titlesize=MEDIUM_SIZE)    # fontsize of the axes title; I think this is for subplots 
 mp.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
