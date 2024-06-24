@@ -297,7 +297,7 @@ BIGGER_SIZE = 27 # set
 # mp.rc('font', family = 'sans-serif') # 'Arial' # font group is sans-serif
 mp.rcParams["font.family"] = "sans-serif"
 st.write(mp.rcParams["font.sans-serif"][:])
-mp.rcParams["font.sans-serif"] = ["Nimbus Sans"]
+# mp.rcParams["font.sans-serif"] = ["Nimbus Sans"]
 mp.rc('font', size=MEDIUM_SIZE)     # controls default text sizes if unspecified
 mp.rc('axes', titlesize=MEDIUM_SIZE)    # fontsize of the axes title; I think this is for subplots 
 mp.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
