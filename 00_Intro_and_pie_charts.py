@@ -295,7 +295,7 @@ BIGGER_SIZE = 27 # set
 # for font in font_manager.findSystemFonts(font_dir):
 #     font_manager.fontManager.addfont(font)
 # mp.rc('font', family = 'sans-serif') # 'Arial' # font group is sans-serif
-mp.rcParams["font.family"] = "sans-serif"
+plt.rcParams["font.family"] = "Arial"
 st.write(mp.rcParams["font.sans-serif"][:])
 # mp.rcParams["font.sans-serif"] = ["Nimbus Sans"]
 mp.rc('font', size=MEDIUM_SIZE)     # controls default text sizes if unspecified
