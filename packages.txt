@@ -1,2 +1,1 @@
 fonts-liberation2
-fonts-arkpandora

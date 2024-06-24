@@ -21,7 +21,8 @@ import matplotlib.pyplot as plt
 # from matplotlib.lines import Line2D
 # from mpl_toolkits.mplot3d import Axes3D
 # from matplotlib import animation
-from matplotlib import font_manager
+# from matplotlib import font_manager
+import threading
 
 # import csv
 
@@ -33,12 +34,12 @@ from datetime import datetime
 # from os.path import exists
 # import os
 
-import openpyxl
+# import openpyxl
 # from openpyxl.worksheet.dimensions import ColumnDimension, DimensionHolder
 # import openpyxl.utils.cell
 # from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font
 
-from scipy import optimize
+# from scipy import optimize
 
 # from IPython.display import display, HTML, clear_output
 
@@ -273,13 +274,14 @@ def default_single_run(product_name,
     emissions_default = sum(df_energy_default.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)])
     return capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default, NPV_default
 
+_render_lock = threading.RLock()
 
 ###################################################################################
 ################################### FORMATTING ####################################
 ###################################################################################
 
 # Streamlit page formatting
-st.set_page_config(page_title = 'CO2R Costing Dashboard - CO bar charts', 
+st.set_page_config(page_title = 'CO2R Costing Dashboard - Ethylene bar charts', 
                    page_icon = ":test_tube:",
                    initial_sidebar_state= 'expanded',
                    menu_items= {'Report a bug': 'mailto:shashwatidc@utexas.edu', },
@@ -718,11 +720,11 @@ with st.sidebar:
     try:
         st.write('Minimum value')
         vbl_max = float(st.text_input(label = 'Minimum value',
-                    key = 'minimum_value_input', value = str(df_flags.loc[vbl_name, 'Range min']),  
+                    key = 'minimum_value_input',# value = str(df_flags.loc[vbl_name, 'Range min']),  
                     label_visibility='collapsed'))
         st.write('Maximum value')
         vbl_min = float(st.text_input(label = 'Maximum value',
-                    key = 'maximum_value_input', value = str(df_flags.loc[vbl_name, 'Range max']),
+                    key = 'maximum_value_input',#  value = str(df_flags.loc[vbl_name, 'Range max']),
                     label_visibility='collapsed'))
         
         st.write('Number of points (integer)')
@@ -1488,60 +1490,62 @@ if not st.session_state.is_active_error:
 
     ###### CAPEX BAR CHART
     with middle_column.container(height = 300, border = False):  
-        capex_bar_fig, axs = plt.subplots() # Set up plot
-        #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
+        with _render_lock:
+            capex_bar_fig, axs = plt.subplots() # Set up plot
+            #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
 
-        y_axis_major_ticks = y_axis_formatting(y_axis_min_capex, y_axis_max_capex, y_axis_num_capex)
+            y_axis_major_ticks = y_axis_formatting(y_axis_min_capex, y_axis_max_capex, y_axis_num_capex)
 
-        ## Axis labels
-        axs.set_ylabel('Capital cost (million \$)')
-        axs.set_xlabel(x_axis_label)
+            ## Axis labels
+            axs.set_ylabel('Capital cost (million \$)')
+            axs.set_xlabel(x_axis_label)
 
-        ## Draw axis ticks
-        axs.xaxis.set_minor_locator(AutoMinorLocator(2)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
-        axs.yaxis.set_minor_locator(AutoMinorLocator(5)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
-        plt.xticks(x_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
-        plt.yticks(y_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
+            ## Draw axis ticks
+            axs.xaxis.set_minor_locator(AutoMinorLocator(2)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
+            axs.yaxis.set_minor_locator(AutoMinorLocator(5)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
+            plt.xticks(x_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
+            plt.yticks(y_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
 
-        ## Apply axis limits
-        axs.set_xlim([x_axis_min,x_axis_max])
-        axs.set_ylim([y_axis_min_capex,y_axis_max_capex])
+            ## Apply axis limits
+            axs.set_xlim([x_axis_min,x_axis_max])
+            axs.set_ylim([y_axis_min_capex,y_axis_max_capex])
 
-        ## Plot series
-        if df_flags.loc['Capacity factor', 'T/F?'] == True: # or df_flags.loc['Renewables capacity factor', 'T/F?'] == True:
-            axs.plot([0.23625,0.23625], [y_axis_min_capex, y_axis_max_capex], alpha = 1,
-                c = theme_colors[6]) # Plot line for cost 
-            axs.text(0.23625, y_axis_min_capex + (y_axis_max_capex - y_axis_min_capex)*0.025, 'Solar capacity', ha='right', va='bottom', #  (5.67 h/day)
-                fontsize = SMALL_SIZE, rotation = 90)
-        if df_flags.loc['{} production rate'.format(product_name), 'T/F?'] == True:
-            axs.text(x_axis_max*0.1, y_axis_max_capex*0.975, 'Lifetime sales', #.format(product_cost_USD_kgprod*product_rate_kg_day*capacity_factor*365*20/1e6), 
-                    ha='left', va='top', 
-                fontsize = SMALL_SIZE)
-            axs.plot([x_axis_min, x_axis_max], 
-                [product_cost_USD_kgprod*df_electrolyzer_assumptions_vs_vbl.loc['Production rate'][0]*capacity_factor*365*20/1e6,
-                product_cost_USD_kgprod*df_electrolyzer_assumptions_vs_vbl.loc['Production rate'][-1]*capacity_factor*365*20/1e6 ],
-                alpha = 1, c = theme_colors[6]) # Plot line for cost 
-            plt.xticks(rotation=35)  # Rotate text labels
-        else:
-            axs.text(x_axis_max*0.975, y_axis_max_capex*0.975, 'Lifetime sales: ${:.0f} million'.format(product_cost_USD_kgprod*product_rate_kg_day*capacity_factor*365*20/1e6), ha='right', va='top', 
-                fontsize = SMALL_SIZE)
-        
-        cumsum = 0
-        for i, category in enumerate(df_capex_BM_vs_vbl.index):
-            axs.bar(vbl_range, df_capex_BM_vs_vbl.fillna(0).loc[category]/1e6, label=category , bottom = cumsum, width = barwidth, color = BM_capex_colors[i],
-                edgecolor = 'w', linewidth = linewidth_calc)
-            cumsum += df_capex_BM_vs_vbl.fillna(0).loc[category]/1e6
-        axs.plot(vbl_range, 
-                df_capex_totals_vs_vbl.loc['Total permanent investment']/1e6, # All capex except working capital, which is recovered during operation
-                label = 'Total permanent investment', alpha = 1, c = theme_colors[6]) # Plot line for Total permanent investment cost 
+            ## Plot series
+            if df_flags.loc['Capacity factor', 'T/F?'] == True: # or df_flags.loc['Renewables capacity factor', 'T/F?'] == True:
+                axs.plot([0.23625,0.23625], [y_axis_min_capex, y_axis_max_capex], alpha = 1,
+                    c = theme_colors[6]) # Plot line for cost 
+                axs.text(0.23625, y_axis_min_capex + (y_axis_max_capex - y_axis_min_capex)*0.025, 'Solar capacity', ha='right', va='bottom', #  (5.67 h/day)
+                    fontsize = SMALL_SIZE, rotation = 90)
+            if df_flags.loc['{} production rate'.format(product_name), 'T/F?'] == True:
+                axs.text(x_axis_max*0.1, y_axis_max_capex*0.975, 'Lifetime sales', #.format(product_cost_USD_kgprod*product_rate_kg_day*capacity_factor*365*20/1e6), 
+                        ha='left', va='top', 
+                    fontsize = SMALL_SIZE)
+                axs.plot([x_axis_min, x_axis_max], 
+                    [product_cost_USD_kgprod*df_electrolyzer_assumptions_vs_vbl.loc['Production rate'][0]*capacity_factor*365*20/1e6,
+                    product_cost_USD_kgprod*df_electrolyzer_assumptions_vs_vbl.loc['Production rate'][-1]*capacity_factor*365*20/1e6 ],
+                    alpha = 1, c = theme_colors[6]) # Plot line for cost 
+                plt.xticks(rotation=35)  # Rotate text labels
+            else:
+                axs.text(x_axis_max*0.975, y_axis_max_capex*0.975, 'Lifetime sales: ${:.0f} million'.format(product_cost_USD_kgprod*product_rate_kg_day*capacity_factor*365*20/1e6), ha='right', va='top', 
+                    fontsize = SMALL_SIZE)
+            
+            cumsum = 0
+            for i, category in enumerate(df_capex_BM_vs_vbl.index):
+                axs.bar(vbl_range, df_capex_BM_vs_vbl.fillna(0).loc[category]/1e6, label=category , bottom = cumsum, width = barwidth, color = BM_capex_colors[i],
+                    edgecolor = 'w', linewidth = linewidth_calc)
+                cumsum += df_capex_BM_vs_vbl.fillna(0).loc[category]/1e6
+            axs.plot(vbl_range[df_capex_totals_vs_vbl.loc['Total permanent investment'] > 0], 
+                    df_capex_totals_vs_vbl.loc['Total permanent investment', df_capex_totals_vs_vbl.loc['Total permanent investment'] > 0]/1e6, # All capex except working capital, which is recovered during operation
+                    label = 'Total permanent investment', alpha = 1, c = theme_colors[6]) # Plot line for Total permanent investment cost 
 
-        ## Legend
-        axs.legend(bbox_to_anchor=(1, 1), loc='upper left', reverse = True) # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
+            ## Legend
+            axs.legend(bbox_to_anchor=(1, 1), loc='upper left', reverse = True) # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
 
-        st.pyplot(capex_bar_fig, transparent = True, use_container_width = True)
+            st.pyplot(capex_bar_fig, transparent = True, use_container_width = True)
 
     ###### OPEX BAR CHART 
     with right_column.container(height = 300, border = False): 
+        with _render_lock:
             opex_bar_fig, axs = plt.subplots() # Set up plot
 
             y_axis_major_ticks = y_axis_formatting(y_axis_min_opex, y_axis_max_opex, y_axis_num_opex)
@@ -1591,76 +1595,77 @@ if not st.session_state.is_active_error:
 
     ###### LEVELIZED BAR CHART
     with middle_column.container(height = 300, border = False): 
-        levelized_bar_fig, axs = plt.subplots() # Set up plot
-        #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
+        with _render_lock:
+            levelized_bar_fig, axs = plt.subplots() # Set up plot
+            #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
 
-        y_axis_major_ticks = y_axis_formatting(y_axis_min_levelized, y_axis_max_levelized, y_axis_num_levelized)
+            y_axis_major_ticks = y_axis_formatting(y_axis_min_levelized, y_axis_max_levelized, y_axis_num_levelized)
 
-        ## Axis labels
-        axs.set_ylabel('Levelized cost \n (\$/kg$_{{{}}}$)'.format(product_name))
-        axs.set_xlabel(x_axis_label)
-        
-        ## Draw axis ticks
-        axs.xaxis.set_minor_locator(AutoMinorLocator(2)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
-        axs.yaxis.set_minor_locator(AutoMinorLocator(5)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
-        plt.xticks(x_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
-        plt.yticks(y_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
-
-        ## Apply axis limits
-        axs.set_xlim([x_axis_min,x_axis_max])
-        axs.set_ylim([y_axis_min_levelized,y_axis_max_levelized])
-
-        ## Plot series
-        axs.plot([x_axis_min, x_axis_max],
-                [df_costing_assumptions_vs_vbl.loc[product_name][0],df_costing_assumptions_vs_vbl.loc[product_name][-1]],
-                alpha = 1, 
-                c = theme_colors[6]) # Plot line for cost 
-        axs.text(x_axis_max * 1.025, product_cost_USD_kgprod, 'Market price', ha='left', va='center', 
-                fontsize = SMALL_SIZE)
-        
-        # Additional lines
-        if df_flags.loc['Capacity factor', 'T/F?'] == True: # or df_flags.loc['Renewables capacity factor', 'T/F?'] == True:
-            axs.plot([0.23625,0.23625], [y_axis_min_levelized, y_axis_max_levelized], alpha = 1,
-                c = theme_colors[6]) # Plot line for solar 
-            axs.text(0.23625, y_axis_max_levelized*0.975, 'Average solar', ha='right', va='top', 
-                fontsize = SMALL_SIZE, rotation = 90)
-    #     axs.plot([0.0677,0.0677], [y_axis_min, y_axis_max], alpha = 1,
-    #              c = theme_colors[6]) # Plot line for solar 
-    #     axs.text(0.0677, y_axis_max*0.975, 'Texas (EIA, Jul 2023)', ha='right', va='top', 
-    #               fontsize = SMALL_SIZE, rotation = 90)
-
-        axs.plot(vbl_range[df_opex_totals_vs_vbl.loc['Levelized cost'] > 0], 
-                df_opex_totals_vs_vbl.loc['Levelized cost', df_opex_totals_vs_vbl.loc['Levelized cost'] > 0],
-                label = 'Levelized cost', alpha = 1, c = theme_colors[6]) # Plot line for total levelized cost
-                # Levelized cost includes all capex except working capital, which is recovered during operation
-        
-        cumsum = 0
-        for i, category in enumerate(df_opex.index):
-            axs.bar(vbl_range, df_opex_vs_vbl.fillna(0).loc[category], label=category , bottom = cumsum, width = barwidth, color = opex_colors[i],
-                edgecolor = 'w', linewidth = linewidth_calc)
-            cumsum += df_opex_vs_vbl.fillna(0).loc[category]
+            ## Axis labels
+            axs.set_ylabel('Levelized cost \n (\$/kg$_{{{}}}$)'.format(product_name))
+            axs.set_xlabel(x_axis_label)
             
-        for i, category in enumerate(df_capex_BM_vs_vbl.index):      
-            axs.bar(vbl_range, df_capex_BM_vs_vbl.fillna(0).loc[category]/(df_costing_assumptions_vs_vbl.loc['Plant lifetime']*365*df_costing_assumptions_vs_vbl.loc['Capacity factor']*df_electrolyzer_assumptions_vs_vbl.loc['Production rate']),
-                    label=category , bottom = cumsum, width = barwidth, color = BM_capex_colors[i],
-                edgecolor = 'w', linewidth = linewidth_calc)
-            cumsum += df_capex_BM_vs_vbl.fillna(0).loc[category]/(df_costing_assumptions_vs_vbl.loc['Plant lifetime']*365*df_costing_assumptions_vs_vbl.loc['Capacity factor']*df_electrolyzer_assumptions_vs_vbl.loc['Production rate'])
-        
-        if df_flags.loc['{} production rate'.format(product_name), 'T/F?'] == True:
-            plt.xticks(rotation=35)  # Rotate text labels
+            ## Draw axis ticks
+            axs.xaxis.set_minor_locator(AutoMinorLocator(2)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
+            axs.yaxis.set_minor_locator(AutoMinorLocator(5)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
+            plt.xticks(x_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
+            plt.yticks(y_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
 
-        if df_flags.loc['Electricity cost', 'T/F?'] == True:
-            axs.text(df_utility_imports.loc['Electricity - current US mix','Cost ($/kWh)'], 
-                    y_axis_max*0.975, 'U.S. average industrial', ha='right', va='top', 
-                fontsize = SMALL_SIZE, rotation = 90)
-            axs.plot([df_utility_imports.loc['Electricity - current US mix', 'Cost ($/kWh)'], df_utility_imports.loc['Electricity - current US mix', 'Cost ($/kWh)']], 
-                    [y_axis_min, y_axis_max], alpha = 1,
-                c = theme_colors[6]) # Plot line for cost 
+            ## Apply axis limits
+            axs.set_xlim([x_axis_min,x_axis_max])
+            axs.set_ylim([y_axis_min_levelized,y_axis_max_levelized])
 
-        ## Legend
-        axs.legend(ncol = 1, bbox_to_anchor=(1.4, 1.15), loc='upper left', reverse = True, fontsize = 16) # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
-    #     axs.legend(bbox_to_anchor=(1, 1), loc='upper left') # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
-        st.pyplot(levelized_bar_fig, transparent = True, use_container_width = True)   
+            ## Plot series
+            axs.plot([x_axis_min, x_axis_max],
+                    [df_costing_assumptions_vs_vbl.loc[product_name][0],df_costing_assumptions_vs_vbl.loc[product_name][-1]],
+                    alpha = 1, 
+                    c = theme_colors[6]) # Plot line for cost 
+            axs.text(x_axis_max * 1.025, product_cost_USD_kgprod, 'Market price', ha='left', va='center', 
+                    fontsize = SMALL_SIZE)
+            
+            # Additional lines
+            if df_flags.loc['Capacity factor', 'T/F?'] == True: # or df_flags.loc['Renewables capacity factor', 'T/F?'] == True:
+                axs.plot([0.23625,0.23625], [y_axis_min_levelized, y_axis_max_levelized], alpha = 1,
+                    c = theme_colors[6]) # Plot line for solar 
+                axs.text(0.23625, y_axis_max_levelized*0.975, 'Average solar', ha='right', va='top', 
+                    fontsize = SMALL_SIZE, rotation = 90)
+        #     axs.plot([0.0677,0.0677], [y_axis_min, y_axis_max], alpha = 1,
+        #              c = theme_colors[6]) # Plot line for solar 
+        #     axs.text(0.0677, y_axis_max*0.975, 'Texas (EIA, Jul 2023)', ha='right', va='top', 
+        #               fontsize = SMALL_SIZE, rotation = 90)
+
+            axs.plot(vbl_range[df_opex_totals_vs_vbl.loc['Levelized cost'] > 0], 
+                    df_opex_totals_vs_vbl.loc['Levelized cost', df_opex_totals_vs_vbl.loc['Levelized cost'] > 0],
+                    label = 'Levelized cost', alpha = 1, c = theme_colors[6]) # Plot line for total levelized cost
+                    # Levelized cost includes all capex except working capital, which is recovered during operation
+            
+            cumsum = 0
+            for i, category in enumerate(df_opex.index):
+                axs.bar(vbl_range, df_opex_vs_vbl.fillna(0).loc[category], label=category , bottom = cumsum, width = barwidth, color = opex_colors[i],
+                    edgecolor = 'w', linewidth = linewidth_calc)
+                cumsum += df_opex_vs_vbl.fillna(0).loc[category]
+                
+            for i, category in enumerate(df_capex_BM_vs_vbl.index):      
+                axs.bar(vbl_range, df_capex_BM_vs_vbl.fillna(0).loc[category]/(df_costing_assumptions_vs_vbl.loc['Plant lifetime']*365*df_costing_assumptions_vs_vbl.loc['Capacity factor']*df_electrolyzer_assumptions_vs_vbl.loc['Production rate']),
+                        label=category , bottom = cumsum, width = barwidth, color = BM_capex_colors[i],
+                    edgecolor = 'w', linewidth = linewidth_calc)
+                cumsum += df_capex_BM_vs_vbl.fillna(0).loc[category]/(df_costing_assumptions_vs_vbl.loc['Plant lifetime']*365*df_costing_assumptions_vs_vbl.loc['Capacity factor']*df_electrolyzer_assumptions_vs_vbl.loc['Production rate'])
+            
+            if df_flags.loc['{} production rate'.format(product_name), 'T/F?'] == True:
+                plt.xticks(rotation=35)  # Rotate text labels
+
+            if df_flags.loc['Electricity cost', 'T/F?'] == True:
+                axs.text(df_utility_imports.loc['Electricity - current US mix','Cost ($/kWh)'], 
+                        y_axis_max*0.975, 'U.S. average industrial', ha='right', va='top', 
+                    fontsize = SMALL_SIZE, rotation = 90)
+                axs.plot([df_utility_imports.loc['Electricity - current US mix', 'Cost ($/kWh)'], df_utility_imports.loc['Electricity - current US mix', 'Cost ($/kWh)']], 
+                        [y_axis_min, y_axis_max], alpha = 1,
+                    c = theme_colors[6]) # Plot line for cost 
+
+            ## Legend
+            axs.legend(ncol = 1, bbox_to_anchor=(1.4, 1.15), loc='upper left', reverse = True, fontsize = 16) # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
+        #     axs.legend(bbox_to_anchor=(1, 1), loc='upper left') # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
+            st.pyplot(levelized_bar_fig, transparent = True, use_container_width = True)   
 
     with right_column.container(height = 300, border = False): 
         pass
@@ -1668,185 +1673,189 @@ if not st.session_state.is_active_error:
     ###### POTENTIALS BAR CHART
     with middle_column.container(height = 300, border = False): 
         if not override_cell_voltage:
-            potentials_bar_fig, axs = plt.subplots() # Set up plot
-            #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
+            with _render_lock:
+                potentials_bar_fig, axs = plt.subplots() # Set up plot
+                #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
 
-            y_axis_major_ticks = y_axis_formatting(y_axis_min_potential, y_axis_max_potential, y_axis_num_potential)
+                y_axis_major_ticks = y_axis_formatting(y_axis_min_potential, y_axis_max_potential, y_axis_num_potential)
 
+                ## Axis labels
+                axs.set_ylabel('Cell potential (V)')
+                axs.set_xlabel(x_axis_label)
+
+                ## Hide or show plot borders 
+                axs.spines['right'].set_visible(True)
+                axs.spines['top'].set_visible(True)
+
+                ## Draw axis ticks
+                plt.minorticks_on()
+                axs.xaxis.set_minor_locator(AutoMinorLocator(2)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
+                axs.yaxis.set_minor_locator(AutoMinorLocator(5)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
+                plt.xticks(x_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
+                plt.yticks(y_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
+
+                ## Apply axis limits
+                axs.set_xlim([x_axis_min,x_axis_max])
+                axs.set_ylim([y_axis_min_potential,y_axis_max_potential])
+                #axs.set_ylim([i_.iloc[:,0].min(axis=0),i_.iloc[:,0].max(axis=0)])
+
+                ## Plot title
+                # axs.set_title('Chronoamperometry at {:.3f} V for {:.2f} hrs'.format(vbl_we_avg, expt_time) )
+
+                ## Plot series
+                cumsum = 0
+                counter = 0
+                for i, category in enumerate(df_potentials_vs_vbl.iloc[2:7].index):
+                    if not df_potentials_vs_vbl.loc[category].isnull().all():
+                        axs.bar(vbl_range, abs(df_potentials_vs_vbl.fillna(0).loc[category]), label=category , bottom = cumsum, 
+                                width = barwidth, color = potentials_colors[counter],
+                        edgecolor = 'w', linewidth = linewidth_calc)
+                        cumsum += abs(df_potentials_vs_vbl.fillna(0).loc[category])
+                        counter += 1
+                        
+                ## Legend
+                axs.legend(bbox_to_anchor=(1, 1), loc='upper left', reverse = True) # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
+                st.pyplot(potentials_bar_fig, transparent = True, use_container_width = True)
+
+    ###### FE-SPC SCATTERPLOT
+    with right_column.container(height = 300, border = False): 
+        with _render_lock:
+            FE_SPC_bar_fig, axs = plt.subplots() # Set up plot
+            
             ## Axis labels
-            axs.set_ylabel('Cell potential (V)')
-            axs.set_xlabel(x_axis_label)
-
-            ## Hide or show plot borders 
-            axs.spines['right'].set_visible(True)
-            axs.spines['top'].set_visible(True)
+            axs.set_ylabel('FE$_{{{}}}$'.format(product_name))
+            axs.set_xlabel('Single-pass conversion') 
 
             ## Draw axis ticks
-            plt.minorticks_on()
+            axs.xaxis.set_major_locator(mp.ticker.MultipleLocator(0.2))
+            axs.yaxis.set_major_locator(mp.ticker.MultipleLocator(0.2))
             axs.xaxis.set_minor_locator(AutoMinorLocator(2)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
-            axs.yaxis.set_minor_locator(AutoMinorLocator(5)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
-            plt.xticks(x_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
-            plt.yticks(y_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
+            axs.yaxis.set_minor_locator(AutoMinorLocator(2)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
 
             ## Apply axis limits
-            axs.set_xlim([x_axis_min,x_axis_max])
-            axs.set_ylim([y_axis_min_potential,y_axis_max_potential])
-            #axs.set_ylim([i_.iloc[:,0].min(axis=0),i_.iloc[:,0].max(axis=0)])
+            axs.set_xlim([0,1])
+            axs.set_ylim([0,1])
 
-            ## Plot title
-            # axs.set_title('Chronoamperometry at {:.3f} V for {:.2f} hrs'.format(vbl_we_avg, expt_time) )
-
-            ## Plot series
-            cumsum = 0
-            counter = 0
-            for i, category in enumerate(df_potentials_vs_vbl.iloc[2:7].index):
-                if not df_potentials_vs_vbl.loc[category].isnull().all():
-                    axs.bar(vbl_range, abs(df_potentials_vs_vbl.fillna(0).loc[category]), label=category , bottom = cumsum, 
-                            width = barwidth, color = potentials_colors[counter],
-                    edgecolor = 'w', linewidth = linewidth_calc)
-                    cumsum += abs(df_potentials_vs_vbl.fillna(0).loc[category])
-                    counter += 1
-                    
-            ## Legend
-            axs.legend(bbox_to_anchor=(1, 1), loc='upper left', reverse = True) # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
-            st.pyplot(potentials_bar_fig, transparent = True, use_container_width = True)
-
-    ###### FE-SPC BAR CHART
-    with right_column.container(height = 300, border = False): 
-        FE_SPC_bar_fig, axs = plt.subplots() # Set up plot
-        
-        ## Axis labels
-        axs.set_ylabel('FE$_{{{}}}$'.format(product_name))
-        axs.set_xlabel('Single-pass conversion') 
-
-        ## Draw axis ticks
-        axs.xaxis.set_major_locator(mp.ticker.MultipleLocator(0.2))
-        axs.yaxis.set_major_locator(mp.ticker.MultipleLocator(0.2))
-        axs.xaxis.set_minor_locator(AutoMinorLocator(2)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
-        axs.yaxis.set_minor_locator(AutoMinorLocator(2)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
-
-        ## Apply axis limits
-        axs.set_xlim([0,1])
-        axs.set_ylim([0,1])
-
-        # Plot FE vs SPC
-        axs.scatter(df_outlet_assumptions_vs_vbl.loc['Single-pass conversion'],
-                    df_outlet_assumptions_vs_vbl.loc['FE {}'.format(product_name)],
-                                color = theme_colors[3], 
-                                label = 'FE$_{{CO_2R, 0}}$ = {}'.format(df_products.loc[product_name, 'FECO2R at SPC = 0']),
-                                s = 200, 
-                                alpha = 1, marker = 'o') 
-    #     axs.scatter(df_products.loc[product_name, 'Typical SPC']*100, df_products.loc[product_name, 'FECO2R at SPC = 0']*100, 
-    #                 marker = 'X', c = 'k', s = 200, alpha = 1, label = 'Limits')
-        
-        axs.legend(bbox_to_anchor = (1, 1), loc= 'upper left') # bbox_to_anchor = (1,1)
-        st.pyplot(FE_SPC_bar_fig, transparent = True, use_container_width = True,)    
+            # Plot FE vs SPC
+            axs.scatter(df_outlet_assumptions_vs_vbl.loc['Single-pass conversion'],
+                        df_outlet_assumptions_vs_vbl.loc['FE {}'.format(product_name)],
+                                    color = theme_colors[3], 
+                                    label = 'FE$_{{CO_2R, 0}}$ = {}'.format(df_products.loc[product_name, 'FECO2R at SPC = 0']),
+                                    s = 200, 
+                                    alpha = 1, marker = 'o') 
+        #     axs.scatter(df_products.loc[product_name, 'Typical SPC']*100, df_products.loc[product_name, 'FECO2R at SPC = 0']*100, 
+        #                 marker = 'X', c = 'k', s = 200, alpha = 1, label = 'Limits')
+            
+            axs.legend(bbox_to_anchor = (1, 1), loc= 'upper left') # bbox_to_anchor = (1,1)
+            st.pyplot(FE_SPC_bar_fig, transparent = True, use_container_width = True,)    
 
     ###### ENERGY BAR CHART 
     with middle_column.container(height = 300, border = False): 
         if not override_cell_voltage:   
-            energy_bar_fig, axs = plt.subplots() # Set up plot
-            #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
+            with _render_lock:
+                energy_bar_fig, axs = plt.subplots() # Set up plot
+                #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
 
-            y_axis_major_ticks = y_axis_formatting(y_axis_min_energy, y_axis_max_energy, y_axis_num_energy)
+                y_axis_major_ticks = y_axis_formatting(y_axis_min_energy, y_axis_max_energy, y_axis_num_energy)
 
-            ## Axis labels
-            axs.set_ylabel('Energy (kJ/mol$_{{{}}}$)'.format(product_name))
-            axs.set_xlabel(x_axis_label)
+                ## Axis labels
+                axs.set_ylabel('Energy (kJ/mol$_{{{}}}$)'.format(product_name))
+                axs.set_xlabel(x_axis_label)
 
-            ## Draw axis ticks
-            axs.xaxis.set_minor_locator(AutoMinorLocator(2)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
-            axs.yaxis.set_minor_locator(AutoMinorLocator(5)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
-            plt.xticks(x_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
-            plt.yticks(y_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
+                ## Draw axis ticks
+                axs.xaxis.set_minor_locator(AutoMinorLocator(2)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
+                axs.yaxis.set_minor_locator(AutoMinorLocator(5)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
+                plt.xticks(x_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
+                plt.yticks(y_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
 
-            ## Apply axis limits
-            axs.set_xlim([x_axis_min,x_axis_max])
-            axs.set_ylim([y_axis_min_energy,y_axis_max_energy])
+                ## Apply axis limits
+                axs.set_xlim([x_axis_min,x_axis_max])
+                axs.set_ylim([y_axis_min_energy,y_axis_max_energy])
 
-            ## Plot series
-            cumsum = 0
-            counter = 0
-            for i, category in enumerate(df_energy_vs_vbl.iloc[:-3].index):
-                if not df_energy_vs_vbl.loc[category].isnull().all():
-                    axs.bar(vbl_range, 
-                            (abs(df_energy_vs_vbl.fillna(0).loc[category])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)'], # energy kJ/kg * 0.001 g/kg * MW g/mol
-                            label=category , 
-                            bottom = cumsum, width = barwidth, color = energy_colors[counter],
-                            edgecolor = 'w', linewidth = linewidth_calc)
-                    cumsum += (abs(df_energy_vs_vbl.fillna(0).loc[category])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)'] # energy kJ/kg * 0.001 g/kg * MW g/mol
-                    counter += 1
-                    
-            ## Legend
-            axs.legend(bbox_to_anchor=(1, 1), loc='upper left', reverse = True) 
-            # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
+                ## Plot series
+                cumsum = 0
+                counter = 0
+                for i, category in enumerate(df_energy_vs_vbl.iloc[:-3].index):
+                    if not df_energy_vs_vbl.loc[category].isnull().all():
+                        axs.bar(vbl_range, 
+                                (abs(df_energy_vs_vbl.fillna(0).loc[category])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)'], # energy kJ/kg * 0.001 g/kg * MW g/mol
+                                label=category , 
+                                bottom = cumsum, width = barwidth, color = energy_colors[counter],
+                                edgecolor = 'w', linewidth = linewidth_calc)
+                        cumsum += (abs(df_energy_vs_vbl.fillna(0).loc[category])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)'] # energy kJ/kg * 0.001 g/kg * MW g/mol
+                        counter += 1
+                        
+                ## Legend
+                axs.legend(bbox_to_anchor=(1, 1), loc='upper left', reverse = True) 
+                # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
 
-            st.pyplot(energy_bar_fig, transparent = True, use_container_width = True)   
+                st.pyplot(energy_bar_fig, transparent = True, use_container_width = True)   
 
     ###### EMISSIONS BAR CHART
     with right_column.container(height = 300, border = False): 
         if not override_cell_voltage:
-            emissions_bar_fig, axs = plt.subplots() # Set up plot
-            #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
+            with _render_lock:
+                emissions_bar_fig, axs = plt.subplots() # Set up plot
+                #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
 
-            y_axis_major_ticks = y_axis_formatting(y_axis_min_emissions, y_axis_max_emissions, y_axis_num_emissions)
+                y_axis_major_ticks = y_axis_formatting(y_axis_min_emissions, y_axis_max_emissions, y_axis_num_emissions)
 
-            ## Axis labels
-            axs.set_ylabel('Emissions \n (kg$_{{CO_2}}$/kg$_{{{}}}$)'.format(product_name))
-            axs.set_xlabel(x_axis_label)
+                ## Axis labels
+                axs.set_ylabel('Emissions \n (kg$_{{CO_2}}$/kg$_{{{}}}$)'.format(product_name))
+                axs.set_xlabel(x_axis_label)
 
-            ## Draw axis ticks
-            axs.xaxis.set_minor_locator(AutoMinorLocator(2)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
-            axs.yaxis.set_minor_locator(AutoMinorLocator(5)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
-            plt.xticks(x_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
-        #     plt.yticks(y_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
+                ## Draw axis ticks
+                axs.xaxis.set_minor_locator(AutoMinorLocator(2)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
+                axs.yaxis.set_minor_locator(AutoMinorLocator(5)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
+                plt.xticks(x_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
+            #     plt.yticks(y_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
 
-            ## Apply axis limits
-            axs.set_xlim([x_axis_min,x_axis_max])
-            axs.set_ylim([y_axis_min_emissions,y_axis_max_emissions])
+                ## Apply axis limits
+                axs.set_xlim([x_axis_min,x_axis_max])
+                axs.set_ylim([y_axis_min_emissions,y_axis_max_emissions])
 
-            ## Plot series
-            axs.plot([x_axis_min, x_axis_max], [MW_CO2/df_products.loc[product_name, 'Molecular weight (g/mol)'],MW_CO2/df_products.loc[product_name, 'Molecular weight (g/mol)']], alpha = 1,
-                    c = theme_colors[6]) # Plot line for negative emissions
-            axs.text(x_axis_max * 0.975, MW_CO2/df_products.loc[product_name, 'Molecular weight (g/mol)']*0.95, 'Negative emissions', ha='right', va='top', 
-                    fontsize = SMALL_SIZE)
-            if df_flags.loc['Grid CO$_2$ intensity', 'T/F?'] == True:
-                axs.plot([df_utility_imports.loc['Electricity - current US mix', 'CO2 emissions (g CO2/kWh)']/1000,df_utility_imports.loc['Electricity - current US mix', 'CO2 emissions (g CO2/kWh)']/1000], 
-                        [y_axis_min_emissions, y_axis_max_emissions], alpha = 1,
-                    c = theme_colors[6]) # Plot line for cost 
-                axs.text(df_utility_imports.loc['Electricity - current US mix','CO2 emissions (g CO2/kWh)']/1000, 
-                        y_axis_max_emissions*0.975, 'U.S. mix', ha='right', va='top', 
-                    fontsize = SMALL_SIZE, rotation = 90)
-                
-                axs.plot([df_utility_imports.loc['Electricity - current California mix', 'CO2 emissions (g CO2/kWh)']/1000,df_utility_imports.loc['Electricity - current California mix', 'CO2 emissions (g CO2/kWh)']/1000], 
-                        [y_axis_min_emissions, y_axis_max_emissions], alpha = 1,
-                    c = theme_colors[6]) # Plot line for cost 
-                axs.text(df_utility_imports.loc['Electricity - current California mix', 'CO2 emissions (g CO2/kWh)']/1000, 
-                        y_axis_max_emissions*0.975, 'California mix', ha='right', va='top', 
-                    fontsize = SMALL_SIZE, rotation = 90)
-                
-                axs.plot([df_utility_imports.loc['Electricity - solar', 'CO2 emissions (g CO2/kWh)']/1000,df_utility_imports.loc['Electricity - solar', 'CO2 emissions (g CO2/kWh)']/1000], 
-                        [y_axis_min_emissions, y_axis_max_emissions], alpha = 1,
-                    c = theme_colors[6]) # Plot line for cost 
-                axs.text(df_utility_imports.loc['Electricity - solar', 'CO2 emissions (g CO2/kWh)']/1000, 
-                                y_axis_max_emissions*0.975, 'Solar', ha='right', va='top', 
-                    fontsize = SMALL_SIZE, rotation = 90)
-
-            cumsum = 0
-            counter = 0
-            for i, category in enumerate(df_emissions_vs_vbl.iloc[:-3].index):
-                if not df_emissions_vs_vbl.loc[category].isnull().all():
-                    axs.bar(vbl_range, abs(df_emissions_vs_vbl.fillna(0).loc[category]), label=category , 
-                            bottom = cumsum, width = barwidth, color = emissions_colors[counter],
-                    edgecolor = 'w', linewidth = linewidth_calc)
-                    cumsum += abs(df_emissions_vs_vbl.fillna(0).loc[category])
-                    counter += 1
+                ## Plot series
+                axs.plot([x_axis_min, x_axis_max], [MW_CO2/df_products.loc[product_name, 'Molecular weight (g/mol)'],MW_CO2/df_products.loc[product_name, 'Molecular weight (g/mol)']], alpha = 1,
+                        c = theme_colors[6]) # Plot line for negative emissions
+                axs.text(x_axis_max * 0.975, MW_CO2/df_products.loc[product_name, 'Molecular weight (g/mol)']*0.95, 'Negative emissions', ha='right', va='top', 
+                        fontsize = SMALL_SIZE)
+                if df_flags.loc['Grid CO$_2$ intensity', 'T/F?'] == True:
+                    axs.plot([df_utility_imports.loc['Electricity - current US mix', 'CO2 emissions (g CO2/kWh)']/1000,df_utility_imports.loc['Electricity - current US mix', 'CO2 emissions (g CO2/kWh)']/1000], 
+                            [y_axis_min_emissions, y_axis_max_emissions], alpha = 1,
+                        c = theme_colors[6]) # Plot line for cost 
+                    axs.text(df_utility_imports.loc['Electricity - current US mix','CO2 emissions (g CO2/kWh)']/1000, 
+                            y_axis_max_emissions*0.975, 'U.S. mix', ha='right', va='top', 
+                        fontsize = SMALL_SIZE, rotation = 90)
                     
-            ## Legend
-            axs.legend(bbox_to_anchor=(1, 1), loc='upper left', reverse = True) # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
+                    axs.plot([df_utility_imports.loc['Electricity - current California mix', 'CO2 emissions (g CO2/kWh)']/1000,df_utility_imports.loc['Electricity - current California mix', 'CO2 emissions (g CO2/kWh)']/1000], 
+                            [y_axis_min_emissions, y_axis_max_emissions], alpha = 1,
+                        c = theme_colors[6]) # Plot line for cost 
+                    axs.text(df_utility_imports.loc['Electricity - current California mix', 'CO2 emissions (g CO2/kWh)']/1000, 
+                            y_axis_max_emissions*0.975, 'California mix', ha='right', va='top', 
+                        fontsize = SMALL_SIZE, rotation = 90)
+                    
+                    axs.plot([df_utility_imports.loc['Electricity - solar', 'CO2 emissions (g CO2/kWh)']/1000,df_utility_imports.loc['Electricity - solar', 'CO2 emissions (g CO2/kWh)']/1000], 
+                            [y_axis_min_emissions, y_axis_max_emissions], alpha = 1,
+                        c = theme_colors[6]) # Plot line for cost 
+                    axs.text(df_utility_imports.loc['Electricity - solar', 'CO2 emissions (g CO2/kWh)']/1000, 
+                                    y_axis_max_emissions*0.975, 'Solar', ha='right', va='top', 
+                        fontsize = SMALL_SIZE, rotation = 90)
 
-            st.pyplot(emissions_bar_fig, transparent = True, use_container_width = True)   
-            
+                cumsum = 0
+                counter = 0
+                for i, category in enumerate(df_emissions_vs_vbl.iloc[:-3].index):
+                    if not df_emissions_vs_vbl.loc[category].isnull().all():
+                        axs.bar(vbl_range, abs(df_emissions_vs_vbl.fillna(0).loc[category]), label=category , 
+                                bottom = cumsum, width = barwidth, color = emissions_colors[counter],
+                        edgecolor = 'w', linewidth = linewidth_calc)
+                        cumsum += abs(df_emissions_vs_vbl.fillna(0).loc[category])
+                        counter += 1
+                        
+                ## Legend
+                axs.legend(bbox_to_anchor=(1, 1), loc='upper left', reverse = True) # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
+
+                st.pyplot(emissions_bar_fig, transparent = True, use_container_width = True)   
+                
     #___________________________________________________________________________________
 
     st.divider()

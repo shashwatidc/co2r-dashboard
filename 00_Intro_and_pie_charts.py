@@ -21,7 +21,8 @@ import matplotlib.pyplot as plt
 # from matplotlib.lines import Line2D
 # from mpl_toolkits.mplot3d import Axes3D
 # from matplotlib import animation
-from matplotlib import font_manager
+# from matplotlib import font_manager
+import threading
 
 # import csv
 
@@ -33,16 +34,14 @@ from datetime import datetime
 # from os.path import exists
 # import os
 
-from io import BytesIO
+# from io import BytesIO
 
-import openpyxl
+# import openpyxl
 # from openpyxl.worksheet.dimensions import ColumnDimension, DimensionHolder
 # import openpyxl.utils.cell
 # from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font
 
-from scipy import optimize
-
-from pathlib import Path
+# from scipy import optimize
 
 # from IPython.display import display, HTML, clear_output
 
@@ -275,6 +274,7 @@ def default_single_run(product_name,
     emissions_default = sum(df_energy_default.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)])
     return capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default, NPV_default
 
+_render_lock = threading.RLock()
 
 ###################################################################################
 ################################### FORMATTING ####################################
@@ -997,25 +997,25 @@ if not np.isnan(FE_product_checked):
         st.metric(label = 'Capex', value = '${:.2f} million'.format(df_capex_totals.loc['Total permanent investment', 'Cost ($)']/1e6), 
                 delta = '{:.2f}%'.format(100*(df_capex_totals.loc['Total permanent investment', 'Cost ($)'] - capex_default)/capex_default),
                 delta_color = delta_color, label_visibility='collapsed') 
-        # with _lock:
-        capex_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
-        axs.pie(df_capex_BM.loc[:, 'Cost ($)'], 
-                labels = df_capex_BM.index, labeldistance = 1.1,
-                autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
-                pctdistance = 0.7,
-                colors = BM_capex_colors, startangle = 90, 
-                textprops = {'fontsize' : SMALL_SIZE}, 
-                radius = 2, wedgeprops= {'width' : 1}, # donut
-                counterclock = False,
-                    )   
-        axs.text(0, 0,  
-            'Capex: \n ${:.2f} million'.format(df_capex_totals.loc[ 'Total permanent investment', 'Cost ($)']/1e6 ), # All capex except working capital, which is recovered during operation
-            ha='center', va='center', 
-            fontsize = MEDIUM_SIZE)  
-        # buffer = BytesIO()
-        # capex_pie_fig.savefig(buffer, format="png")
-        # st.image(buffer, width = 400)
-        st.pyplot(capex_pie_fig, transparent = True, use_container_width = True)
+        with _render_lock:
+            capex_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
+            axs.pie(df_capex_BM.loc[:, 'Cost ($)'], 
+                    labels = df_capex_BM.index, labeldistance = 1.1,
+                    autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
+                    pctdistance = 0.7,
+                    colors = BM_capex_colors, startangle = 90, 
+                    textprops = {'fontsize' : SMALL_SIZE}, 
+                    radius = 2, wedgeprops= {'width' : 1}, # donut
+                    counterclock = False,
+                        )   
+            axs.text(0, 0,  
+                'Capex: \n ${:.2f} million'.format(df_capex_totals.loc[ 'Total permanent investment', 'Cost ($)']/1e6 ), # All capex except working capital, which is recovered during operation
+                ha='center', va='center', 
+                fontsize = MEDIUM_SIZE)  
+            # buffer = BytesIO()
+            # capex_pie_fig.savefig(buffer, format="png")
+            # st.image(buffer, width = 400)
+            st.pyplot(capex_pie_fig, transparent = True, use_container_width = True)
 
     ###### OPEX PIE CHART 
     with right_column.container(height = 455, border = False): 
@@ -1025,23 +1025,23 @@ if not np.isnan(FE_product_checked):
                 delta = '{:.2f}%'.format(100*(df_opex_totals.loc['Production cost', 'Cost ($/kg {})'.format(product_name)] - opex_default)/opex_default),
                 delta_color = delta_color, label_visibility = 'collapsed') 
 
-        # with _lock:
-        opex_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
-        axs.pie(df_opex.loc[:, 'Cost ($/kg {})'.format(product_name)], 
-                labels = df_opex.index, labeldistance = 1.1,
-                autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '',  
-                pctdistance = 0.8,
-                colors = opex_colors, startangle = 90, 
-                textprops = {'fontsize' : SMALL_SIZE}, 
-                radius = 2, wedgeprops= {'width' : 1}, # donut
-                counterclock = False,
-                # explode = 0.2*np.ones(len(df_opex.index),
-                    )   
-        axs.text(0, 0,  
-            'Opex: \n \${:.2f}/kg$_{{{}}}$'.format(df_opex_totals.loc[ 'Production cost', 'Cost ($/kg {})'.format(product_name)], product_name), # All capex except working capital, which is recovered during operation
-            ha='center', va='center', 
-            fontsize = MEDIUM_SIZE)  
-        st.pyplot(opex_pie_fig, transparent = True, use_container_width = True)   
+        with _render_lock:
+            opex_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
+            axs.pie(df_opex.loc[:, 'Cost ($/kg {})'.format(product_name)], 
+                    labels = df_opex.index, labeldistance = 1.1,
+                    autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '',  
+                    pctdistance = 0.8,
+                    colors = opex_colors, startangle = 90, 
+                    textprops = {'fontsize' : SMALL_SIZE}, 
+                    radius = 2, wedgeprops= {'width' : 1}, # donut
+                    counterclock = False,
+                    # explode = 0.2*np.ones(len(df_opex.index),
+                        )   
+            axs.text(0, 0,  
+                'Opex: \n \${:.2f}/kg$_{{{}}}$'.format(df_opex_totals.loc[ 'Production cost', 'Cost ($/kg {})'.format(product_name)], product_name), # All capex except working capital, which is recovered during operation
+                ha='center', va='center', 
+                fontsize = MEDIUM_SIZE)  
+            st.pyplot(opex_pie_fig, transparent = True, use_container_width = True)   
 
     ###### LEVELIZED PIE CHART
     with middle_column.container(height = 455, border = False): 
@@ -1055,21 +1055,22 @@ if not np.isnan(FE_product_checked):
         full_list_of_costs = pd.concat([df_opex.loc[:, 'Cost ($/kg {})'.format(product_name)],
                             df_capex_BM.loc[:,'Cost ($)']/(365*capacity_factor*lifetime_years*product_rate_kg_day)], axis = 0)
 
-        axs.pie(full_list_of_costs, 
-                labels = full_list_of_costs.index, labeldistance = 1.1,
-                autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
-                pctdistance = 0.8,
-                colors = levelized_colors, startangle = 90, 
-                textprops = {'fontsize' : SMALL_SIZE}, 
-                radius = 2, wedgeprops= {'width' : 1}, # donut
-                counterclock = False,
-                # explode = 0.2*np.ones(len(df_opex.index),
-                )   
-        axs.text(0, 0,  
-        'Levelized cost: \n \${:.2f}/kg$_{{{}}}$'.format(df_opex_totals.loc[ 'Levelized cost', 'Cost ($/kg {})'.format(product_name)], product_name), # All capex except working capital, which is recovered during operation
-        ha='center', va='center', 
-        fontsize = MEDIUM_SIZE)  
-        st.pyplot(levelized_pie_fig, transparent = True, use_container_width = True)   
+        with _render_lock:
+            axs.pie(full_list_of_costs, 
+                    labels = full_list_of_costs.index, labeldistance = 1.1,
+                    autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
+                    pctdistance = 0.8,
+                    colors = levelized_colors, startangle = 90, 
+                    textprops = {'fontsize' : SMALL_SIZE}, 
+                    radius = 2, wedgeprops= {'width' : 1}, # donut
+                    counterclock = False,
+                    # explode = 0.2*np.ones(len(df_opex.index),
+                    )   
+            axs.text(0, 0,  
+            'Levelized cost: \n \${:.2f}/kg$_{{{}}}$'.format(df_opex_totals.loc[ 'Levelized cost', 'Cost ($/kg {})'.format(product_name)], product_name), # All capex except working capital, which is recovered during operation
+            ha='center', va='center', 
+            fontsize = MEDIUM_SIZE)  
+            st.pyplot(levelized_pie_fig, transparent = True, use_container_width = True)   
 
     with right_column.container(height = 455, border = False): 
         pass
@@ -1082,23 +1083,23 @@ if not np.isnan(FE_product_checked):
                 delta = '{:.2f}%'.format(100*(df_potentials.loc['Cell potential', 'Value'] - potential_default)/potential_default),
                 delta_color = delta_color, label_visibility='collapsed') 
         if not override_cell_voltage:
-            # with _lock:
-            potentials_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
-            axs.pie(abs(df_potentials.iloc[2:7].loc[:,'Value']),
-                    labels = df_potentials.iloc[2:7].index, labeldistance = 1.1,
-                    autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
-                    pctdistance = 0.8,
-                    colors = potentials_colors, startangle = 90, 
-                    textprops = {'fontsize' : SMALL_SIZE}, 
-                    radius = 2, wedgeprops= {'width' : 1}, # donut
-                    counterclock = False,
-                    # explode = 0.2*np.ones(len(df_opex.index),
-                    )   
-            axs.text(0, 0,  
-            'Cell potential: \n {:.2f} V'.format(df_potentials.loc['Cell potential', 'Value']),
-            ha='center', va='center', 
-            fontsize = MEDIUM_SIZE)  
-            st.pyplot(potentials_pie_fig, transparent = True, use_container_width = True)
+            with _render_lock:
+                potentials_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
+                axs.pie(abs(df_potentials.iloc[2:7].loc[:,'Value']),
+                        labels = df_potentials.iloc[2:7].index, labeldistance = 1.1,
+                        autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
+                        pctdistance = 0.8,
+                        colors = potentials_colors, startangle = 90, 
+                        textprops = {'fontsize' : SMALL_SIZE}, 
+                        radius = 2, wedgeprops= {'width' : 1}, # donut
+                        counterclock = False,
+                        # explode = 0.2*np.ones(len(df_opex.index),
+                        )   
+                axs.text(0, 0,  
+                'Cell potential: \n {:.2f} V'.format(df_potentials.loc['Cell potential', 'Value']),
+                ha='center', va='center', 
+                fontsize = MEDIUM_SIZE)  
+                st.pyplot(potentials_pie_fig, transparent = True, use_container_width = True)
 
     ###### ENERGY PIE CHART 
     with right_column.container(height = 455, border = False): 
@@ -1107,24 +1108,24 @@ if not np.isnan(FE_product_checked):
         st.metric(label = 'Energy', value = r'{:.2f} MJ/kg {}'.format(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)]/1000, product_name),
                 delta = '{:.2f}%'.format(100*(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)] - energy_default)/energy_default),
                 delta_color = delta_color, label_visibility='collapsed') 
-        # with _lock:
-        if not override_cell_voltage:
-            energy_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
-            axs.pie((abs(df_energy.iloc[2:-2].loc[:, 'Energy (kJ/kg {})'.format(product_name)])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)'],
-                    labels = df_energy.iloc[2:-2].index, labeldistance = 1.1,
-                    autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
-                    pctdistance = 0.8,
-                    colors = energy_colors, startangle = 90, 
-                    textprops = {'fontsize' : SMALL_SIZE}, 
-                    radius = 2, wedgeprops= {'width' : 1}, # donut
-                    counterclock = False,
-                    # explode = 0.2*np.ones(len(df_opex.index),
-                    )   
-            axs.text(0, 0,  
-            'Energy: \n {:.0f} kJ/mol$_{{{}}}$'.format(sum((abs(df_energy.fillna(0).iloc[2:-2].loc[:, 'Energy (kJ/kg {})'.format(product_name)])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)']), product_name),
-            ha='center', va='center', 
-            fontsize = MEDIUM_SIZE)  
-            st.pyplot(energy_pie_fig, transparent = True, use_container_width = True)   
+        with _render_lock:
+            if not override_cell_voltage:
+                energy_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
+                axs.pie((abs(df_energy.iloc[2:-2].loc[:, 'Energy (kJ/kg {})'.format(product_name)])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)'],
+                        labels = df_energy.iloc[2:-2].index, labeldistance = 1.1,
+                        autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
+                        pctdistance = 0.8,
+                        colors = energy_colors, startangle = 90, 
+                        textprops = {'fontsize' : SMALL_SIZE}, 
+                        radius = 2, wedgeprops= {'width' : 1}, # donut
+                        counterclock = False,
+                        # explode = 0.2*np.ones(len(df_opex.index),
+                        )   
+                axs.text(0, 0,  
+                'Energy: \n {:.0f} kJ/mol$_{{{}}}$'.format(sum((abs(df_energy.fillna(0).iloc[2:-2].loc[:, 'Energy (kJ/kg {})'.format(product_name)])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)']), product_name),
+                ha='center', va='center', 
+                fontsize = MEDIUM_SIZE)  
+                st.pyplot(energy_pie_fig, transparent = True, use_container_width = True)   
 
     ###### EMISSIONS PIE CHART
     with middle_column.container(height = 455, border = False): 
@@ -1135,22 +1136,23 @@ if not np.isnan(FE_product_checked):
                 delta = '{:.2f}%'.format(100*(sum(df_energy.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)])  - emissions_default)/emissions_default),
                 delta_color = delta_color, label_visibility='collapsed') 
             if not override_cell_voltage:
-                emissions_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
-                axs.pie(df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2], 
-                    labels = df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index, labeldistance = 1.1,
-                    autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
-                    pctdistance = 0.8,
-                    colors = emissions_colors, startangle = 90, 
-                    textprops = {'fontsize' : SMALL_SIZE}, 
-                    radius = 2, wedgeprops= {'width' : 1}, # donut
-                    counterclock = False,
-                    # explode = 0.2*np.ones(len(df_opex.index),
-                    )   
-                axs.text(0, 0,  
-                'Emissions: \n {:.2f} kg$_{{CO_2}}$/kg$_{{{}}}$'.format(sum(df_emissions.fillna(0).iloc[:-2]), product_name), # All capex except working capital, which is recovered during operation
-                ha='center', va='center', 
-                fontsize = MEDIUM_SIZE)  
-                st.pyplot(emissions_pie_fig, transparent = True, use_container_width = True)   
+                with _render_lock:
+                    emissions_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
+                    axs.pie(df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2], 
+                        labels = df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index, labeldistance = 1.1,
+                        autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
+                        pctdistance = 0.8,
+                        colors = emissions_colors, startangle = 90, 
+                        textprops = {'fontsize' : SMALL_SIZE}, 
+                        radius = 2, wedgeprops= {'width' : 1}, # donut
+                        counterclock = False,
+                        # explode = 0.2*np.ones(len(df_opex.index),
+                        )   
+                    axs.text(0, 0,  
+                    'Emissions: \n {:.2f} kg$_{{CO_2}}$/kg$_{{{}}}$'.format(sum(df_emissions.fillna(0).iloc[:-2]), product_name), # All capex except working capital, which is recovered during operation
+                    ha='center', va='center', 
+                    fontsize = MEDIUM_SIZE)  
+                    st.pyplot(emissions_pie_fig, transparent = True, use_container_width = True)   
 
     st.divider()
             
