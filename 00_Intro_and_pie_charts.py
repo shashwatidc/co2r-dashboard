@@ -1042,17 +1042,24 @@ if not np.isnan(FE_product_checked):
                 fontsize = MEDIUM_SIZE)  
             # Label pie chart with arrows
             box_properties = dict(boxstyle="square,pad=0.3", fc="none", lw=0)
-            label_properties = dict(arrowprops=dict(arrowstyle="-"),
+            label_properties_away = dict(arrowprops=dict(arrowstyle="-"),
+                                bbox=box_properties, zorder=0, va="center")
+            label_properties_near = dict(arrowprops=dict(arrowstyle="-",alpha = 0),
                                 bbox=box_properties, zorder=0, va="center")
             for i, wedge in enumerate(wedges):
-                middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1
+                middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1 # in radians
                 y_posn = np.sin(np.deg2rad(middle_angle))
                 x_posn = np.cos(np.deg2rad(middle_angle))
                 horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
-                connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
-                label_properties["arrowprops"].update({"connectionstyle": connectionstyle})
-                axs.annotate(df_opex.index[i], xy=(x_posn, y_posn), xytext=(2.5*np.sign(x_posn), 3.1*y_posn),
-                            horizontalalignment=horizontalalignment, **label_properties)
+                if (wedge.theta2 - wedge.theta1) < np.pi/12:
+                    connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
+                    label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
+                    axs.annotate(df_opex.index[i], xy=(x_posn, y_posn), xytext=(2.5*np.sign(x_posn), 3.1*y_posn),
+                                horizontalalignment=horizontalalignment, **label_properties_away)
+                else:                            
+                    axs.annotate(df_opex.index[i], xy=(x_posn, y_posn), xytext=(1.5*np.sign(x_posn), 1.6*y_posn),
+                                horizontalalignment=horizontalalignment, **label_properties_near)
+
 
             st.pyplot(opex_pie_fig, transparent = True, use_container_width = True)   
 
@@ -1087,17 +1094,23 @@ if not np.isnan(FE_product_checked):
 
             # Label pie chart with arrows
             box_properties = dict(boxstyle="square,pad=0.3", fc="none", lw=0)
-            label_properties = dict(arrowprops=dict(arrowstyle="-"),
+            label_properties_away = dict(arrowprops=dict(arrowstyle="-"),
+                                bbox=box_properties, zorder=0, va="center")
+            label_properties_near = dict(arrowprops=dict(arrowstyle="-",alpha = 0),
                                 bbox=box_properties, zorder=0, va="center")
             for i, wedge in enumerate(wedges):
-                middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1
+                middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1 # in radians
                 y_posn = np.sin(np.deg2rad(middle_angle))
                 x_posn = np.cos(np.deg2rad(middle_angle))
                 horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
-                connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
-                label_properties["arrowprops"].update({"connectionstyle": connectionstyle})
-                axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), xytext=(2.5*np.sign(x_posn), 3.1*y_posn),
-                            horizontalalignment=horizontalalignment, **label_properties)
+                if (wedge.theta2 - wedge.theta1) < np.pi/12:
+                    connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
+                    label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
+                    axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), xytext=(2.5*np.sign(x_posn), 3.1*y_posn),
+                                horizontalalignment=horizontalalignment, **label_properties_away)
+                else:                            
+                    axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), xytext=(1.5*np.sign(x_posn), 1.6*y_posn),
+                                horizontalalignment=horizontalalignment, **label_properties_near)
 
             st.pyplot(levelized_pie_fig, transparent = True, use_container_width = True)   
 
@@ -1157,17 +1170,23 @@ if not np.isnan(FE_product_checked):
                     
                 # Label pie chart with arrows
                 box_properties = dict(boxstyle="square,pad=0.3", fc="none", lw=0)
-                label_properties = dict(arrowprops=dict(arrowstyle="-"),
+                label_properties_away = dict(arrowprops=dict(arrowstyle="-"),
+                                    bbox=box_properties, zorder=0, va="center")
+                label_properties_near = dict(arrowprops=dict(arrowstyle="-",alpha = 0),
                                     bbox=box_properties, zorder=0, va="center")
                 for i, wedge in enumerate(wedges):
-                    middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1
+                    middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1 # in radians
                     y_posn = np.sin(np.deg2rad(middle_angle))
                     x_posn = np.cos(np.deg2rad(middle_angle))
                     horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
-                    connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
-                    label_properties["arrowprops"].update({"connectionstyle": connectionstyle})
-                    axs.annotate(df_energy.iloc[2:-2].index[i], xy=(x_posn, y_posn), xytext=(2.5*np.sign(x_posn), 3.1*y_posn),
-                                horizontalalignment=horizontalalignment, **label_properties)
+                    if (wedge.theta2 - wedge.theta1) < np.pi/12:
+                        connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
+                        label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
+                        axs.annotate(df_energy.iloc[2:-2].index[i], xy=(x_posn, y_posn), xytext=(2.5*np.sign(x_posn), 3.1*y_posn),
+                                    horizontalalignment=horizontalalignment, **label_properties_away)
+                    else:                            
+                        axs.annotate(df_energy.iloc[2:-2].index[i], xy=(x_posn, y_posn), xytext=(1.5*np.sign(x_posn), 1.6*y_posn),
+                                    horizontalalignment=horizontalalignment, **label_properties_near)
                 
                 st.pyplot(energy_pie_fig, transparent = True, use_container_width = True)   
 
@@ -1208,13 +1227,13 @@ if not np.isnan(FE_product_checked):
                         y_posn = np.sin(np.deg2rad(middle_angle))
                         x_posn = np.cos(np.deg2rad(middle_angle))
                         horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
-                        if middle_angle < np.pi/12:
+                        if (wedge.theta2 - wedge.theta1) < np.pi/12:
                             connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                             label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
                             axs.annotate(df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i], xy=(x_posn, y_posn), xytext=(2.5*np.sign(x_posn), 3.1*y_posn),
                                         horizontalalignment=horizontalalignment, **label_properties_away)
                         else:                            
-                            axs.annotate(df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index, xy=(x_posn, y_posn), xytext=(np.sign(x_posn)*2, y_posn*2),
+                            axs.annotate(df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i], xy=(x_posn, y_posn), xytext=(1.5*np.sign(x_posn), 1.6*y_posn),
                                         horizontalalignment=horizontalalignment, **label_properties_near)
 
                     st.pyplot(emissions_pie_fig, transparent = True, use_container_width = True)   
