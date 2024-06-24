@@ -703,7 +703,7 @@ def updated_radio_state(df_flags):
     st.session_state.maximum_value_input = str(df_flags.loc[vbl_name, 'Range max'])
 
 df_flags = flags(product_name)
-    
+
 with st.sidebar:
     ## Initialize overridden_vbl_radio widget
 
@@ -720,11 +720,11 @@ with st.sidebar:
     try:
         st.write('Minimum value')
         vbl_min = float(st.text_input(label = 'Minimum value',
-                    key = 'minimum_value_input',#  value = str(df_flags.loc[vbl_name, 'Range min']),  
+                    key = 'minimum_value_input',# value = str(df_flags.loc[vbl_name, 'Range min']),  
                     label_visibility='collapsed'))
         st.write('Maximum value')
         vbl_max = float(st.text_input(label = 'Maximum value',
-                    key = 'maximum_value_input', # value = str(df_flags.loc[vbl_name, 'Range max']),
+                    key = 'maximum_value_input',#  value = str(df_flags.loc[vbl_name, 'Range max']),
                     label_visibility='collapsed'))
         
         st.write('Number of points (integer)')

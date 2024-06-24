@@ -159,7 +159,7 @@ def cached_single_run(product_name,
         kJ_per_kWh,
         )
 
-# # Cache default model run 
+# Cache default model run 
 # @st.cache_data
 # def default_single_run(product_name,
 #         product_rate_kg_day,
@@ -214,7 +214,7 @@ def cached_single_run(product_name,
 #         ):
 #     __, df_capex_totals_default, __, __, __, __,\
 #                 df_energy_default, __, __, __, __, __, df_opex_totals_default, __,\
-#                 __, df_potentials_default, __, __, __, __, __, __ = cached_single_run(product_name,
+#                 __, df_potentials_default, __, __, __, __, __ = cached_single_run(product_name,
 #         product_rate_kg_day,
 #         df_products,
 #         FE_CO2R_0,
@@ -423,7 +423,8 @@ Blues = mp.colormaps['Blues']
 
 st.title("CO$_2$R Costing Dashboard: Bar charts for CO$_2$R to Ethylene")
 st.write('''See how the capital and operating cost vary with changes in the process for CO$_2$ reduction to ethylene. 
-         :red[It is based on the model in our paper [__]()]. ''')
+         :red[It is based on the model in our paper [__]()]. 
+        ''')
 st.write("**Cite this work: __**")
 st.write("Questions, collaborations, requests? Contact Shashwati da Cunha ([shashwatidc@utexas.edu](mailto:shashwatidc@utexas.edu)).")
 # st.write(
