@@ -1051,7 +1051,7 @@ if not np.isnan(FE_product_checked):
                 horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
                 connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                 label_properies["arrowprops"].update({"connectionstyle": connectionstyle})
-                axs.annotate(df_opex.index[i], xy=(x_posn, y_posn), xytext=(3*np.sign(x_posn), 3*y_posn),
+                axs.annotate(df_opex.index[i], xy=(x_posn, y_posn), xytext=(3*np.sign(x_posn), 3.1*y_posn),
                             horizontalalignment=horizontalalignment, **label_properies)
 
             st.pyplot(opex_pie_fig, transparent = True, use_container_width = True)   
@@ -1096,7 +1096,7 @@ if not np.isnan(FE_product_checked):
                 horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
                 connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                 label_properies["arrowprops"].update({"connectionstyle": connectionstyle})
-                axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), xytext=(3*np.sign(x_posn), 3*y_posn),
+                axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), xytext=(3*np.sign(x_posn), 3.1*y_posn),
                             horizontalalignment=horizontalalignment, **label_properies)
 
             st.pyplot(levelized_pie_fig, transparent = True, use_container_width = True)   
@@ -1140,8 +1140,8 @@ if not np.isnan(FE_product_checked):
         with _render_lock:
             if not override_cell_voltage:
                 energy_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
-                axs.pie((abs(df_energy.iloc[2:-2].loc[:, 'Energy (kJ/kg {})'.format(product_name)])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)'],
-                        labels = df_energy.iloc[2:-2].index, labeldistance = 1.1,
+                wedges, __, __ = axs.pie((abs(df_energy.iloc[2:-2].loc[:, 'Energy (kJ/kg {})'.format(product_name)])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)'],
+                        # labels = df_energy.iloc[2:-2].index, labeldistance = 1.1,
                         autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
                         pctdistance = 0.8,
                         colors = energy_colors, startangle = 90, 
@@ -1154,6 +1154,21 @@ if not np.isnan(FE_product_checked):
                 'Energy: \n {:.0f} kJ/mol$_{{{}}}$'.format(sum((abs(df_energy.fillna(0).iloc[2:-2].loc[:, 'Energy (kJ/kg {})'.format(product_name)])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)']), product_name),
                 ha='center', va='center', 
                 fontsize = MEDIUM_SIZE)  
+                    
+                # Label pie chart with arrows
+                box_properties = dict(boxstyle="square,pad=0.3", fc="none", lw=0)
+                label_properies = dict(arrowprops=dict(arrowstyle="-"),
+                                    bbox=box_properties, zorder=0, va="center")
+                for i, wedge in enumerate(wedges):
+                    middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1
+                    y_posn = np.sin(np.deg2rad(middle_angle))
+                    x_posn = np.cos(np.deg2rad(middle_angle))
+                    horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
+                    connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
+                    label_properies["arrowprops"].update({"connectionstyle": connectionstyle})
+                    axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), xytext=(3*np.sign(x_posn), 3.1*y_posn),
+                                horizontalalignment=horizontalalignment, **label_properies)
+                
                 st.pyplot(energy_pie_fig, transparent = True, use_container_width = True)   
 
     ###### EMISSIONS PIE CHART
@@ -1167,8 +1182,8 @@ if not np.isnan(FE_product_checked):
             if not override_cell_voltage:
                 with _render_lock:
                     emissions_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
-                    axs.pie(df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2], 
-                        labels = df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index, labeldistance = 1.1,
+                    wedges, __, __ = axs.pie(df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2], 
+                        # labels = df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index, labeldistance = 1.1,
                         autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
                         pctdistance = 0.8,
                         colors = emissions_colors, startangle = 90, 
@@ -1181,6 +1196,21 @@ if not np.isnan(FE_product_checked):
                     'Emissions: \n {:.2f} kg$_{{CO_2}}$/kg$_{{{}}}$'.format(sum(df_emissions.fillna(0).iloc[:-2]), product_name), # All capex except working capital, which is recovered during operation
                     ha='center', va='center', 
                     fontsize = MEDIUM_SIZE)  
+                            
+                    # Label pie chart with arrows
+                    box_properties = dict(boxstyle="square,pad=0.3", fc="none", lw=0)
+                    label_properies = dict(arrowprops=dict(arrowstyle="-"),
+                                        bbox=box_properties, zorder=0, va="center")
+                    for i, wedge in enumerate(wedges):
+                        middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1
+                        y_posn = np.sin(np.deg2rad(middle_angle))
+                        x_posn = np.cos(np.deg2rad(middle_angle))
+                        horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
+                        connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
+                        label_properies["arrowprops"].update({"connectionstyle": connectionstyle})
+                        axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), xytext=(3*np.sign(x_posn), 3.1*y_posn),
+                                    horizontalalignment=horizontalalignment, **label_properies)
+
                     st.pyplot(emissions_pie_fig, transparent = True, use_container_width = True)   
 
     st.divider()
