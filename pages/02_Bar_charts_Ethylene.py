@@ -524,15 +524,15 @@ override_animation = False
 override_single = False
 model_FE = False
 is_battery = False
-st.session_state.is_active_error = False
+st.session_state.is_active_error_ethylene = False
 product_name = 'Ethylene' # default
 range_selection = 'Linear' # default
 override_vbl_selection = 'Total current density' # default
 vbl_name = 'Current density' # default
-if 'minimum_value_input' not in st.session_state:
-    st.session_state.minimum_value_input = str(0.001)
-if 'maximum_value_input' not in st.session_state:
-    st.session_state.maximum_value_input = str(1500)
+if 'minimum_value_input_ethylene' not in st.session_state:
+    st.session_state.minimum_value_input_ethylene = str(0.001)
+if 'maximum_value_input_ethylene' not in st.session_state:
+    st.session_state.maximum_value_input_ethylene = str(1500)
 
 ########## OTHER FIXED VALUES
 # PRODUCT COSTS
@@ -697,17 +697,17 @@ def y_axis_formatting(y_axis_min, y_axis_max, y_axis_num):
     return(y_axis_major_ticks)
 
 def updated_radio_state(df_flags):
-    vbl_row = options_list.index(st.session_state['overridden_vbl_radio']) # convert input into integer
+    vbl_row = options_list.index(st.session_state['overridden_vbl_radio_ethylene']) # convert input into integer
     vbl_name = df_flags.index[vbl_row] # set vbl_name from that row
-    st.session_state.minimum_value_input = str(df_flags.loc[vbl_name, 'Range min'])
-    st.session_state.maximum_value_input = str(df_flags.loc[vbl_name, 'Range max'])
+    st.session_state.minimum_value_input_ethylene = str(df_flags.loc[vbl_name, 'Range min'])
+    st.session_state.maximum_value_input_ethylene = str(df_flags.loc[vbl_name, 'Range max'])
 
 df_flags = flags(product_name)
 
 with st.sidebar:
-    ## Initialize overridden_vbl_radio widget
+    ## Initialize overridden_vbl_radio_ethylene widget
 
-    override_vbl_selection = st.radio(label = 'Select variable to see cost sensitivity ', key='overridden_vbl_radio',
+    override_vbl_selection = st.radio(label = 'Select variable to see cost sensitivity ', key='overridden_vbl_radio_ethylene',
                           options= options_list, 
                     index = 4, # default option
                     label_visibility='visible',
@@ -720,22 +720,22 @@ with st.sidebar:
     try:
         st.write('Minimum value')
         vbl_min = float(st.text_input(label = 'Minimum value',
-                    key = 'minimum_value_input',# value = str(df_flags.loc[vbl_name, 'Range min']),  
+                    key = 'minimum_value_input_ethylene', # value = str(df_flags.loc[vbl_name, 'Range min']),  
                     label_visibility='collapsed'))
         st.write('Maximum value')
         vbl_max = float(st.text_input(label = 'Maximum value',
-                    key = 'maximum_value_input',#  value = str(df_flags.loc[vbl_name, 'Range max']),
+                    key = 'maximum_value_input_ethylene',#  value = str(df_flags.loc[vbl_name, 'Range max']),
                     label_visibility='collapsed'))
         
         st.write('Number of points (integer)')
         vbl_num = int(st.text_input(label = 'Number of points',
                     value = 11, # TODO: fix this
                     label_visibility='collapsed'))
-        st.session_state.is_active_error = False
+        st.session_state.is_active_error_ethylene = False
     except:
         st.error('One of your x-variable values is invalid. Please check that they are all numbers and \
                   that the number of points is an integer.')
-        st.session_state.is_active_error = True
+        st.session_state.is_active_error_ethylene = True
         st.header('*:red[There is an error in the model inputs.]*')
 
     st.write('Spacing for points')
@@ -780,11 +780,11 @@ with st.sidebar:
             x_axis_min = float(x_axis_min)
             x_axis_max = float(x_axis_max)
             x_axis_num = int(x_axis_num)
-            st.session_state.is_active_error = False
+            st.session_state.is_active_error_ethylene = False
         except:
             st.error('One of your x-axis values is invalid. Please check that they are all numbers and \
                     that the number of x-ticks is an integer.')
-            st.session_state.is_active_error = True
+            st.session_state.is_active_error_ethylene = True
             st.header('*:red[There is an error in the model inputs.]*')
 
     with st.expander('**y-axes formatting**', expanded = False):
@@ -803,11 +803,11 @@ with st.sidebar:
             y_axis_min_capex = float(y_axis_min_capex)
             y_axis_max_capex = float(y_axis_max_capex)
             y_axis_num_capex = int(y_axis_num_capex)
-            st.session_state.is_active_error = False
+            st.session_state.is_active_error_ethylene = False
         except:
             st.error('One of your capex y-axis values is invalid. Please check that they are all numbers and \
                     that the number of y-ticks is an integer.')
-            st.session_state.is_active_error = True
+            st.session_state.is_active_error_ethylene = True
             st.header('*:red[There is an error in the model inputs..]*')
 
         st.divider()
@@ -825,11 +825,11 @@ with st.sidebar:
             y_axis_min_opex = float(y_axis_min_opex)
             y_axis_max_opex = float(y_axis_max_opex)
             y_axis_num_opex = int(y_axis_num_opex)
-            st.session_state.is_active_error = False
+            st.session_state.is_active_error_ethylene = False
         except:
             st.error('One of your opex y-axis values is invalid. Please check that they are all numbers and \
                     that the number of y-ticks is an integer.')
-            st.session_state.is_active_error = True
+            st.session_state.is_active_error_ethylene = True
             st.header('*:red[There is an error in the model inputs..]*')
     
         st.divider()
@@ -847,11 +847,11 @@ with st.sidebar:
             y_axis_min_levelized = float(y_axis_min_levelized)
             y_axis_max_levelized = float(y_axis_max_levelized)
             y_axis_num_levelized = int(y_axis_num_levelized)
-            st.session_state.is_active_error = False
+            st.session_state.is_active_error_ethylene = False
         except:
             st.error('One of your levelized cost y-axis values is invalid. Please check that they are all numbers and \
                     that the number of y-ticks is an integer.')
-            st.session_state.is_active_error = True
+            st.session_state.is_active_error_ethylene = True
             st.header('*:red[There is an error in the model inputs..]*')
 
         st.write('**Cell potential**')
@@ -868,11 +868,11 @@ with st.sidebar:
             y_axis_min_potential = float(y_axis_min_potential)
             y_axis_max_potential = float(y_axis_max_potential)
             y_axis_num_potential = int(y_axis_num_potential)
-            st.session_state.is_active_error = False
+            st.session_state.is_active_error_ethylene = False
         except:
             st.error('One of your opex y-axis values is invalid. Please check that they are all numbers and \
                     that the number of y-ticks is an integer.')
-            st.session_state.is_active_error = True
+            st.session_state.is_active_error_ethylene = True
             st.header('*:red[There is an error in the model inputs..]*')
 
         st.divider()
@@ -890,11 +890,11 @@ with st.sidebar:
             y_axis_min_energy = float(y_axis_min_energy)
             y_axis_max_energy = float(y_axis_max_energy)
             y_axis_num_energy = int(y_axis_num_energy)
-            st.session_state.is_active_error = False
+            st.session_state.is_active_error_ethylene = False
         except:
             st.error('One of your energy y-axis values is invalid. Please check that they are all numbers and \
                     that the number of y-ticks is an integer.')
-            st.session_state.is_active_error = True
+            st.session_state.is_active_error_ethylene = True
             st.header('*:red[There is an error in the model inputs..]*')
     
         st.divider()
@@ -912,11 +912,11 @@ with st.sidebar:
             y_axis_min_emissions = float(y_axis_min_emissions)
             y_axis_max_emissions = float(y_axis_max_emissions)
             y_axis_num_emissions = int(y_axis_num_emissions)
-            st.session_state.is_active_error = False
+            st.session_state.is_active_error_ethylene = False
         except:
             st.error('One of your emissions y-axis values is invalid. Please check that they are all numbers and \
                     that the number of y-ticks is an integer.')
-            st.session_state.is_active_error = True
+            st.session_state.is_active_error_ethylene = True
             st.header('*:red[There is an error in the model inputs..]*')
 
 
@@ -1051,9 +1051,9 @@ with st.sidebar:
                 df_products=df_products,
                 crossover_ratio=crossover_ratio)
         if not np.isnan(FE_product_checked): 
-            st.session_state.is_active_error = False
+            st.session_state.is_active_error_ethylene = False
         else:
-            st.session_state.is_active_error = True
+            st.session_state.is_active_error_ethylene = True
             st.header(':red[Model is physically unviable. Please check $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio.]')    
         
         st.latex(r'''
@@ -1244,7 +1244,7 @@ with st.sidebar:
     
 ##########################  GENERATE MODEL OVER RANGE  ##########################
 with middle_column:
-    if not st.session_state.is_active_error:
+    if not st.session_state.is_active_error_ethylene:
         progress_bar = st.progress(0, text= "Running model over range. Please wait.")
 
         ### Generate modeling results for variable range 
@@ -1438,10 +1438,10 @@ with middle_column:
         df_emissions_vs_vbl_2.insert(0, 'Units', 'kg CO2/kg {}'.format(product_name))
 
         if df_capex_BM_vs_vbl.isnull().values.all():
-            st.session_state.is_active_error = True
+            st.session_state.is_active_error_ethylene = True
             st.header('*:red[There is an error in the model inputs. Please check the sidebar for error messages.]*')
         else:
-            st.session_state.is_active_error = False
+            st.session_state.is_active_error_ethylene = False
 
     else:
         st.header('*:red There is an error in the model inputs. Please check the sidebar for error messages.*')
@@ -1450,7 +1450,7 @@ with middle_column:
 
 ############################### FIGURE OUTPUTS #####################################
 
-if not st.session_state.is_active_error:
+if not st.session_state.is_active_error_ethylene:
     ###### BAR CHART FORMATTING
     ### Define colors
     if is_battery:
@@ -1671,50 +1671,50 @@ if not st.session_state.is_active_error:
 
     ###### POTENTIALS BAR CHART
     with middle_column.container(height = 300, border = False): 
-        if not override_cell_voltage:
-            with _render_lock:
-                potentials_bar_fig, axs = plt.subplots() # Set up plot
-                #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
+        # if not override_cell_voltage:
+        with _render_lock:
+            potentials_bar_fig, axs = plt.subplots() # Set up plot
+            #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
 
-                y_axis_major_ticks = y_axis_formatting(y_axis_min_potential, y_axis_max_potential, y_axis_num_potential)
+            y_axis_major_ticks = y_axis_formatting(y_axis_min_potential, y_axis_max_potential, y_axis_num_potential)
 
-                ## Axis labels
-                axs.set_ylabel('Cell potential (V)')
-                axs.set_xlabel(x_axis_label)
+            ## Axis labels
+            axs.set_ylabel('Cell potential (V)')
+            axs.set_xlabel(x_axis_label)
 
-                ## Hide or show plot borders 
-                axs.spines['right'].set_visible(True)
-                axs.spines['top'].set_visible(True)
+            ## Hide or show plot borders 
+            axs.spines['right'].set_visible(True)
+            axs.spines['top'].set_visible(True)
 
-                ## Draw axis ticks
-                plt.minorticks_on()
-                axs.xaxis.set_minor_locator(AutoMinorLocator(2)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
-                axs.yaxis.set_minor_locator(AutoMinorLocator(5)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
-                plt.xticks(x_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
-                plt.yticks(y_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
+            ## Draw axis ticks
+            plt.minorticks_on()
+            axs.xaxis.set_minor_locator(AutoMinorLocator(2)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
+            axs.yaxis.set_minor_locator(AutoMinorLocator(5)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
+            plt.xticks(x_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
+            plt.yticks(y_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
 
-                ## Apply axis limits
-                axs.set_xlim([x_axis_min,x_axis_max])
-                axs.set_ylim([y_axis_min_potential,y_axis_max_potential])
-                #axs.set_ylim([i_.iloc[:,0].min(axis=0),i_.iloc[:,0].max(axis=0)])
+            ## Apply axis limits
+            axs.set_xlim([x_axis_min,x_axis_max])
+            axs.set_ylim([y_axis_min_potential,y_axis_max_potential])
+            #axs.set_ylim([i_.iloc[:,0].min(axis=0),i_.iloc[:,0].max(axis=0)])
 
-                ## Plot title
-                # axs.set_title('Chronoamperometry at {:.3f} V for {:.2f} hrs'.format(vbl_we_avg, expt_time) )
+            ## Plot title
+            # axs.set_title('Chronoamperometry at {:.3f} V for {:.2f} hrs'.format(vbl_we_avg, expt_time) )
 
-                ## Plot series
-                cumsum = 0
-                counter = 0
-                for i, category in enumerate(df_potentials_vs_vbl.iloc[2:7].index):
-                    if not df_potentials_vs_vbl.loc[category].isnull().all():
-                        axs.bar(vbl_range, abs(df_potentials_vs_vbl.fillna(0).loc[category]), label=category , bottom = cumsum, 
-                                width = barwidth, color = potentials_colors[counter],
-                        edgecolor = 'w', linewidth = linewidth_calc)
-                        cumsum += abs(df_potentials_vs_vbl.fillna(0).loc[category])
-                        counter += 1
-                        
-                ## Legend
-                axs.legend(bbox_to_anchor=(1, 1), loc='upper left', reverse = True) # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
-                st.pyplot(potentials_bar_fig, transparent = True, use_container_width = True)
+            ## Plot series
+            cumsum = 0
+            counter = 0
+            for i, category in enumerate(df_potentials_vs_vbl.iloc[2:7].index):
+                if not df_potentials_vs_vbl.loc[category].isnull().all():
+                    axs.bar(vbl_range, abs(df_potentials_vs_vbl.fillna(0).loc[category]), label=category , bottom = cumsum, 
+                            width = barwidth, color = potentials_colors[counter],
+                    edgecolor = 'w', linewidth = linewidth_calc)
+                    cumsum += abs(df_potentials_vs_vbl.fillna(0).loc[category])
+                    counter += 1
+                    
+            ## Legend
+            axs.legend(bbox_to_anchor=(1, 1), loc='upper left', reverse = True) # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
+            st.pyplot(potentials_bar_fig, transparent = True, use_container_width = True)
 
     ###### FE-SPC SCATTERPLOT
     with right_column.container(height = 300, border = False): 
@@ -1750,110 +1750,110 @@ if not st.session_state.is_active_error:
 
     ###### ENERGY BAR CHART 
     with middle_column.container(height = 300, border = False): 
-        if not override_cell_voltage:   
-            with _render_lock:
-                energy_bar_fig, axs = plt.subplots() # Set up plot
-                #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
+        # if not override_cell_voltage:   
+        with _render_lock:
+            energy_bar_fig, axs = plt.subplots() # Set up plot
+            #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
 
-                y_axis_major_ticks = y_axis_formatting(y_axis_min_energy, y_axis_max_energy, y_axis_num_energy)
+            y_axis_major_ticks = y_axis_formatting(y_axis_min_energy, y_axis_max_energy, y_axis_num_energy)
 
-                ## Axis labels
-                axs.set_ylabel('Energy (kJ/mol$_{{{}}}$)'.format(product_name))
-                axs.set_xlabel(x_axis_label)
+            ## Axis labels
+            axs.set_ylabel('Energy (kJ/mol$_{{{}}}$)'.format(product_name))
+            axs.set_xlabel(x_axis_label)
 
-                ## Draw axis ticks
-                axs.xaxis.set_minor_locator(AutoMinorLocator(2)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
-                axs.yaxis.set_minor_locator(AutoMinorLocator(5)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
-                plt.xticks(x_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
-                plt.yticks(y_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
+            ## Draw axis ticks
+            axs.xaxis.set_minor_locator(AutoMinorLocator(2)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
+            axs.yaxis.set_minor_locator(AutoMinorLocator(5)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
+            plt.xticks(x_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
+            plt.yticks(y_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
 
-                ## Apply axis limits
-                axs.set_xlim([x_axis_min,x_axis_max])
-                axs.set_ylim([y_axis_min_energy,y_axis_max_energy])
+            ## Apply axis limits
+            axs.set_xlim([x_axis_min,x_axis_max])
+            axs.set_ylim([y_axis_min_energy,y_axis_max_energy])
 
-                ## Plot series
-                cumsum = 0
-                counter = 0
-                for i, category in enumerate(df_energy_vs_vbl.iloc[:-3].index):
-                    if not df_energy_vs_vbl.loc[category].isnull().all():
-                        axs.bar(vbl_range, 
-                                (abs(df_energy_vs_vbl.fillna(0).loc[category])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)'], # energy kJ/kg * 0.001 g/kg * MW g/mol
-                                label=category , 
-                                bottom = cumsum, width = barwidth, color = energy_colors[counter],
-                                edgecolor = 'w', linewidth = linewidth_calc)
-                        cumsum += (abs(df_energy_vs_vbl.fillna(0).loc[category])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)'] # energy kJ/kg * 0.001 g/kg * MW g/mol
-                        counter += 1
-                        
-                ## Legend
-                axs.legend(bbox_to_anchor=(1, 1), loc='upper left', reverse = True) 
-                # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
+            ## Plot series
+            cumsum = 0
+            counter = 0
+            for i, category in enumerate(df_energy_vs_vbl.iloc[:-3].index):
+                if not df_energy_vs_vbl.loc[category].isnull().all():
+                    axs.bar(vbl_range, 
+                            (abs(df_energy_vs_vbl.fillna(0).loc[category])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)'], # energy kJ/kg * 0.001 g/kg * MW g/mol
+                            label=category , 
+                            bottom = cumsum, width = barwidth, color = energy_colors[counter],
+                            edgecolor = 'w', linewidth = linewidth_calc)
+                    cumsum += (abs(df_energy_vs_vbl.fillna(0).loc[category])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)'] # energy kJ/kg * 0.001 g/kg * MW g/mol
+                    counter += 1
+                    
+            ## Legend
+            axs.legend(bbox_to_anchor=(1, 1), loc='upper left', reverse = True) 
+            # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
 
-                st.pyplot(energy_bar_fig, transparent = True, use_container_width = True)   
+            st.pyplot(energy_bar_fig, transparent = True, use_container_width = True)   
 
     ###### EMISSIONS BAR CHART
     with right_column.container(height = 300, border = False): 
-        if not override_cell_voltage:
-            with _render_lock:
-                emissions_bar_fig, axs = plt.subplots() # Set up plot
-                #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
+    # if not override_cell_voltage:
+        with _render_lock:
+            emissions_bar_fig, axs = plt.subplots() # Set up plot
+            #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
 
-                y_axis_major_ticks = y_axis_formatting(y_axis_min_emissions, y_axis_max_emissions, y_axis_num_emissions)
+            y_axis_major_ticks = y_axis_formatting(y_axis_min_emissions, y_axis_max_emissions, y_axis_num_emissions)
 
-                ## Axis labels
-                axs.set_ylabel('Emissions \n (kg$_{{CO_2}}$/kg$_{{{}}}$)'.format(product_name))
-                axs.set_xlabel(x_axis_label)
+            ## Axis labels
+            axs.set_ylabel('Emissions \n (kg$_{{CO_2}}$/kg$_{{{}}}$)'.format(product_name))
+            axs.set_xlabel(x_axis_label)
 
-                ## Draw axis ticks
-                axs.xaxis.set_minor_locator(AutoMinorLocator(2)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
-                axs.yaxis.set_minor_locator(AutoMinorLocator(5)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
-                plt.xticks(x_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
-            #     plt.yticks(y_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
+            ## Draw axis ticks
+            axs.xaxis.set_minor_locator(AutoMinorLocator(2)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
+            axs.yaxis.set_minor_locator(AutoMinorLocator(5)) # subdivide major ticks into this many minor divisions (eg. major step = 5 V, then autominorlocator(5) will mark off every 1 V)
+            plt.xticks(x_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
+        #     plt.yticks(y_axis_major_ticks) # tick locations as a list, eg. plt.xticks([0,10,20])
 
-                ## Apply axis limits
-                axs.set_xlim([x_axis_min,x_axis_max])
-                axs.set_ylim([y_axis_min_emissions,y_axis_max_emissions])
+            ## Apply axis limits
+            axs.set_xlim([x_axis_min,x_axis_max])
+            axs.set_ylim([y_axis_min_emissions,y_axis_max_emissions])
 
-                ## Plot series
-                axs.plot([x_axis_min, x_axis_max], [MW_CO2/df_products.loc[product_name, 'Molecular weight (g/mol)'],MW_CO2/df_products.loc[product_name, 'Molecular weight (g/mol)']], alpha = 1,
-                        c = theme_colors[6]) # Plot line for negative emissions
-                axs.text(x_axis_max * 0.975, MW_CO2/df_products.loc[product_name, 'Molecular weight (g/mol)']*0.95, 'Negative emissions', ha='right', va='top', 
-                        fontsize = SMALL_SIZE)
-                if df_flags.loc['Grid CO$_2$ intensity', 'T/F?'] == True:
-                    axs.plot([df_utility_imports.loc['Electricity - current US mix', 'CO2 emissions (g CO2/kWh)']/1000,df_utility_imports.loc['Electricity - current US mix', 'CO2 emissions (g CO2/kWh)']/1000], 
-                            [y_axis_min_emissions, y_axis_max_emissions], alpha = 1,
-                        c = theme_colors[6]) # Plot line for cost 
-                    axs.text(df_utility_imports.loc['Electricity - current US mix','CO2 emissions (g CO2/kWh)']/1000, 
-                            y_axis_max_emissions*0.975, 'U.S. mix', ha='right', va='top', 
-                        fontsize = SMALL_SIZE, rotation = 90)
+            ## Plot series
+            axs.plot([x_axis_min, x_axis_max], [MW_CO2/df_products.loc[product_name, 'Molecular weight (g/mol)'],MW_CO2/df_products.loc[product_name, 'Molecular weight (g/mol)']], alpha = 1,
+                    c = theme_colors[6]) # Plot line for negative emissions
+            axs.text(x_axis_max * 0.975, MW_CO2/df_products.loc[product_name, 'Molecular weight (g/mol)']*0.95, 'Negative emissions', ha='right', va='top', 
+                    fontsize = SMALL_SIZE)
+            if df_flags.loc['Grid CO$_2$ intensity', 'T/F?'] == True:
+                axs.plot([df_utility_imports.loc['Electricity - current US mix', 'CO2 emissions (g CO2/kWh)']/1000,df_utility_imports.loc['Electricity - current US mix', 'CO2 emissions (g CO2/kWh)']/1000], 
+                        [y_axis_min_emissions, y_axis_max_emissions], alpha = 1,
+                    c = theme_colors[6]) # Plot line for cost 
+                axs.text(df_utility_imports.loc['Electricity - current US mix','CO2 emissions (g CO2/kWh)']/1000, 
+                        y_axis_max_emissions*0.975, 'U.S. mix', ha='right', va='top', 
+                    fontsize = SMALL_SIZE, rotation = 90)
+                
+                axs.plot([df_utility_imports.loc['Electricity - current California mix', 'CO2 emissions (g CO2/kWh)']/1000,df_utility_imports.loc['Electricity - current California mix', 'CO2 emissions (g CO2/kWh)']/1000], 
+                        [y_axis_min_emissions, y_axis_max_emissions], alpha = 1,
+                    c = theme_colors[6]) # Plot line for cost 
+                axs.text(df_utility_imports.loc['Electricity - current California mix', 'CO2 emissions (g CO2/kWh)']/1000, 
+                        y_axis_max_emissions*0.975, 'California mix', ha='right', va='top', 
+                    fontsize = SMALL_SIZE, rotation = 90)
+                
+                axs.plot([df_utility_imports.loc['Electricity - solar', 'CO2 emissions (g CO2/kWh)']/1000,df_utility_imports.loc['Electricity - solar', 'CO2 emissions (g CO2/kWh)']/1000], 
+                        [y_axis_min_emissions, y_axis_max_emissions], alpha = 1,
+                    c = theme_colors[6]) # Plot line for cost 
+                axs.text(df_utility_imports.loc['Electricity - solar', 'CO2 emissions (g CO2/kWh)']/1000, 
+                                y_axis_max_emissions*0.975, 'Solar', ha='right', va='top', 
+                    fontsize = SMALL_SIZE, rotation = 90)
+
+            cumsum = 0
+            counter = 0
+            for i, category in enumerate(df_emissions_vs_vbl.iloc[:-3].index):
+                if not df_emissions_vs_vbl.loc[category].isnull().all():
+                    axs.bar(vbl_range, abs(df_emissions_vs_vbl.fillna(0).loc[category]), label=category , 
+                            bottom = cumsum, width = barwidth, color = emissions_colors[counter],
+                    edgecolor = 'w', linewidth = linewidth_calc)
+                    cumsum += abs(df_emissions_vs_vbl.fillna(0).loc[category])
+                    counter += 1
                     
-                    axs.plot([df_utility_imports.loc['Electricity - current California mix', 'CO2 emissions (g CO2/kWh)']/1000,df_utility_imports.loc['Electricity - current California mix', 'CO2 emissions (g CO2/kWh)']/1000], 
-                            [y_axis_min_emissions, y_axis_max_emissions], alpha = 1,
-                        c = theme_colors[6]) # Plot line for cost 
-                    axs.text(df_utility_imports.loc['Electricity - current California mix', 'CO2 emissions (g CO2/kWh)']/1000, 
-                            y_axis_max_emissions*0.975, 'California mix', ha='right', va='top', 
-                        fontsize = SMALL_SIZE, rotation = 90)
-                    
-                    axs.plot([df_utility_imports.loc['Electricity - solar', 'CO2 emissions (g CO2/kWh)']/1000,df_utility_imports.loc['Electricity - solar', 'CO2 emissions (g CO2/kWh)']/1000], 
-                            [y_axis_min_emissions, y_axis_max_emissions], alpha = 1,
-                        c = theme_colors[6]) # Plot line for cost 
-                    axs.text(df_utility_imports.loc['Electricity - solar', 'CO2 emissions (g CO2/kWh)']/1000, 
-                                    y_axis_max_emissions*0.975, 'Solar', ha='right', va='top', 
-                        fontsize = SMALL_SIZE, rotation = 90)
+            ## Legend
+            axs.legend(bbox_to_anchor=(1, 1), loc='upper left', reverse = True) # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
 
-                cumsum = 0
-                counter = 0
-                for i, category in enumerate(df_emissions_vs_vbl.iloc[:-3].index):
-                    if not df_emissions_vs_vbl.loc[category].isnull().all():
-                        axs.bar(vbl_range, abs(df_emissions_vs_vbl.fillna(0).loc[category]), label=category , 
-                                bottom = cumsum, width = barwidth, color = emissions_colors[counter],
-                        edgecolor = 'w', linewidth = linewidth_calc)
-                        cumsum += abs(df_emissions_vs_vbl.fillna(0).loc[category])
-                        counter += 1
-                        
-                ## Legend
-                axs.legend(bbox_to_anchor=(1, 1), loc='upper left', reverse = True) # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
-
-                st.pyplot(emissions_bar_fig, transparent = True, use_container_width = True)   
+            st.pyplot(emissions_bar_fig, transparent = True, use_container_width = True)   
                 
     #___________________________________________________________________________________
 
