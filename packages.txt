@@ -1,3 +1,0 @@
-update
-install ttf-mscorefonts-installer
-install fontconfig

@@ -291,9 +291,9 @@ st.set_page_config(page_title = 'CO2R Costing Dashboard - Home',
 SMALL_SIZE = 20 # set smallest font size
 MEDIUM_SIZE = 24 # set medium font size
 BIGGER_SIZE = 27 # set
-# font_dir = ['/.streamlit/Arial']
-# for font in font_manager.findSystemFonts(font_dir):
-#     font_manager.fontManager.addfont(font)
+font_dir = ['/.streamlit/Arial/Arial']
+for font in font_manager.findSystemFonts(font_dir):
+    font_manager.fontManager.addfont(font)
 mp.rc('font', family = 'sans-serif') # 'Arial' # font group is sans-serif
 # st.write(plt.rcParams["font.sans-serif"][:])
 mp.rcParams["font.sans-serif"] = ["Arial"]
