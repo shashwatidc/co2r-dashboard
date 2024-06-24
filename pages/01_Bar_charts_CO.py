@@ -160,119 +160,118 @@ def cached_single_run(product_name,
         )
 
 # Cache default model run 
-@st.cache_data
-def default_single_run(product_name,
-        product_rate_kg_day,
-        df_products,
-        FE_CO2R_0,
-        FE_product_specified,
-        j_total_mA_cm2,
-        SPC,
-        crossover_ratio,
-        P,
-        T_streams,
-        R_ohmcm2,
-        an_E_eqm,
-        an_eta_ref,
-        an_Tafel_slope,
-        an_j_ref,
-        cathode_outlet_humidity,
-        excess_water_ratio,   
-        electrolyte_conc,  
-        density_kgm3,
-        PSA_second_law_efficiency,
-        carbon_capture_efficiency,
-        T_sep,         
-        electricity_cost_USD_kWh,
-        heat_cost_USD_kWh,
-        electricity_emissions_kgCO2_kWh,
-        heat_emissions_kgCO2_kWh,
-        product_cost_USD_kgprod,
-        H2_cost_USD_kgH2,
-        water_cost_USD_kg,
-        CO2_cost_USD_tCO2,
-        electrolyzer_capex_USD_m2,       
-        lifetime_years,
-        capacity_factor,
-        battery_capex_USD_kWh,               
-        battery_capacity,
-        model_FE,
-        overridden_vbl,
-        overridden_value,
-        overridden_unit,
-        override_optimization,
-        exponent,
-        scaling,
-        MW_CO2,
-        MW_H2O,
-        MW_O2,
-        MW_MX,
-        R, 
-        F,
-        K_to_C = 273.15,
-        kJ_per_kWh = 3.60E+03,
-        ):
-    __, df_capex_totals_default, __, __, __, __,\
-                df_energy_default, __, __, __, __, __, df_opex_totals_default, __,\
-                __, df_potentials_default, __, __, __, __, __, __, \
-                __, NPV_default, __, __ = cached_single_run(product_name,
-        product_rate_kg_day,
-        df_products,
-        FE_CO2R_0,
-        FE_product_specified,
-        j_total_mA_cm2,
-        SPC,
-        crossover_ratio,
-        P,
-        T_streams,
-        R_ohmcm2,
-        an_E_eqm,
-        an_eta_ref,
-        an_Tafel_slope,
-        an_j_ref,
-        cathode_outlet_humidity,
-        excess_water_ratio,   
-        electrolyte_conc,  
-        density_kgm3,
-        PSA_second_law_efficiency,
-        carbon_capture_efficiency,
-        T_sep,         
-        electricity_cost_USD_kWh,
-        heat_cost_USD_kWh,
-        electricity_emissions_kgCO2_kWh,
-        heat_emissions_kgCO2_kWh,
-        product_cost_USD_kgprod,
-        H2_cost_USD_kgH2,
-        water_cost_USD_kg,
-        CO2_cost_USD_tCO2,
-        electrolyzer_capex_USD_m2,       
-        lifetime_years,
-        capacity_factor,
-        battery_capex_USD_kWh,               
-        battery_capacity,
-        model_FE,
-        overridden_vbl,
-        overridden_value,
-        overridden_unit,
-        override_optimization,
-        exponent,
-        scaling,
-        MW_CO2,
-        MW_H2O,
-        MW_O2,
-        MW_MX,
-        R, 
-        F,
-        K_to_C,
-        kJ_per_kWh,
-        )
-    capex_default = df_capex_totals_default.loc['Total permanent investment', 'Cost ($)']
-    opex_default = df_opex_totals_default.loc['Production cost', 'Cost ($/kg {})'.format(product_name)]
-    levelized_default = df_opex_totals_default.loc['Levelized cost', 'Cost ($/kg {})'.format(product_name)]
-    potential_default = df_potentials_default.loc['Cell potential', 'Value'] 
-    energy_default = df_energy_default.loc['Total', 'Energy (kJ/kg {})'.format(product_name)]
-    emissions_default = sum(df_energy_default.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)])
-    return capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default, NPV_default
+# @st.cache_data
+# def default_single_run(product_name,
+#         product_rate_kg_day,
+#         df_products,
+#         FE_CO2R_0,
+#         FE_product_specified,
+#         j_total_mA_cm2,
+#         SPC,
+#         crossover_ratio,
+#         P,
+#         T_streams,
+#         R_ohmcm2,
+#         an_E_eqm,
+#         an_eta_ref,
+#         an_Tafel_slope,
+#         an_j_ref,
+#         cathode_outlet_humidity,
+#         excess_water_ratio,   
+#         electrolyte_conc,  
+#         density_kgm3,
+#         PSA_second_law_efficiency,
+#         carbon_capture_efficiency,
+#         T_sep,         
+#         electricity_cost_USD_kWh,
+#         heat_cost_USD_kWh,
+#         electricity_emissions_kgCO2_kWh,
+#         heat_emissions_kgCO2_kWh,
+#         product_cost_USD_kgprod,
+#         H2_cost_USD_kgH2,
+#         water_cost_USD_kg,
+#         CO2_cost_USD_tCO2,
+#         electrolyzer_capex_USD_m2,       
+#         lifetime_years,
+#         capacity_factor,
+#         battery_capex_USD_kWh,               
+#         battery_capacity,
+#         model_FE,
+#         overridden_vbl,
+#         overridden_value,
+#         overridden_unit,
+#         override_optimization,
+#         exponent,
+#         scaling,
+#         MW_CO2,
+#         MW_H2O,
+#         MW_O2,
+#         MW_MX,
+#         R, 
+#         F,
+#         K_to_C = 273.15,
+#         kJ_per_kWh = 3.60E+03,
+#         ):
+#     __, df_capex_totals_default, __, __, __, __,\
+#                 df_energy_default, __, __, __, __, __, df_opex_totals_default, __,\
+#                 __, df_potentials_default, __, __, __, __, __ = cached_single_run(product_name,
+#         product_rate_kg_day,
+#         df_products,
+#         FE_CO2R_0,
+#         FE_product_specified,
+#         j_total_mA_cm2,
+#         SPC,
+#         crossover_ratio,
+#         P,
+#         T_streams,
+#         R_ohmcm2,
+#         an_E_eqm,
+#         an_eta_ref,
+#         an_Tafel_slope,
+#         an_j_ref,
+#         cathode_outlet_humidity,
+#         excess_water_ratio,   
+#         electrolyte_conc,  
+#         density_kgm3,
+#         PSA_second_law_efficiency,
+#         carbon_capture_efficiency,
+#         T_sep,         
+#         electricity_cost_USD_kWh,
+#         heat_cost_USD_kWh,
+#         electricity_emissions_kgCO2_kWh,
+#         heat_emissions_kgCO2_kWh,
+#         product_cost_USD_kgprod,
+#         H2_cost_USD_kgH2,
+#         water_cost_USD_kg,
+#         CO2_cost_USD_tCO2,
+#         electrolyzer_capex_USD_m2,       
+#         lifetime_years,
+#         capacity_factor,
+#         battery_capex_USD_kWh,               
+#         battery_capacity,
+#         model_FE,
+#         overridden_vbl,
+#         overridden_value,
+#         overridden_unit,
+#         override_optimization,
+#         exponent,
+#         scaling,
+#         MW_CO2,
+#         MW_H2O,
+#         MW_O2,
+#         MW_MX,
+#         R, 
+#         F,
+#         K_to_C,
+#         kJ_per_kWh,
+#         )
+#     capex_default = df_capex_totals_default.loc['Total permanent investment', 'Cost ($)']
+#     opex_default = df_opex_totals_default.loc['Production cost', 'Cost ($/kg {})'.format(product_name)]
+#     levelized_default = df_opex_totals_default.loc['Levelized cost', 'Cost ($/kg {})'.format(product_name)]
+#     potential_default = df_potentials_default.loc['Cell potential', 'Value'] 
+#     energy_default = df_energy_default.loc['Total', 'Energy (kJ/kg {})'.format(product_name)]
+#     emissions_default = sum(df_energy_default.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)])
+#     return capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default
 
 _render_lock = threading.RLock()
 
@@ -927,49 +926,49 @@ st.sidebar.header('Model inputs' )
 with st.sidebar:
     st.subheader('Cell potential model')
     with st.expander(label = '**Simplified Butler-Volmer model assumptions**', expanded = False):
-        override_cell_voltage = st.checkbox('Manually specify full-cell voltage', value = False)
-        cell_E_V = st.slider(label = 'Cell voltage',
-                            min_value = 0.001, 
-                            max_value = 10.0, 
-                            step = 0.1, value = cell_E_V,
-                            format = '%.1f',
-                    help = '''Check the box above to set the full-cell voltage. No underlying voltage model will be used. 
-                    This means that current and voltage have no physical relationship.
-                      \n Default cell voltage: {} V'''.format(default_cell_E_V),
-                    disabled = not override_cell_voltage)
-        if override_cell_voltage:
-            st.write('*Using specified cell voltage*')
-        else:
-            st.write('*Modeling cell voltage from simplified Butler-Volmer model*')
-            override_eta_cat = st.checkbox('Specify cathode (CO$_2$R) overpotential', value = False)
-            BV_eta_cat_V = st.slider(label = 'Cathodic overpotential (V)',
-                            min_value = -10.0, 
-                            max_value = 0.0, 
-                            step = 0.1, value = BV_eta_cat_V,
-                            format = '%.1f',
-                            disabled = not override_eta_cat,
-                            help = '''Check the box above to set the cathodic overpotential. 
-                            Thermodynamics, cell resistance and anodic overpotential will be modeled. 
-                            Note that more negative overpotentials indicate slower kinetics.
-                              \n Default cathodic overpotential: {} V'''.format(default_BV_eta_cat_V),)
-            if override_eta_cat:
-                st.write('*Using manually specified cathodic overpotential*')
-            else:
-                st.write('*Modeling cathodic overpotential from Tafel slope, {:.0f} mV/dec*'.format(cat_Tafel_slope))
+    #     override_cell_voltage = st.checkbox('Manually specify full-cell voltage', value = False)
+    #     cell_E_V = st.slider(label = 'Cell voltage',
+    #                         min_value = 0.001, 
+    #                         max_value = 10.0, 
+    #                         step = 0.1, value = cell_E_V,
+    #                         format = '%.1f',
+    #                 help = '''Check the box above to set the full-cell voltage. No underlying voltage model will be used. 
+    #                 This means that current and voltage have no physical relationship.
+    #                   \n Default cell voltage: {} V'''.format(default_cell_E_V),
+    #                 disabled = not override_cell_voltage)
+    #     if override_cell_voltage:
+    #         st.write('*Using specified cell voltage*')
+    #     else:
+    #         st.write('*Modeling cell voltage from simplified Butler-Volmer model*')
+    #         override_eta_cat = st.checkbox('Specify cathode (CO$_2$R) overpotential', value = False)
+    #         BV_eta_cat_V = st.slider(label = 'Cathodic overpotential (V)',
+    #                         min_value = -10.0, 
+    #                         max_value = 0.0, 
+    #                         step = 0.1, value = BV_eta_cat_V,
+    #                         format = '%.1f',
+    #                         disabled = not override_eta_cat,
+    #                         help = '''Check the box above to set the cathodic overpotential. 
+    #                         Thermodynamics, cell resistance and anodic overpotential will be modeled. 
+    #                         Note that more negative overpotentials indicate slower kinetics.
+    #                           \n Default cathodic overpotential: {} V'''.format(default_BV_eta_cat_V),)
+    #         if override_eta_cat:
+    #             st.write('*Using manually specified cathodic overpotential*')
+    #         else:
+    #             st.write('*Modeling cathodic overpotential from Tafel slope, {:.0f} mV/dec*'.format(cat_Tafel_slope))
 
-            override_eta_an = st.checkbox('Specify anode (oxidation reaction) overpotential', value = False)
-            BV_eta_an_V = st.slider(label = 'Anodic overpotential (V)',
-                            min_value = 0.0, 
-                            max_value = 10.0, 
-                            step = 0.1, value = BV_eta_an_V,
-                            format = '%.1f',
-                            disabled = not override_eta_an,
-                            help = '''Check the box above to set the anodic overpotential. Thermodynamics, cell resistance and cathodic overpotential will be modeled. 
-                              \n Default anodic overpotential: {} V'''.format(default_BV_eta_an_V),) 
-            if override_eta_an:
-                st.write('*Using manually specified anodic overpotential*')
-            else:
-                st.write('*Modeling anodic overpotential from Tafel slope, {:.0f} mV/dec*'.format(an_Tafel_slope))
+    #         override_eta_an = st.checkbox('Specify anode (oxidation reaction) overpotential', value = False)
+    #         BV_eta_an_V = st.slider(label = 'Anodic overpotential (V)',
+    #                         min_value = 0.0, 
+    #                         max_value = 10.0, 
+    #                         step = 0.1, value = BV_eta_an_V,
+    #                         format = '%.1f',
+    #                         disabled = not override_eta_an,
+    #                         help = '''Check the box above to set the anodic overpotential. Thermodynamics, cell resistance and cathodic overpotential will be modeled. 
+    #                           \n Default anodic overpotential: {} V'''.format(default_BV_eta_an_V),) 
+    #         if override_eta_an:
+    #             st.write('*Using manually specified anodic overpotential*')
+    #         else:
+    #             st.write('*Modeling anodic overpotential from Tafel slope, {:.0f} mV/dec*'.format(an_Tafel_slope))
             
             override_ohmic = st.checkbox('Specify full-cell area-specific resistance', value = False)
             R_ohmcm2 = st.slider(label = 'Area-specific resistance ($ \Omega \cdot$ cm$^2$)',
@@ -1210,7 +1209,7 @@ with st.sidebar:
 
 ##########################  RUN MODEL AT DEFAULT VALUES  ###########################
 
-# capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default, NPV_default = default_single_run(product_name = product_name, 
+# capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default = default_single_run(product_name = product_name, 
 #                         product_rate_kg_day = default_product_rate_kg_day, 
 #                         df_products = df_products, FE_CO2R_0 = default_FE_CO2R_0, 
 #                         FE_product_specified = default_FE_product_specified, 
@@ -1288,8 +1287,7 @@ with middle_column:
             ### Generate physical and costing model
             df_capex_BM, df_capex_totals, df_costing_assumptions, df_depreciation, df_electrolyzer_assumptions, df_electrolyzer_streams_mol_s,\
                 df_energy, df_feedstocks, df_general, df_maintenance, df_operations, df_opex, df_opex_totals, df_outlet_assumptions,\
-                df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities, df_cashflows, \
-                cashflows, NPV, IRR, breakeven_price_USD_kgprod = cached_single_run(product_name = product_name, 
+                df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities = cached_single_run(product_name = product_name, 
                                                                             product_rate_kg_day = product_rate_kg_day, 
                                                                             df_products = df_products, FE_CO2R_0 = FE_CO2R_0, 
                                                                             FE_product_specified = FE_product_specified, 

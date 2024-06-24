@@ -214,8 +214,7 @@ def default_single_run(product_name,
         ):
     __, df_capex_totals_default, __, __, __, __,\
                 df_energy_default, __, __, __, __, __, df_opex_totals_default, __,\
-                __, df_potentials_default, __, __, __, __, __, __, \
-                __, NPV_default, __, __ = cached_single_run(product_name,
+                __, df_potentials_default, __, __, __, __, __ = cached_single_run(product_name,
         product_rate_kg_day,
         df_products,
         FE_CO2R_0,
@@ -272,7 +271,7 @@ def default_single_run(product_name,
     potential_default = df_potentials_default.loc['Cell potential', 'Value'] 
     energy_default = df_energy_default.loc['Total', 'Energy (kJ/kg {})'.format(product_name)]
     emissions_default = sum(df_energy_default.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)])
-    return capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default, NPV_default
+    return capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default
 
 _render_lock = threading.RLock()
 
@@ -872,7 +871,7 @@ with st.sidebar:
 
 ##########################  RUN MODEL AT DEFAULT VALUES  ###########################
 
-capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default, NPV_default = default_single_run(product_name = product_name, 
+capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default = default_single_run(product_name = product_name, 
                         product_rate_kg_day = default_product_rate_kg_day, 
                         df_products = df_products, FE_CO2R_0 = default_FE_CO2R_0, 
                         FE_product_specified = default_FE_product_specified, 
@@ -918,8 +917,7 @@ else:
 if not np.isnan(FE_product_checked): 
     df_capex_BM, df_capex_totals, df_costing_assumptions, df_depreciation, df_electrolyzer_assumptions, df_electrolyzer_streams_mol_s,\
             df_energy, df_feedstocks, df_general, df_maintenance, df_operations, df_opex, df_opex_totals, df_outlet_assumptions,\
-            df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities, df_cashflows, \
-            cashflows, NPV, IRR, breakeven_price_USD_kgprod = cached_single_run(product_name = product_name, 
+            df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities = cached_single_run(product_name = product_name, 
                         product_rate_kg_day = product_rate_kg_day, 
                         df_products = df_products, FE_CO2R_0 = FE_CO2R_0, 
                         FE_product_specified = FE_product_specified, 

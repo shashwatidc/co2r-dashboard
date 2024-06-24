@@ -258,56 +258,59 @@ def single_run(product_name,
     #     cell_E_V = cell_E_V
     #     )
 
-    print('Here')
+    # print('Here')
+
+    # For now, NPV, IRR and breakeven cost are not displayed. Save computation time by not calculating them
 
     # Calculate NPV at 15% interest rate
-    df_cashflows, cashflows, NPV = cashflow_years(    
-        plant_lifetime = int(lifetime_years),
-        depreciation_schedule = 'linear', # 'MACRS' or 'linear'
-        D = 0, # optional, used for MACRS only - depreciation%
-        depreciation_lifetime = 12, # at roughly 8% depreciation per year, used elsewhere. optional, used for linear only - total time before salvage value is recovered
-        salvage_value = 0, # conservative assumption. optional, used for linear only - fraction of original capital that is recovered
-        interest = 0.15, # typical assumption
-        f = 0.03, # typical inflation %
-        sales = df_sales.loc['Total', 'Earnings ($/yr)'],
-        production_cost = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
-        C_TDC = df_capex_totals.loc['Total depreciable capital', 'Cost ($)'], # df_capex_totals.loc['Total depreciable capital', 'Cost ($)'] 
-        C_WC = df_capex_totals.loc['Working capital', 'Cost ($)'],
-        t = 0.2, # tax in % per year,
-        )
+    # df_cashflows, cashflows, NPV = cashflow_years(    
+    #     plant_lifetime = int(lifetime_years),
+    #     depreciation_schedule = 'linear', # 'MACRS' or 'linear'
+    #     D = 0, # optional, used for MACRS only - depreciation%
+    #     depreciation_lifetime = 12, # at roughly 8% depreciation per year, used elsewhere. optional, used for linear only - total time before salvage value is recovered
+    #     salvage_value = 0, # conservative assumption. optional, used for linear only - fraction of original capital that is recovered
+    #     interest = 0.15, # typical assumption
+    #     f = 0.03, # typical inflation %
+    #     sales = df_sales.loc['Total', 'Earnings ($/yr)'],
+    #     production_cost = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
+    #     C_TDC = df_capex_totals.loc['Total depreciable capital', 'Cost ($)'], # df_capex_totals.loc['Total depreciable capital', 'Cost ($)'] 
+    #     C_WC = df_capex_totals.loc['Working capital', 'Cost ($)'],
+    #     t = 0.2, # tax in % per year,
+    #     )
 
     ## Calculate IRR at 0 salvage value
-    IRR = calculate_IRR(    
-        plant_lifetime = int(lifetime_years),
-        depreciation_schedule = 'linear', # 'MACRS' or 'linear'
-        D = 0, # optional, used for MACRS only - depreciation%
-        depreciation_lifetime = 12, # at roughly 8% depreciation per year, used elsewhere. optional, used for linear only - total time before salvage value is recovered
-        salvage_value = 0, # conservative assumption. optional, used for linear only - fraction of original capital that is recovered
-        f = 0.03, # typical inflation %
-        sales = df_sales.loc['Total', 'Earnings ($/yr)'],
-        production_cost = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
-        C_TDC = df_capex_totals.loc['Total depreciable capital', 'Cost ($)'], # df_capex_totals.loc['Total depreciable capital', 'Cost ($)'] 
-        C_WC = df_capex_totals.loc['Working capital', 'Cost ($)'],
-        t = 0.2, # tax in % per year,
-        )
+    # IRR = calculate_IRR(    
+    #     plant_lifetime = int(lifetime_years),
+    #     depreciation_schedule = 'linear', # 'MACRS' or 'linear'
+    #     D = 0, # optional, used for MACRS only - depreciation%
+    #     depreciation_lifetime = 12, # at roughly 8% depreciation per year, used elsewhere. optional, used for linear only - total time before salvage value is recovered
+    #     salvage_value = 0, # conservative assumption. optional, used for linear only - fraction of original capital that is recovered
+    #     f = 0.03, # typical inflation %
+    #     sales = df_sales.loc['Total', 'Earnings ($/yr)'],
+    #     production_cost = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
+    #     C_TDC = df_capex_totals.loc['Total depreciable capital', 'Cost ($)'], # df_capex_totals.loc['Total depreciable capital', 'Cost ($)'] 
+    #     C_WC = df_capex_totals.loc['Working capital', 'Cost ($)'],
+    #     t = 0.2, # tax in % per year,
+    #     )
 
-    breakeven_price_USD_kgprod = calculate_breakeven_price(
-        plant_lifetime = int(lifetime_years),
-        depreciation_schedule = 'linear', # 'MACRS' or 'linear'
-        D = 0, # optional, used for MACRS only - depreciation%
-        depreciation_lifetime = 12, # at roughly 8% depreciation per year, used elsewhere. optional, used for linear only - total time before salvage value is recovered
-        salvage_value = 0, # conservative assumption. optional, used for linear only - fraction of original capital that is recovered
-        interest  = 0.15, # interest %
-        f = 0.03, # typical inflation %
-        product_rate_kg_day = product_rate_kg_day, # production in kg/day
-        capacity_factor = capacity_factor, # capacity factor as a fraction of days in a year
-        production_cost = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
-        C_TDC = df_capex_totals.loc['Total depreciable capital', 'Cost ($)'], # df_capex_totals.loc['Total depreciable capital', 'Cost ($)'] 
-        C_WC = df_capex_totals.loc['Working capital', 'Cost ($)'],
-        t = 0.2, # tax in % per year,
-        )
+    # breakeven_price_USD_kgprod = calculate_breakeven_price(
+    #     plant_lifetime = int(lifetime_years),
+    #     depreciation_schedule = 'linear', # 'MACRS' or 'linear'
+    #     D = 0, # optional, used for MACRS only - depreciation%
+    #     depreciation_lifetime = 12, # at roughly 8% depreciation per year, used elsewhere. optional, used for linear only - total time before salvage value is recovered
+    #     salvage_value = 0, # conservative assumption. optional, used for linear only - fraction of original capital that is recovered
+    #     interest  = 0.15, # interest %
+    #     f = 0.03, # typical inflation %
+    #     product_rate_kg_day = product_rate_kg_day, # production in kg/day
+    #     capacity_factor = capacity_factor, # capacity factor as a fraction of days in a year
+    #     production_cost = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
+    #     C_TDC = df_capex_totals.loc['Total depreciable capital', 'Cost ($)'], # df_capex_totals.loc['Total depreciable capital', 'Cost ($)'] 
+    #     C_WC = df_capex_totals.loc['Working capital', 'Cost ($)'],
+    #     t = 0.2, # tax in % per year,
+    #     )
     
     return df_capex_BM, df_capex_totals, df_costing_assumptions, df_depreciation, df_electrolyzer_assumptions, df_electrolyzer_streams_mol_s,\
             df_energy, df_feedstocks, df_general, df_maintenance, df_operations, df_opex, df_opex_totals, df_outlet_assumptions,\
-            df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities, df_cashflows, \
-            cashflows, NPV, IRR, breakeven_price_USD_kgprod
+            df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities, 
+    # df_cashflows, \
+    #         cashflows, NPV, IRR, breakeven_price_USD_kgprod

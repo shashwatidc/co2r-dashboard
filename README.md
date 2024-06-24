@@ -28,7 +28,9 @@ Data for constants, utilities and products: `DataForTEA.xlsx`
 **Other**
 Webpage formatting: `\.streamlit\config.toml`
 
-Package specifications: `requirements.txt`
+Package specifications: 
+- `requirements.txt` (installed through pip)
+- `packages.txt` (installed through apt-get in Debian)
 
 License: `LICENSE.md`
 
