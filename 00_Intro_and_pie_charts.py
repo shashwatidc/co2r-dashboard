@@ -1048,10 +1048,10 @@ if not np.isnan(FE_product_checked):
                 middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1
                 y_posn = np.sin(np.deg2rad(middle_angle))
                 x_posn = np.cos(np.deg2rad(middle_angle))
-                horizontalalignment = {-1.1: "right", 1.1: "left"}[int(np.sign(x_posn))]
+                horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
                 connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                 label_properies["arrowprops"].update({"connectionstyle": connectionstyle})
-                axs.annotate(df_opex.index[i], xy=(x_posn, y_posn), xytext=(1.35*np.sign(x_posn), 1.35*y_posn),
+                axs.annotate(df_opex.index[i], xy=(x_posn, y_posn), xytext=(1.35*np.sign(x_posn), 1.4*y_posn),
                             horizontalalignment=horizontalalignment, **label_properies)
 
             st.pyplot(opex_pie_fig, transparent = True, use_container_width = True)   
@@ -1093,10 +1093,10 @@ if not np.isnan(FE_product_checked):
                 middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1
                 y_posn = np.sin(np.deg2rad(middle_angle))
                 x_posn = np.cos(np.deg2rad(middle_angle))
-                horizontalalignment = {-1.1: "right", 1.1: "left"}[int(np.sign(x_posn))]
+                horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
                 connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                 label_properies["arrowprops"].update({"connectionstyle": connectionstyle})
-                axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), xytext=(1.35*np.sign(x_posn), 1.35*y_posn),
+                axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), xytext=(1.35*np.sign(x_posn), 1.4*y_posn),
                             horizontalalignment=horizontalalignment, **label_properies)
 
             st.pyplot(levelized_pie_fig, transparent = True, use_container_width = True)   
