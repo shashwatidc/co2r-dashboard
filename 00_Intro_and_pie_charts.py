@@ -297,8 +297,8 @@ font_dir = Path(mp.get_data_path(), r'/.streamlit/Arial/Arial.ttf')
 # for font in font_manager.findSystemFonts(font_dir):
 #     font_manager.fontManager.addfont(fontpaths = font)
 # mp.rc('font', family = 'sans-serif') # 'Arial' # font group is sans-serif
-mp.rcParams["font.family"] = "Arial"
-mp.rcParams["font.sans-serif"] = ["Liberation Sans"]
+mp.rcParams["font.family"] = "sans-serif"
+mp.rcParams["font.sans-serif"] = "Liberation Sans"
 mp.rc('font', size=MEDIUM_SIZE)     # controls default text sizes if unspecified
 mp.rc('axes', titlesize=MEDIUM_SIZE)    # fontsize of the axes title; I think this is for subplots 
 mp.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
