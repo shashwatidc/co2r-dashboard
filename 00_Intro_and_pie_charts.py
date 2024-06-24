@@ -1051,7 +1051,7 @@ if not np.isnan(FE_product_checked):
                 horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
                 connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                 label_properies["arrowprops"].update({"connectionstyle": connectionstyle})
-                axs.annotate(df_opex.index[i], xy=(x_posn, y_posn), xytext=(3*np.sign(x_posn), 3.1*y_posn),
+                axs.annotate(df_opex.index[i], xy=(x_posn, y_posn), xytext=(2.5*np.sign(x_posn), 3.1*y_posn),
                             horizontalalignment=horizontalalignment, **label_properies)
 
             st.pyplot(opex_pie_fig, transparent = True, use_container_width = True)   
@@ -1096,7 +1096,7 @@ if not np.isnan(FE_product_checked):
                 horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
                 connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                 label_properies["arrowprops"].update({"connectionstyle": connectionstyle})
-                axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), xytext=(3*np.sign(x_posn), 3.1*y_posn),
+                axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), xytext=(2.5*np.sign(x_posn), 3.1*y_posn),
                             horizontalalignment=horizontalalignment, **label_properies)
 
             st.pyplot(levelized_pie_fig, transparent = True, use_container_width = True)   
@@ -1166,7 +1166,7 @@ if not np.isnan(FE_product_checked):
                     horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
                     connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                     label_properies["arrowprops"].update({"connectionstyle": connectionstyle})
-                    axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), xytext=(3*np.sign(x_posn), 3.1*y_posn),
+                    axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), xytext=(2.5*np.sign(x_posn), 3.1*y_posn),
                                 horizontalalignment=horizontalalignment, **label_properies)
                 
                 st.pyplot(energy_pie_fig, transparent = True, use_container_width = True)   
@@ -1208,7 +1208,7 @@ if not np.isnan(FE_product_checked):
                         horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
                         connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                         label_properies["arrowprops"].update({"connectionstyle": connectionstyle})
-                        axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), xytext=(3*np.sign(x_posn), 3.1*y_posn),
+                        axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), xytext=(2.5*np.sign(x_posn), 3.1*y_posn),
                                     horizontalalignment=horizontalalignment, **label_properies)
 
                     st.pyplot(emissions_pie_fig, transparent = True, use_container_width = True)   
