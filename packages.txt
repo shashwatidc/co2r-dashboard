@@ -1,2 +1,3 @@
-ttf-mscorefonts-installer
-fontconfig
+update
+install ttf-mscorefonts-installer
+install fontconfig
