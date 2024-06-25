@@ -1054,13 +1054,13 @@ if not np.isnan(FE_product_checked):
                 y_posn = np.sin(np.deg2rad(middle_angle))
                 x_posn = np.cos(np.deg2rad(middle_angle))
                 verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
-                horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
+                horizontalalignment = {-1: "left", 1: "right"}[int(np.sign(x_posn))]
                 if (wedge.theta2 - wedge.theta1) <19:
                     flag = -flag
                     connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                     label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
                     axs.annotate(df_opex.index[i], xy=(x_posn, y_posn), 
-                                 xytext=(flag*x_posn, 3.5*y_posn),
+                                 xytext=(flag*np.sign(x_posn), 3.5*y_posn),
                                 horizontalalignment=horizontalalignment, 
                                 **label_properties_away)
                 else:                            
@@ -1111,13 +1111,13 @@ if not np.isnan(FE_product_checked):
                 y_posn = np.sin(np.deg2rad(middle_angle))
                 x_posn = np.cos(np.deg2rad(middle_angle))
                 verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
-                horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
+                horizontalalignment = {-1: "left", 1: "right"}[int(np.sign(x_posn))]
                 if (wedge.theta2 - wedge.theta1) <19:
                     flag = -flag
                     connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                     label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
                     axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), 
-                                 xytext=(flag*x_posn, 3.5*y_posn),
+                                 xytext=(flag*np.sign(x_posn), 3.5*y_posn),
                                 horizontalalignment=horizontalalignment, 
                                 **label_properties_away)
                 else:                            
@@ -1193,12 +1193,12 @@ if not np.isnan(FE_product_checked):
                     y_posn = np.sin(np.deg2rad(middle_angle))
                     x_posn = np.cos(np.deg2rad(middle_angle))
                     verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
-                    horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
+                    horizontalalignment = {-1: "left", 1: "right"}[int(np.sign(x_posn))]
                     if (wedge.theta2 - wedge.theta1) <19:
                         flag = -flag    
                         connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                         label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
-                        axs.annotate(df_energy.iloc[2:-2].index[i], xy=(x_posn, y_posn), xytext=(flag*x_posn, 3.5*y_posn),
+                        axs.annotate(df_energy.iloc[2:-2].index[i], xy=(x_posn, y_posn), xytext=(flag*np.sign(x_posn), 3.5*y_posn),
                                 horizontalalignment=horizontalalignment, 
                                 **label_properties_away)
                     else:                            
@@ -1249,11 +1249,11 @@ if not np.isnan(FE_product_checked):
                             connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                             label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
                             axs.annotate(df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i], xy=(x_posn, y_posn), 
-                                         xytext=(flag*x_posn, 3.5*y_posn),
+                                         xytext=(flag*np.sign(x_posn), 3.5*y_posn),
                                         horizontalalignment=horizontalalignment, 
                                         **label_properties_away)
                         else:                            
-                            horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
+                            horizontalalignment = {-1: "left", 1: "right"}[int(np.sign(x_posn))]
                             axs.text(2.4*x_posn, 2.4*y_posn,
                                         df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i],
                                         horizontalalignment=horizontalalignment,
