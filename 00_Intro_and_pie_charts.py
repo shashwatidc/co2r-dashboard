@@ -1063,9 +1063,7 @@ if not np.isnan(FE_product_checked):
                     axs.text(2.4*x_posn, 2.4*y_posn,
                             df_opex.index[i],
                             horizontalalignment=horizontalalignment, 
-                            verticalalignment = verticalalignment,
-                            **label_properties_near)
-
+                            verticalalignment = verticalalignment)
 
             st.pyplot(opex_pie_fig, transparent = True, use_container_width = True)   
 
@@ -1121,8 +1119,7 @@ if not np.isnan(FE_product_checked):
                     axs.text(2.4*x_posn, 2.4*y_posn,
                              full_list_of_costs.index[i],
                             horizontalalignment=horizontalalignment, 
-                            verticalalignment = verticalalignment,
-                            **label_properties_near)
+                            verticalalignment = verticalalignment)
 
             st.pyplot(levelized_pie_fig, transparent = True, use_container_width = True)   
 
@@ -1201,8 +1198,7 @@ if not np.isnan(FE_product_checked):
                     else:                            
                         axs.text(2.4*x_posn, 2.4*y_posn,df_energy.iloc[2:-2].index[i],
                                 horizontalalignment=horizontalalignment, 
-                                verticalalignment = verticalalignment,
-                                **label_properties_near)
+                                verticalalignment = verticalalignment)
                 
                 st.pyplot(energy_pie_fig, transparent = True, use_container_width = True)   
 
