@@ -989,7 +989,7 @@ if not np.isnan(FE_product_checked):
     delta_color = delta_color_checker(df_capex_totals = df_capex_totals)    
 
     flag = 1
-    far_near = {1: 2.5, -1: 3.5}
+    far_near = {1: 3.5, -1: 4.5}
 
     ###### CAPEX PIE CHART
     with middle_column.container(height = 455, border = False): 
