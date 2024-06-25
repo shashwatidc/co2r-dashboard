@@ -428,6 +428,7 @@ st.write('''See how the capital and operating cost vary with changes in the proc
 st.write(':red[**Known issues:** Currently, there is no warning if you enter a numeric value in any text box that is out of  \
          physical range, e.g. capacity factor > 1, single-pass conversion > 1. The displayed results will be physically unreasonable. \
          User is responsible for checking that their inputs are reasonable.]')
+st.write('Copyright © {%Y} Shashwati C da Cunha. All rights reserved.'.format(datetime.now().date()))
 st.write("**Cite this work: __**")
 st.write("Questions, collaborations, requests? Contact Shashwati da Cunha ([shashwatidc@utexas.edu](mailto:shashwatidc@utexas.edu)).")
 # st.write(

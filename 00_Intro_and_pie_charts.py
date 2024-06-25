@@ -430,6 +430,7 @@ st.write('''This tool generates the capital and operating cost for a CO₂ reduc
          into either CO or ethylene. :red[It is based on the model in our paper [__]()]. 
         ''')
 st.write("**Cite this work: __**")
+st.write('Copyright © {%Y} Shashwati C da Cunha. All rights reserved.'.format(datetime.now().date()))
 st.write("Questions, collaborations, requests? Contact Shashwati da Cunha ([shashwatidc@utexas.edu](mailto:shashwatidc@utexas.edu)).")
 # st.write(
 #     '<img width=100 src="https://emojipedia-us.s3.amazonaws.com/source/skype/289/squid_1f991.png" style="margin-left: 5px; filter: hue-rotate(230deg) brightness(1.1);">',
