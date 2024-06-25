@@ -1050,15 +1050,22 @@ if not np.isnan(FE_product_checked):
                 middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1 # in degrees
                 y_posn = np.sin(np.deg2rad(middle_angle))
                 x_posn = np.cos(np.deg2rad(middle_angle))
+                verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
                 horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
-                if (wedge.theta2 - wedge.theta1) < 36:
+                if (wedge.theta2 - wedge.theta1) < 25:
                     connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                     label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
-                    axs.annotate(df_opex.index[i], xy=(x_posn, y_posn), xytext=(2.5*np.sign(x_posn), 3.1*y_posn),
-                                horizontalalignment=horizontalalignment, **label_properties_away)
+                    axs.annotate(df_opex.index[i], xy=(x_posn, y_posn), 
+                                 xytext=(2.5*x_posn, 3.1*y_posn),
+                                horizontalalignment=horizontalalignment, 
+                                verticalalignment = verticalalignment,
+                                **label_properties_away)
                 else:                            
-                    axs.annotate(df_opex.index[i], xy=(x_posn, y_posn), xytext=(1.5*np.sign(x_posn), 1.6*y_posn),
-                                horizontalalignment=horizontalalignment, **label_properties_near)
+                    axs.annotate(df_opex.index[i], xy=(x_posn, y_posn), 
+                                 xytext=(2.25*np.sign(x_posn), 2.4*y_posn),
+                                horizontalalignment=horizontalalignment, 
+                                verticalalignment = verticalalignment,
+                                **label_properties_near)
 
 
             st.pyplot(opex_pie_fig, transparent = True, use_container_width = True)   
@@ -1102,15 +1109,22 @@ if not np.isnan(FE_product_checked):
                 middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1 # in degrees
                 y_posn = np.sin(np.deg2rad(middle_angle))
                 x_posn = np.cos(np.deg2rad(middle_angle))
+                verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
                 horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
-                if (wedge.theta2 - wedge.theta1) < 36:
+                if (wedge.theta2 - wedge.theta1) < 25:
                     connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                     label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
-                    axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), xytext=(2.5*np.sign(x_posn), 3.1*y_posn),
-                                horizontalalignment=horizontalalignment, **label_properties_away)
+                    axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), 
+                                 xytext=(2.5*x_posn, 3.1*y_posn),
+                                horizontalalignment=horizontalalignment, 
+                                verticalalignment = verticalalignment,
+                                **label_properties_away)
                 else:                            
-                    axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), xytext=(1.5*np.sign(x_posn), 1.6*y_posn),
-                                horizontalalignment=horizontalalignment, **label_properties_near)
+                    axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), 
+                                 xytext=(2.25*x_posn, 2.4*y_posn),
+                                horizontalalignment=horizontalalignment, 
+                                verticalalignment = verticalalignment,
+                                **label_properties_near)
 
             st.pyplot(levelized_pie_fig, transparent = True, use_container_width = True)   
 
@@ -1178,15 +1192,21 @@ if not np.isnan(FE_product_checked):
                     middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1 # in degrees
                     y_posn = np.sin(np.deg2rad(middle_angle))
                     x_posn = np.cos(np.deg2rad(middle_angle))
+                    verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
                     horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
-                    if (wedge.theta2 - wedge.theta1) < 36:
+                    if (wedge.theta2 - wedge.theta1) < 25:
                         connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                         label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
-                        axs.annotate(df_energy.iloc[2:-2].index[i], xy=(x_posn, y_posn), xytext=(2.5*np.sign(x_posn), 3.1*y_posn),
-                                    horizontalalignment=horizontalalignment, **label_properties_away)
+                        axs.annotate(df_energy.iloc[2:-2].index[i], xy=(x_posn, y_posn), xytext=(2.5*x_posn, 3.1*y_posn),
+                                horizontalalignment=horizontalalignment, 
+                                verticalalignment = verticalalignment,
+                                **label_properties_away)
                     else:                            
-                        axs.annotate(df_energy.iloc[2:-2].index[i], xy=(x_posn, y_posn), xytext=(1.5*np.sign(x_posn), 1.6*y_posn),
-                                    horizontalalignment=horizontalalignment, **label_properties_near)
+                        axs.annotate(df_energy.iloc[2:-2].index[i], xy=(x_posn, y_posn), 
+                                     xytext=(2.25*x_posn, 2.4*y_posn),
+                                horizontalalignment=horizontalalignment, 
+                                verticalalignment = verticalalignment,
+                                **label_properties_near)
                 
                 st.pyplot(energy_pie_fig, transparent = True, use_container_width = True)   
 
@@ -1232,13 +1252,16 @@ if not np.isnan(FE_product_checked):
                             connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                             label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
                             axs.annotate(df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i], xy=(x_posn, y_posn), 
-                                         xytext=(3.5*x_posn, 3.5*y_posn),
-                                        horizontalalignment=horizontalalignment, **label_properties_away)
+                                         xytext=(2.5*x_posn, 3.1*y_posn),
+                                        horizontalalignment=horizontalalignment, 
+                                        verticalalignment = verticalalignment,
+                                        **label_properties_away)
                         else:                            
                             axs.annotate(df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i], xy=(x_posn, y_posn), 
-                                         xytext=(2.5*x_posn, 2.5*y_posn),
+                                         xytext=(2.25*x_posn, 2.4*y_posn),
                                         horizontalalignment=horizontalalignment,
-                                        verticalalignment=verticalalignment, **label_properties_near)
+                                        verticalalignment=verticalalignment, 
+                                        **label_properties_near)
 
                     st.pyplot(emissions_pie_fig, transparent = True, use_container_width = True)   
 
