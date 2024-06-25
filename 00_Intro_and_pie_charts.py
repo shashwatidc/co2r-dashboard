@@ -1060,11 +1060,11 @@ if not np.isnan(FE_product_checked):
                                 horizontalalignment=horizontalalignment, 
                                 **label_properties_away)
                 else:                            
-                    axs.annotate(df_opex.index[i], xy=(x_posn, y_posn), 
-                                 xytext=(1.5*np.sign(x_posn), 2.4*y_posn),
-                                horizontalalignment=horizontalalignment, 
-                                verticalalignment = verticalalignment,
-                                **label_properties_near)
+                    axs.text(2.4*x_posn, 2.4*y_posn,
+                            df_opex.index[i],
+                            horizontalalignment=horizontalalignment, 
+                            verticalalignment = verticalalignment,
+                            **label_properties_near)
 
 
             st.pyplot(opex_pie_fig, transparent = True, use_container_width = True)   
@@ -1118,11 +1118,11 @@ if not np.isnan(FE_product_checked):
                                 horizontalalignment=horizontalalignment, 
                                 **label_properties_away)
                 else:                            
-                    axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), 
-                                 xytext=(1.5*x_posn, 2.4*y_posn),
-                                horizontalalignment=horizontalalignment, 
-                                verticalalignment = verticalalignment,
-                                **label_properties_near)
+                    axs.text(2.4*x_posn, 2.4*y_posn,
+                             full_list_of_costs.index[i],
+                            horizontalalignment=horizontalalignment, 
+                            verticalalignment = verticalalignment,
+                            **label_properties_near)
 
             st.pyplot(levelized_pie_fig, transparent = True, use_container_width = True)   
 
@@ -1199,8 +1199,7 @@ if not np.isnan(FE_product_checked):
                                 horizontalalignment=horizontalalignment, 
                                 **label_properties_away)
                     else:                            
-                        axs.annotate(df_energy.iloc[2:-2].index[i], xy=(x_posn, y_posn), 
-                                     xytext=(1.5*x_posn, 2.4*y_posn),
+                        axs.text(2.4*x_posn, 2.4*y_posn,df_energy.iloc[2:-2].index[i],
                                 horizontalalignment=horizontalalignment, 
                                 verticalalignment = verticalalignment,
                                 **label_properties_near)
@@ -1252,7 +1251,7 @@ if not np.isnan(FE_product_checked):
                                         **label_properties_away)
                         else:                            
                             horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
-                            axs.text(1.5*x_posn, 2.4*y_posn,
+                            axs.text(2.4*x_posn, 2.4*y_posn,
                                         df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i],
                                         horizontalalignment=horizontalalignment,
                                         verticalalignment=verticalalignment)
