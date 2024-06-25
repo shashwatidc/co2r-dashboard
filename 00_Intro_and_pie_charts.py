@@ -1252,7 +1252,7 @@ if not np.isnan(FE_product_checked):
                                         **label_properties_away)
                         else:                            
                             horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
-                            axs.text((1.5*x_posn, 2.4*y_posn),
+                            axs.text(1.5*x_posn, 2.4*y_posn,
                                         df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i],
                                         horizontalalignment=horizontalalignment,
                                         verticalalignment=verticalalignment)
