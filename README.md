@@ -1,6 +1,7 @@
 ### CO<sub>2</sub>R Costing Dashboard
 
 **Cite this work : [__]()**
+This tool generates the capital and operating cost for a CO₂ reduction process converting captured CO₂ into either CO or ethylene. It is based on the model in our paper __.
 
 This is the source code for the [CO<sub>2</sub>R Costing Dashboard web app](https://co2r-dashboard.streamlit.app/). To use the app to generate technoeconomics for a CO<sub>2</sub> reduction process, please go straight to the [website](https://co2r-dashboard.streamlit.app/). You only need this repository if you want to see or change the backend for the web app.
 
