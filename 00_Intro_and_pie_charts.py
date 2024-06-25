@@ -988,6 +988,9 @@ if not np.isnan(FE_product_checked):
 
     delta_color = delta_color_checker(df_capex_totals = df_capex_totals)    
 
+    flag = 1
+    far_near = {1: 2.5, -1: 3.5}
+
     ###### CAPEX PIE CHART
     with middle_column.container(height = 455, border = False): 
         st.subheader('Capital cost')
@@ -1053,19 +1056,18 @@ if not np.isnan(FE_product_checked):
                 verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
                 horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
                 if (wedge.theta2 - wedge.theta1) <19:
+                    flag = -flag
                     connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                     label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
                     axs.annotate(df_opex.index[i], xy=(x_posn, y_posn), 
-                                 xytext=(2.5*x_posn, 4.1*y_posn),
+                                 xytext=(flag*x_posn, 3.5*y_posn),
                                 horizontalalignment=horizontalalignment, 
                                 **label_properties_away)
                 else:                            
                     axs.text(2.4*x_posn, 2.4*y_posn,
                             df_opex.index[i],
                             horizontalalignment=horizontalalignment, 
-                            verticalalignment = verticalalignment,
-                            **label_properties_near)
-
+                            verticalalignment = verticalalignment)
 
             st.pyplot(opex_pie_fig, transparent = True, use_container_width = True)   
 
@@ -1111,18 +1113,18 @@ if not np.isnan(FE_product_checked):
                 verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
                 horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
                 if (wedge.theta2 - wedge.theta1) <19:
+                    flag = -flag
                     connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                     label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
                     axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), 
-                                 xytext=(2.5*x_posn, 4.1*y_posn),
+                                 xytext=(flag*x_posn, 3.5*y_posn),
                                 horizontalalignment=horizontalalignment, 
                                 **label_properties_away)
                 else:                            
                     axs.text(2.4*x_posn, 2.4*y_posn,
                              full_list_of_costs.index[i],
                             horizontalalignment=horizontalalignment, 
-                            verticalalignment = verticalalignment,
-                            **label_properties_near)
+                            verticalalignment = verticalalignment)
 
             st.pyplot(levelized_pie_fig, transparent = True, use_container_width = True)   
 
@@ -1193,16 +1195,16 @@ if not np.isnan(FE_product_checked):
                     verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
                     horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
                     if (wedge.theta2 - wedge.theta1) <19:
+                        flag = -flag    
                         connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                         label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
-                        axs.annotate(df_energy.iloc[2:-2].index[i], xy=(x_posn, y_posn), xytext=(2.5*x_posn, 4.1*y_posn),
+                        axs.annotate(df_energy.iloc[2:-2].index[i], xy=(x_posn, y_posn), xytext=(flag*x_posn, 3.5*y_posn),
                                 horizontalalignment=horizontalalignment, 
                                 **label_properties_away)
                     else:                            
                         axs.text(2.4*x_posn, 2.4*y_posn,df_energy.iloc[2:-2].index[i],
                                 horizontalalignment=horizontalalignment, 
-                                verticalalignment = verticalalignment,
-                                **label_properties_near)
+                                verticalalignment = verticalalignment)
                 
                 st.pyplot(energy_pie_fig, transparent = True, use_container_width = True)   
 
@@ -1242,11 +1244,12 @@ if not np.isnan(FE_product_checked):
                         x_posn = np.cos(np.deg2rad(middle_angle))
                         verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
                         if (wedge.theta2 - wedge.theta1) < 15:
+                            flag = -flag
                             horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
                             connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                             label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
                             axs.annotate(df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i], xy=(x_posn, y_posn), 
-                                         xytext=(2.5*x_posn, 4.1*y_posn),
+                                         xytext=(flag*x_posn, 3.5*y_posn),
                                         horizontalalignment=horizontalalignment, 
                                         **label_properties_away)
                         else:                            
