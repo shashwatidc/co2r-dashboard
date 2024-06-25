@@ -1043,8 +1043,8 @@ if not np.isnan(FE_product_checked):
             'Opex: \n \${:.2f}/kg$_{{{}}}$'.format(df_opex_totals.loc[ 'Production cost', 'Cost ($/kg {})'.format(product_name)], product_name), # All capex except working capital, which is recovered during operation
             ha='center', va='center', 
             fontsize = MEDIUM_SIZE)  
-            axs.text(2.5, 0, ' ') # make figure bigger
-            axs.text(-2.5, 0, ' ') # make figure bigger
+            axs.text(2.5, 0, 'x', color = 'white') # make figure bigger
+            axs.text(-2.5, 0, 'x', color = 'white') # make figure bigger
             st.pyplot(opex_pie_fig, transparent = True, use_container_width = True)   
 
     ###### LEVELIZED PIE CHART
