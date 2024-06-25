@@ -1232,11 +1232,11 @@ if not np.isnan(FE_product_checked):
                             connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                             label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
                             axs.annotate(df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i], xy=(x_posn, y_posn), 
-                                         xytext=(2.5*x_posn, 3.1*y_posn),
+                                         xytext=(3.5*x_posn, 3.5*y_posn),
                                         horizontalalignment=horizontalalignment, **label_properties_away)
                         else:                            
                             axs.annotate(df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i], xy=(x_posn, y_posn), 
-                                         xytext=(1.5*x_posn, 1.5*y_posn),
+                                         xytext=(2.5*x_posn, 2.5*y_posn),
                                         horizontalalignment=horizontalalignment,
                                         verticalalignment=verticalalignment, **label_properties_near)
 
