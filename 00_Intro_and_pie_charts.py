@@ -1237,8 +1237,6 @@ if not np.isnan(FE_product_checked):
                     box_properties = dict(boxstyle="square,pad=0.3", fc="none", lw=0)
                     label_properties_away = dict(arrowprops=dict(arrowstyle="-"),
                                         bbox=box_properties, zorder=0, va="center")
-                    label_properties_near = dict(arrowprops=dict(arrowstyle="-",alpha = 0),
-                                        bbox=box_properties, zorder=0, va="center")
                     for i, wedge in enumerate(wedges):
                         middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1 # in degrees
                         y_posn = np.sin(np.deg2rad(middle_angle))
@@ -1253,11 +1251,10 @@ if not np.isnan(FE_product_checked):
                                         horizontalalignment=horizontalalignment, 
                                         **label_properties_away)
                         else:                            
-                            axs.annotate(df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i], xy=(x_posn, y_posn), 
-                                         xytext=(1.5*x_posn, 2.4*y_posn),
+                            axs.text((1.5*x_posn, 2.4*y_posn),
+                                     df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i],
                                         horizontalalignment=horizontalalignment,
-                                        verticalalignment=verticalalignment, 
-                                        **label_properties_near)
+                                        verticalalignment=verticalalignment)
 
                     st.pyplot(emissions_pie_fig, transparent = True, use_container_width = True)   
 
