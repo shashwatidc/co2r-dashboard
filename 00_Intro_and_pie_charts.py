@@ -988,7 +988,8 @@ if not np.isnan(FE_product_checked):
 
     delta_color = delta_color_checker(df_capex_totals = df_capex_totals)    
 
-    flag = 1
+    alternating = 1
+    flag = False
     far_near = {1: 3.5, -1: 4.5}
 
     ###### CAPEX PIE CHART
@@ -1028,48 +1029,20 @@ if not np.isnan(FE_product_checked):
 
         with _render_lock:
             opex_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
-            wedges, __, __ = axs.pie(df_opex.loc[:, 'Cost ($/kg {})'.format(product_name)], 
-                    # labels = df_opex.index, 
-                    # labeldistance = 1.1,
-                    autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '',  
+            axs.pie(df_opex.loc[:, 'Cost ($/kg {})'.format(product_name)], 
+                    labels = df_opex.index, labeldistance = 1.1,
+                    autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
                     pctdistance = 0.8,
                     colors = opex_colors, startangle = 90, 
                     textprops = {'fontsize' : SMALL_SIZE}, 
                     radius = 2, wedgeprops= {'width' : 1}, # donut
                     counterclock = False,
                     # explode = 0.2*np.ones(len(df_opex.index),
-                        ) 
+                    )   
             axs.text(0, 0,  
-                'Opex: \n \${:.2f}/kg$_{{{}}}$'.format(df_opex_totals.loc[ 'Production cost', 'Cost ($/kg {})'.format(product_name)], product_name), # All capex except working capital, which is recovered during operation
-                ha='center', va='center', 
-                fontsize = MEDIUM_SIZE)  
-            # Label pie chart with arrows
-            box_properties = dict(boxstyle="square,pad=0.3", fc="none", lw=0)
-            label_properties_away = dict(arrowprops=dict(arrowstyle="-"),
-                                bbox=box_properties, zorder=0, va="center")
-            label_properties_near = dict(arrowprops=dict(arrowstyle="-",alpha = 0),
-                                bbox=box_properties, zorder=0, va="center")
-            for i, wedge in enumerate(wedges):
-                middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1 # in degrees
-                y_posn = np.sin(np.deg2rad(middle_angle))
-                x_posn = np.cos(np.deg2rad(middle_angle))
-                verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
-                horizontalalignment = {-1: "left", 1: "right"}[int(np.sign(x_posn))]
-                if (wedge.theta2 - wedge.theta1) <19:
-                    flag = -flag
-                    connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
-                    label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
-                    axs.annotate(df_opex.index[i], xy=(x_posn, y_posn), 
-                                 xytext=(far_near[flag]*np.sign(x_posn), 4.5*y_posn),
-                                horizontalalignment=horizontalalignment, 
-                                **label_properties_away)
-                else:                            
-                    horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
-                    axs.text(2.4*x_posn, 2.4*y_posn,
-                            df_opex.index[i],
-                            horizontalalignment=horizontalalignment, 
-                            verticalalignment = verticalalignment)
-
+            'Opex: \n \${:.2f}/kg$_{{{}}}$'.format(df_opex_totals.loc[ 'Production cost', 'Cost ($/kg {})'.format(product_name)], product_name), # All capex except working capital, which is recovered during operation
+            ha='center', va='center', 
+            fontsize = MEDIUM_SIZE)  
             st.pyplot(opex_pie_fig, transparent = True, use_container_width = True)   
 
     ###### LEVELIZED PIE CHART
@@ -1086,22 +1059,21 @@ if not np.isnan(FE_product_checked):
 
         with _render_lock:
             wedges, __, __ = axs.pie(full_list_of_costs, 
-                    # labels = full_list_of_costs.index, 
-                    # labeldistance = 1.1,
-                    autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
-                    pctdistance = 0.8,
-                    colors = levelized_colors, startangle = 90, 
-                    textprops = {'fontsize' : SMALL_SIZE}, 
-                    radius = 2, wedgeprops= {'width' : 1}, # donut
-                    counterclock = False,
-                    # explode = 0.2*np.ones(len(df_opex.index),
-                    )   
+                            # labels = full_list_of_costs.index, 
+                            # labeldistance = 1.1,
+                            autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
+                            pctdistance = 0.8,
+                            colors = levelized_colors, startangle = 0, 
+                            textprops = {'fontsize' : SMALL_SIZE}, 
+                            radius = 2, wedgeprops= {'width' : 1}, # donut
+                            counterclock = False,
+                            # explode = 0.2*np.ones(len(df_opex.index),
+                            )   
             axs.text(0, 0,  
             'Levelized cost: \n \${:.2f}/kg$_{{{}}}$'.format(df_opex_totals.loc[ 'Levelized cost', 'Cost ($/kg {})'.format(product_name)], product_name), # All capex except working capital, which is recovered during operation
             ha='center', va='center', 
-            fontsize = MEDIUM_SIZE)  
-
-            # Label pie chart with arrows
+            fontsize = MEDIUM_SIZE)
+            
             box_properties = dict(boxstyle="square,pad=0.3", fc="none", lw=0)
             label_properties_away = dict(arrowprops=dict(arrowstyle="-"),
                                 bbox=box_properties, zorder=0, va="center")
@@ -1112,22 +1084,21 @@ if not np.isnan(FE_product_checked):
                 y_posn = np.sin(np.deg2rad(middle_angle))
                 x_posn = np.cos(np.deg2rad(middle_angle))
                 verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
-                horizontalalignment = {-1: "left", 1: "right"}[int(np.sign(x_posn))]
-                if (wedge.theta2 - wedge.theta1) <19:
-                    flag = -flag
+                horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
+                if (wedge.theta2 - wedge.theta1) <22:
+                    alternating = -alternating
                     connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                     label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
                     axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), 
-                                 xytext=(far_near[flag]*np.sign(x_posn), 4.5*y_posn),
+                                xytext=(far_near[alternating]*1*x_posn, 3.7*y_posn),
                                 horizontalalignment=horizontalalignment, 
                                 **label_properties_away)
                 else:                            
                     horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
-                    axs.text(2.4*x_posn, 2.4*y_posn,
-                             full_list_of_costs.index[i],
+                    axs.text(2.3*x_posn, 2.3*y_posn,
+                            full_list_of_costs.index[i],
                             horizontalalignment=horizontalalignment, 
                             verticalalignment = verticalalignment)
-
             st.pyplot(levelized_pie_fig, transparent = True, use_container_width = True)   
 
     with right_column.container(height = 455, border = False): 
@@ -1169,46 +1140,20 @@ if not np.isnan(FE_product_checked):
         with _render_lock:
             if not override_cell_voltage:
                 energy_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
-                wedges, __, __ = axs.pie((abs(df_energy.iloc[2:-2].loc[:, 'Energy (kJ/kg {})'.format(product_name)])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)'],
-                        # labels = df_energy.iloc[2:-2].index, labeldistance = 1.1,
+                axs.pie((abs(df_energy.iloc[2:-2].loc[:, 'Energy (kJ/kg {})'.format(product_name)])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)'],
+                        labels = df_energy.iloc[2:-2].index, labeldistance = 1.1,
                         autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
                         pctdistance = 0.8,
-                        colors = energy_colors, startangle = 90, 
+                        colors = energy_colors, startangle = 0, 
                         textprops = {'fontsize' : SMALL_SIZE}, 
                         radius = 2, wedgeprops= {'width' : 1}, # donut
                         counterclock = False,
                         # explode = 0.2*np.ones(len(df_opex.index),
                         )   
                 axs.text(0, 0,  
-                'Energy: \n {:.0f} kJ/mol$_{{{}}}$'.format(sum((abs(df_energy.fillna(0).iloc[2:-2].loc[:, 'Energy (kJ/kg {})'.format(product_name)])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)']), product_name),
-                ha='center', va='center', 
-                fontsize = MEDIUM_SIZE)  
-                    
-                # Label pie chart with arrows
-                box_properties = dict(boxstyle="square,pad=0.3", fc="none", lw=0)
-                label_properties_away = dict(arrowprops=dict(arrowstyle="-"),
-                                    bbox=box_properties, zorder=0, va="center")
-                label_properties_near = dict(arrowprops=dict(arrowstyle="-",alpha = 0),
-                                    bbox=box_properties, zorder=0, va="center")
-                for i, wedge in enumerate(wedges):
-                    middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1 # in degrees
-                    y_posn = np.sin(np.deg2rad(middle_angle))
-                    x_posn = np.cos(np.deg2rad(middle_angle))
-                    verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
-                    horizontalalignment = {-1: "left", 1: "right"}[int(np.sign(x_posn))]
-                    if (wedge.theta2 - wedge.theta1) <19:
-                        flag = -flag    
-                        connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
-                        label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
-                        axs.annotate(df_energy.iloc[2:-2].index[i], xy=(x_posn, y_posn), xytext=(far_near[flag]*0.5*np.sign(x_posn), 3.5*y_posn),
-                                horizontalalignment=horizontalalignment, 
-                                **label_properties_away)
-                    else:                            
-                        horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
-                        axs.text(2.4*x_posn, 2.4*y_posn,df_energy.iloc[2:-2].index[i],
-                                horizontalalignment=horizontalalignment, 
-                                verticalalignment = verticalalignment)
-                
+                        'Energy: \n {:.0f} kJ/mol$_{{{}}}$'.format(sum((abs(df_energy.fillna(0).iloc[2:-2].loc[:, 'Energy (kJ/kg {})'.format(product_name)])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)']), product_name),
+                        ha='center', va='center', 
+                        fontsize = MEDIUM_SIZE)                  
                 st.pyplot(energy_pie_fig, transparent = True, use_container_width = True)   
 
     ###### EMISSIONS PIE CHART
@@ -1247,21 +1192,20 @@ if not np.isnan(FE_product_checked):
                         x_posn = np.cos(np.deg2rad(middle_angle))
                         verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
                         if (wedge.theta2 - wedge.theta1) < 15:
-                            flag = -flag
+                            alternating = -alternating
                             horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
                             connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                             label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
                             axs.annotate(df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i], xy=(x_posn, y_posn), 
-                                         xytext=(far_near[flag]*0.5*np.sign(x_posn), 3.5*y_posn),
-                                        horizontalalignment=horizontalalignment, 
+                                        xytext=(far_near[alternating]*0.7*np.sign(x_posn), 3.5*y_posn),
+                                        horizontalalignment=horizontalalignment, verticalalignment = 'center',
                                         **label_properties_away)
                         else:                            
                             horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
-                            axs.text(2.4*x_posn, 2.4*y_posn,
+                            axs.text(2.3*x_posn, 2.3*y_posn,
                                         df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i],
                                         horizontalalignment=horizontalalignment,
                                         verticalalignment=verticalalignment)
-
                     st.pyplot(emissions_pie_fig, transparent = True, use_container_width = True)   
 
     st.divider()
