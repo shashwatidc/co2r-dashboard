@@ -94,7 +94,7 @@ def capex(
     dict_capex_BM = {
         'Electrolyzer' : ['Electrolysis', '$5000/m2 - Linear scaling, Badgett Cortright J Cleaner Prod 2022', np.NaN],
         #         'Deionization' : ['', '', 0] , # TODO: add deionization capex and opex
-        'Balance of plant' : ['Pressure changes etc', '53% of plant bare module - Linear scaling, H2A model', np.NaN] ,
+        'Balance of plant' : ['Pressure changes etc', '34% of electrolyzer bare module - Linear scaling, H2A model', np.NaN] ,
         'Cathode PSA - CO$_2$/products' : ['Separations', 'Scaling factor 0.7 to Shin Jiao Nat Sust 2021', np.NaN] ,
         'Cathode PSA - Products/H$_2$' : ['Separations', 'Scaling factor 0.7 to Shin Jiao Nat Sust 2021', np.NaN] ,
         'Anode PSA - CO$_2$/O$_2$' : ['Separations', 'Scaling factor 0.7 to Shin Jiao Nat Sust 2021', np.NaN] ,
@@ -113,7 +113,7 @@ def capex(
     # df_capex_BM.loc['Electrolyzer', 'Cost ($)'] = electrolyzer_capex_USD_cm2 * area_m2 * 10**4 # Assume linear scaling
     
     # Badgett et al - $10,000/m2 to $5,000/m2 depending on manufacturing scale
-    df_capex_BM.loc['Electrolyzer', 'Cost ($)'] = electrolyzer_capex_USD_m2 * area_m2 # Assume linear scaling
+    df_capex_BM.loc['Electrolyzer', 'Cost ($)'] = electrolyzer_capex_USD_m2 * area_m2 * 1.12 # Assume linear scaling
 
     # H2A - balance of plant is 34.5% of electrolyzer capex
     df_capex_BM.loc['Balance of plant', 'Cost ($)']  = df_capex_BM.loc['Electrolyzer', 'Cost ($)'] * 0.345
