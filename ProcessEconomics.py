@@ -115,8 +115,8 @@ def capex(
     # Badgett et al - $10,000/m2 to $5,000/m2 depending on manufacturing scale
     df_capex_BM.loc['Electrolyzer', 'Cost ($)'] = electrolyzer_capex_USD_m2 * area_m2 # Assume linear scaling
 
-    # H2A - balance of plant is 34.5% capex, 65.5% is electrolyzer
-    df_capex_BM.loc['Balance of plant', 'Cost ($)']  = df_capex_BM.loc['Electrolyzer', 'Cost ($)'] * 34.5/65.5
+    # H2A - balance of plant is 34.5% of electrolyzer capex
+    df_capex_BM.loc['Balance of plant', 'Cost ($)']  = df_capex_BM.loc['Electrolyzer', 'Cost ($)'] * 0.345
 
     ## TODO: Are these FOB costs  (without delivery)? Or including delivery, installation, material factors (including bare-module factor) to give bare-module costs?
     # PSA - reference cost with scaling factor
