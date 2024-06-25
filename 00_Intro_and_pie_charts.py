@@ -1228,15 +1228,15 @@ if not np.isnan(FE_product_checked):
                         x_posn = np.cos(np.deg2rad(middle_angle))
                         horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
                         verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
-                        if (wedge.theta2 - wedge.theta1) < 36:
+                        if (wedge.theta2 - wedge.theta1) < 25:
                             connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                             label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
                             axs.annotate(df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i], xy=(x_posn, y_posn), 
-                                         xytext=(2.5*np.sign(x_posn), 3.1*np.sign(y_posn)),
+                                         xytext=(2.5*x_posn, 3.1*y_posn),
                                         horizontalalignment=horizontalalignment, **label_properties_away)
                         else:                            
                             axs.annotate(df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i], xy=(x_posn, y_posn), 
-                                         xytext=(2.3*np.sign(x_posn), 2.3*np.sign(y_posn)),
+                                         xytext=(1.5*x_posn, 1.5*y_posn),
                                         horizontalalignment=horizontalalignment,
                                         verticalalignment=verticalalignment, **label_properties_near)
 
