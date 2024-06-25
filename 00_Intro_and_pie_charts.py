@@ -1227,7 +1227,7 @@ if not np.isnan(FE_product_checked):
                         y_posn = np.sin(np.deg2rad(middle_angle))
                         x_posn = np.cos(np.deg2rad(middle_angle))
                         horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
-                        verticalalignment = {-1: "right", 1: "left"}[int(np.sign(y_posn))]
+                        verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
                         if (wedge.theta2 - wedge.theta1) < 36:
                             connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                             label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
