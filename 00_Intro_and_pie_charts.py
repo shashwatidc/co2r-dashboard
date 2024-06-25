@@ -1060,10 +1060,11 @@ if not np.isnan(FE_product_checked):
                     connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                     label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
                     axs.annotate(df_opex.index[i], xy=(x_posn, y_posn), 
-                                 xytext=(flag*np.sign(x_posn), 3.5*y_posn),
+                                 xytext=(far_near[flag]*np.sign(x_posn), 3.5*y_posn),
                                 horizontalalignment=horizontalalignment, 
                                 **label_properties_away)
                 else:                            
+                    horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
                     axs.text(2.4*x_posn, 2.4*y_posn,
                             df_opex.index[i],
                             horizontalalignment=horizontalalignment, 
@@ -1117,10 +1118,11 @@ if not np.isnan(FE_product_checked):
                     connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                     label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
                     axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), 
-                                 xytext=(flag*np.sign(x_posn), 3.5*y_posn),
+                                 xytext=(far_near[flag]*np.sign(x_posn), 3.5*y_posn),
                                 horizontalalignment=horizontalalignment, 
                                 **label_properties_away)
                 else:                            
+                    horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
                     axs.text(2.4*x_posn, 2.4*y_posn,
                              full_list_of_costs.index[i],
                             horizontalalignment=horizontalalignment, 
@@ -1198,10 +1200,11 @@ if not np.isnan(FE_product_checked):
                         flag = -flag    
                         connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                         label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
-                        axs.annotate(df_energy.iloc[2:-2].index[i], xy=(x_posn, y_posn), xytext=(flag*np.sign(x_posn), 3.5*y_posn),
+                        axs.annotate(df_energy.iloc[2:-2].index[i], xy=(x_posn, y_posn), xytext=(far_near[flag]*np.sign(x_posn), 3.5*y_posn),
                                 horizontalalignment=horizontalalignment, 
                                 **label_properties_away)
                     else:                            
+                        horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
                         axs.text(2.4*x_posn, 2.4*y_posn,df_energy.iloc[2:-2].index[i],
                                 horizontalalignment=horizontalalignment, 
                                 verticalalignment = verticalalignment)
@@ -1249,11 +1252,11 @@ if not np.isnan(FE_product_checked):
                             connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                             label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
                             axs.annotate(df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i], xy=(x_posn, y_posn), 
-                                         xytext=(flag*np.sign(x_posn), 3.5*y_posn),
+                                         xytext=(far_near[flag]*np.sign(x_posn), 3.5*y_posn),
                                         horizontalalignment=horizontalalignment, 
                                         **label_properties_away)
                         else:                            
-                            horizontalalignment = {-1: "left", 1: "right"}[int(np.sign(x_posn))]
+                            horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
                             axs.text(2.4*x_posn, 2.4*y_posn,
                                         df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i],
                                         horizontalalignment=horizontalalignment,
