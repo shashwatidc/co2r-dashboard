@@ -1051,14 +1051,13 @@ if not np.isnan(FE_product_checked):
                 y_posn = np.sin(np.deg2rad(middle_angle))
                 x_posn = np.cos(np.deg2rad(middle_angle))
                 verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
-                horizontalalignment = {-1: "left", 1: "right"}[int(np.sign(x_posn))]
-                if (wedge.theta2 - wedge.theta1) < 25:
+                horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
+                if (wedge.theta2 - wedge.theta1) <19:
                     connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                     label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
                     axs.annotate(df_opex.index[i], xy=(x_posn, y_posn), 
                                  xytext=(2.5*x_posn, 4.1*y_posn),
                                 horizontalalignment=horizontalalignment, 
-                                verticalalignment = verticalalignment,
                                 **label_properties_away)
                 else:                            
                     axs.annotate(df_opex.index[i], xy=(x_posn, y_posn), 
@@ -1110,14 +1109,13 @@ if not np.isnan(FE_product_checked):
                 y_posn = np.sin(np.deg2rad(middle_angle))
                 x_posn = np.cos(np.deg2rad(middle_angle))
                 verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
-                horizontalalignment = {-1: "left", 1: "right"}[int(np.sign(x_posn))]
-                if (wedge.theta2 - wedge.theta1) < 25:
+                horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
+                if (wedge.theta2 - wedge.theta1) <19:
                     connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                     label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
                     axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), 
                                  xytext=(2.5*x_posn, 4.1*y_posn),
                                 horizontalalignment=horizontalalignment, 
-                                verticalalignment = verticalalignment,
                                 **label_properties_away)
                 else:                            
                     axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), 
@@ -1193,13 +1191,12 @@ if not np.isnan(FE_product_checked):
                     y_posn = np.sin(np.deg2rad(middle_angle))
                     x_posn = np.cos(np.deg2rad(middle_angle))
                     verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
-                    horizontalalignment = {-1: "left", 1: "right"}[int(np.sign(x_posn))]
-                    if (wedge.theta2 - wedge.theta1) < 25:
+                    horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
+                    if (wedge.theta2 - wedge.theta1) <19:
                         connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                         label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
                         axs.annotate(df_energy.iloc[2:-2].index[i], xy=(x_posn, y_posn), xytext=(2.5*x_posn, 4.1*y_posn),
                                 horizontalalignment=horizontalalignment, 
-                                verticalalignment = verticalalignment,
                                 **label_properties_away)
                     else:                            
                         axs.annotate(df_energy.iloc[2:-2].index[i], xy=(x_posn, y_posn), 
@@ -1246,15 +1243,14 @@ if not np.isnan(FE_product_checked):
                         middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1 # in degrees
                         y_posn = np.sin(np.deg2rad(middle_angle))
                         x_posn = np.cos(np.deg2rad(middle_angle))
-                        horizontalalignment = {-1: "left", 1: "right"}[int(np.sign(x_posn))]
+                        horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
                         verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
-                        if (wedge.theta2 - wedge.theta1) < 25:
+                        if (wedge.theta2 - wedge.theta1) <19:
                             connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
                             label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
                             axs.annotate(df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i], xy=(x_posn, y_posn), 
                                          xytext=(2.5*x_posn, 4.1*y_posn),
                                         horizontalalignment=horizontalalignment, 
-                                        verticalalignment = verticalalignment,
                                         **label_properties_away)
                         else:                            
                             axs.annotate(df_emissions.loc[~np.isnan(df_emissions)].iloc[:-2].index[i], xy=(x_posn, y_posn), 
