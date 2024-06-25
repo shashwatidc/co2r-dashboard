@@ -248,7 +248,7 @@ def feedstocks(
 
     # Fill in costs # TODO: fix this whole section to be more precise
     df_feedstocks.loc['Captured CO2', 'Cost ($/yr)'] = df_costing_assumptions.loc['CO2', 'Cost']/1000*df_streams.loc['Fresh CO2 feed', 'Mass flow rate (kg/day)']*365*capacity_factor
-    df_feedstocks.loc['Deionized water','Cost ($/yr)'] = df_costing_assumptions.loc['Water', 'Cost']/1000*df_streams.loc['Fresh water feed', 'Mass flow rate (kg/day)']*365*capacity_factor #df_streams[]
+    df_feedstocks.loc['Deionized water','Cost ($/yr)'] = df_costing_assumptions.loc['Water', 'Cost']*df_streams.loc['Fresh water feed', 'Mass flow rate (kg/day)']*365*capacity_factor #df_streams[]
 
     df_feedstocks
     
