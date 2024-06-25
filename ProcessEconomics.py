@@ -56,7 +56,7 @@ def costing_assumptions(
         'Water' : [water_cost_USD_kg, '$/kg'],
         'CO2' : [CO2_cost_USD_tCO2 , '$/ton CO2'],
         'Plant lifetime': [lifetime_years, 'years'],
-        'Electrolyzer capex': [electrolyzer_capex_USD_m2, '$/kWh'],
+        'Electrolyzer capex': [electrolyzer_capex_USD_m2, '$/m^2'],
         "Capacity factor" : [capacity_factor, ''],
     },
     ).transpose()
