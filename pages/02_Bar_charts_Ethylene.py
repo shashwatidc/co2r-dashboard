@@ -1521,7 +1521,7 @@ if not st.session_state.is_active_error_ethylene:
             axs.set_ylim([y_axis_min_capex,y_axis_max_capex])
 
             ## Plot series
-            if df_flags.loc['Capacity factor', 'T/F?'] == True or df_flags.loc['Renewables capacity factor', 'T/F?'] == True:
+            if df_flags.loc['Capacity factor', 'T/F?'] == True :
                 axs.plot([0.23625,0.23625], [y_axis_min_capex, y_axis_max_capex], alpha = 1,
                     c = theme_colors[6]) # Plot line for cost 
                 axs.text(0.23625, y_axis_min_capex + (y_axis_max_capex - y_axis_min_capex)*0.025, 'Solar capacity', ha='right', va='bottom', #  (5.67 h/day)
