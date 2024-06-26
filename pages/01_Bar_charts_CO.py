@@ -1382,7 +1382,7 @@ with middle_column:
             df_costing_assumptions_vs_vbl = pd.concat([df_costing_assumptions_vs_vbl, 
                                         df_costing_assumptions['Cost']], axis = 1) # Store costing assumptions for plotting
             df_sales_vs_vbl = pd.concat([df_sales_vs_vbl, 
-                                        df_opex['Cost ($/kg {})'.format(product_name)]], axis = 1) # Store opex for plotting
+                                    df_sales['Earnings ($/yr)']], axis = 1) # Store costing assumptions for plotting
             
             ### Adjust FE_product, SPC, capacity_factor and variable back to their original values in globals()
             if vbl_name != 'Cell voltage' and vbl_name != 'Cathodic overpotential' and vbl_name != 'Anodic overpotential':
