@@ -395,7 +395,6 @@ def SPC_check(FE_product_specified,
               FE_CO2R_0,
               product_name,
               model_FE,
-              override_optimization,
               df_products,
               crossover_ratio
               ):
@@ -404,7 +403,7 @@ def SPC_check(FE_product_specified,
     Check FE and SPC to meet carbon mass balance; model their tradeoff if desired
     product of choice, electrolyzer data containing whether or not to model the tradeoff, 
     product data as a dataframe containing [product name, electron transfers for product (mol e-/ mol product), 
-    stoichiometry as mol CO2/ mol product], crossover ratio (mol CO2 crossed/ mol e-), whether an optimization is being run (requiring no np.NaN outputs)
+    stoichiometry as mol CO2/ mol product], crossover ratio (mol CO2 crossed/ mol e-), 
     Returns FE, SPC and updated dataframe for electrolyzer assumptions
     This function is called directly from the integrated model to adjust inputs into other functions, not indirectly by the electrolyzer model
     """
@@ -417,33 +416,27 @@ def SPC_check(FE_product_specified,
     # Regardless of whether the SPC-FE tradeoff is being modeled, mass balance must be observed
     
     # First check that the given SPC is valid
-    exceeds_max_SPC = False 
-
     max_SPC = z_product*FE_CO2R_0 / (z_product*FE_CO2R_0 + crossover_ratio*n_product)
-    
+
     if SPC > max_SPC:
-        exceeds_max_SPC = True
-             
-    # For optimization alone, if max SPC is exceeded, reset SPC to almost the maximum allowed 
-    if exceeds_max_SPC:
-        SPC_tried = SPC
-        if override_optimization:
-            SPC = max_SPC  * 0.9999999
-            print('Specified SPC {} is impossibly high given the crossover! Instead, using {}; max SPC is {}'.format(SPC_tried, SPC, max_SPC) )
-        
-        else:
-            SPC = np.NaN
-            FE_product = np.NaN
-            print('Specified SPC {} is impossibly high given the crossover! Instead, using {}; max SPC is {}'.format(SPC_tried, SPC, max_SPC) )
+        SPC = np.NaN
+        FE_product = np.NaN
+        print('Specified SPC {} is impossibly high given the crossover! Instead, using {}; max SPC is {}'.format(SPC_tried, np.NaN, max_SPC) )
         
     # Get minimum allowed FE
     # By mass balance, the minimum FE = Ṅ_CO2R/ (Ṅ_CO2R + Ṅ_carbonate) = (z*FE_CO2R*i/n_CO2R*F) / ((z*FE_CO2R*i/n_CO2R*F) + (c*i/F))
     min_FE = (n_product*crossover_ratio/z_product)*(SPC/(1-SPC)) 
-
+    
+    # Check that FE specified is high enough for mass balance
+    if FE_product < min_FE:
+        print('Resulting FE {} is impossibly low given the crossover (must be > {})! Instead, using {}'.format(FE_product, min_FE, np.NaN)) # FE_product_specified) )
+        SPC = np.NaN
+        FE_product = np.NaN # FE_product_specified
+        
     ### Run SPC-FE tradeoff model 
     # If at this stage, the SPC is a number, then proceed to model FE. Otherwise both SPC and FE were reset to NaN above
     if not np.isnan(SPC):         
-        if model_FE: # if we want to override the given FE
+        if model_FE == 'Hawks': # if we want to override the given FE
             root, infodict, flag_converged, message = optimize.fsolve(func = eqn_known_SPC_jtotal,  
                                         x0 = FE_CO2R_0, # x1 = min_FE + 1e-3,
                                               # bracket = [(min_FE + 1e-5), (FE_CO2R_0 - 1e-5)],
@@ -489,23 +482,14 @@ def SPC_check(FE_product_specified,
             #         # if override_optimization:
             #             # FE_product = 0  
             
-        else:
+        elif model_FE == 'Kas':
             FE_product = FE_CO2R_0 - scaling*(SPC**exponent)
 #             FE_product = FE_CO2R_0 - 4.7306*(SPC**5.4936)
             print('Using Kas Smith 2021 tradeoff with exponent = {}, scaling = {}'.format(exponent, scaling))
             # 20240105: testing out Kas Smith 2021 tradeoff. Remove lines above and restore below to proceed
 #             FE_product = FE_product_specified
-    else:
-        FE_product = np.NaN
-    
-    # Check that FE specified is high enough for mass balance
-    if FE_product < min_FE:
-        print('Resulting FE {} is impossibly low given the crossover (must be > {})! Instead, using {}'.format(FE_product, min_FE, np.NaN)) # FE_product_specified) )
-        if override_optimization:
-            FE_product = 0 # for optimization, SPC is specified elsewhere
         else:
-            FE_product = np.NaN # FE_product_specified
-            SPC = np.NaN
+            FE_product = FE_product_specified
         
     print('SPC_check gives SPC = {}%; FE {}% \n'.format(SPC*100, FE_product*100))
 

@@ -525,7 +525,7 @@ override_ohmic = False
 overridden_vbl = ''
 overridden_value = np.NaN
 overridden_unit = ''
-model_FE = False
+model_FE = 'Kas'
 is_battery = False
 
 middle_column, right_column = st.columns(2, gap = 'large')
@@ -556,7 +556,7 @@ default_H2_cost_USD_kgH2 = H2_cost_USD_kgH2
 # RAW INPUTS
 crossover_ratio = crossover_neutral
 default_crossover_ratio = crossover_ratio
-FE_product_specified = np.NaN # df_products.loc[product_name, 'FECO2R at SPC = 0']  # 0.9 # 0.90 # %/100
+FE_product_specified = df_products.loc[product_name, 'FECO2R at SPC = 0']  # 0.9 # 0.90 # %/100
 default_FE_product_specified = FE_product_specified
 j_total_mA_cm2 = float(df_products.loc[product_name, 'Optimal j @ 7.6 c/kWh, Hawks model']) # 300 # mA/cm2
 default_j_total_mA_cm2 = j_total_mA_cm2
@@ -678,22 +678,23 @@ with st.sidebar:
                 index = 0,
                 label_visibility= 'collapsed')
         if answer == option_1:
-            model_FE = True
+            model_FE = 'Hawks'
             st.write('*Using [Hawks and Baker model](https://doi.org/10.1021/acsenergylett.2c01106) for $ FE_{}$ - $ X_{CO_2}$ tradeoff*')
             st.latex(r"""
                     \scriptsize \implies \displaystyle \frac{FE_{CO_2R}}{FE_{CO_2R, \: 0}} + \displaystyle \frac{-X_{CO_2} \cdot (1 + \frac{c \cdot n_{i}}{z_i \cdot FE_{CO_2R}})}{\ln(1-X_{CO_2} \cdot (1 + \frac{c \cdot n_{i}}{z_i \cdot FE_{CO_2R}}))} = 0
                     """)
         elif answer == option_2:
-            model_FE = False
+            model_FE = 'Kas'
             st.write('*Using [Kas and Smith model](https://doi.org/10.1021/acssuschemeng.0c07694) for $ FE_{}$ - $ X_{CO_2}$ tradeoff*')
             st.latex(r"""
                     \footnotesize \implies FE_{CO_2R} = FE_{CO_2R, \: 0} - 4.7306 \cdot {X_{CO_2}}^{5.4936}
                     """)
-        # elif answer == option_3: # TODO I don't think this works rn?
-        #     FE_product_specified = st.slider(label = 'FE_{}'.format(product_name),
-        #             min_value = 0.001,
-        #             max_value = 1.0,
-        #             step = 0.01, value = FE_CO2R_0)
+        elif answer == option_3: # TODO I don't think this works rn?
+            model_FE = None
+            FE_product_specified = st.slider(label = 'FE_{}'.format(product_name),
+                    min_value = 0.001,
+                    max_value = 1.0,
+                    step = 0.01, value = FE_CO2R_0)
 
         FE_CO2R_0 = st.slider(label = '$ FE_{CO_2R, \: 0}$, maximum Faradaic efficiency',
                             min_value = 0.001, 
@@ -877,7 +878,7 @@ capex_default, opex_default, levelized_default, potential_default, energy_defaul
                         df_products = df_products, FE_CO2R_0 = default_FE_CO2R_0, 
                         FE_product_specified = default_FE_product_specified, 
                         j_total_mA_cm2 = default_j_total_mA_cm2,SPC = default_SPC, 
-                        crossover_ratio = default_crossover_ratio, model_FE = True,  
+                        crossover_ratio = default_crossover_ratio, model_FE = 'Hawks',  
                         overridden_vbl = '', overridden_value = np.NaN, overridden_unit = '', 
                         override_optimization =  False, P = default_P, T_streams = default_T_streams, 
                         R_ohmcm2 = default_R_ohmcm2, an_E_eqm = default_an_E_eqm, MW_CO2 = MW_CO2, 
