@@ -492,6 +492,7 @@ def totals(df,
 def opex_seider(df_feedstocks,
         df_capex_totals,
         df_utilities,
+        df_sales,
         df_operations,
         df_maintenance,
         df_overhead,
@@ -535,6 +536,7 @@ def opex_seider(df_feedstocks,
     df_opex_totals.loc['Cost of manufacture'] = df_opex['Cost ($/yr)'].sum(axis=0) -  df_opex.loc['General expenses', 'Cost ($/yr)']
     df_opex_totals.loc['Production cost'] = df_opex['Cost ($/yr)'].sum(axis=0)
     df_opex_totals.loc['Levelized cost'] = df_opex_totals.loc['Production cost'] + df_capex_totals.loc['Total permanent investment', 'Cost ($)']/lifetime_years
+    df_opex_totals.loc['Profit'] = df_sales.loc['Total', 'Earnings ($/yr)'] - df_opex_totals.loc['Levelized cost']
                                                             
     df_opex_totals['Cost ($/kg {})'.format(product_name)] = df_opex_totals['Cost ($/yr)']/(product_rate_kg_day*365*capacity_factor)
     df_opex_totals['Cost ($/day)'] = df_opex_totals['Cost ($/yr)']/(365*capacity_factor)
@@ -554,6 +556,7 @@ def opex_seider(df_feedstocks,
 def opex_sinnott(C_ISBL, # currently C_TDC
                  df_feedstocks,
                  df_utilities,
+                 df_sales,
                  df_depreciation,
                  df_general,
                  df_capex_totals,
@@ -617,6 +620,7 @@ def opex_sinnott(C_ISBL, # currently C_TDC
     df_opex_totals.loc['Cost of manufacture'] = df_opex['Cost ($/yr)'].sum(axis=0) -  df_opex.loc['General expenses', 'Cost ($/yr)']
     df_opex_totals.loc['Production cost'] =  df_opex['Cost ($/yr)'].sum(axis=0)
     df_opex_totals.loc['Levelized cost'] = df_opex_totals.loc['Production cost'] + df_capex_totals.loc['Total permanent investment', 'Cost ($)']/lifetime_years
+    df_opex_totals.loc['Profit'] = df_sales.loc['Total', 'Earnings ($/yr)'] - df_opex_totals.loc['Levelized cost']
 
     df_opex_totals['Cost ($/kg {})'.format(product_name)] = df_opex_totals['Cost ($/yr)']/(product_rate_kg_day*365*capacity_factor)
     df_opex_totals['Cost ($/day)'] = df_opex_totals['Cost ($/yr)']/(365*capacity_factor)

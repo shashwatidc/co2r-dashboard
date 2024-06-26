@@ -495,7 +495,8 @@ def SPC_check(FE_product_specified,
             print('Using Kas Smith 2021 tradeoff with exponent = {}, scaling = {}'.format(exponent, scaling))
             # 20240105: testing out Kas Smith 2021 tradeoff. Remove lines above and restore below to proceed
 #             FE_product = FE_product_specified
-    print(min_FE)
+    else:
+        FE_product = np.NaN
     
     # Check that FE specified is high enough for mass balance
     if FE_product < min_FE:
@@ -629,7 +630,10 @@ def electrolyzer_SS_mass_balance(
     }
          
     df_electrolyzer_streams_mol_s = pd.Series(dict_electrolyzer_streams_mol_s) # convert to dataframe
-    
+
+    if np.isnan(SPC):
+        df_electrolyzer_streams_mol_s.loc[:] = np.NaN
+
     return df_outlet_assumptions, df_electrolyzer_streams_mol_s
 
 

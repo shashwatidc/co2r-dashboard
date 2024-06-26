@@ -1514,22 +1514,20 @@ if not st.session_state.is_active_error_ethylene:
             axs.set_ylim([y_axis_min_capex,y_axis_max_capex])
 
             ## Plot series
-            if df_flags.loc['Capacity factor', 'T/F?'] == True: # or df_flags.loc['Renewables capacity factor', 'T/F?'] == True:
-                axs.plot([0.23625,0.23625], [y_axis_min_capex, y_axis_max_capex], alpha = 1,
+            if df_flags.loc['Capacity factor', 'T/F?'] == True or df_flags.loc['Renewables capacity factor', 'T/F?'] == True:
+                axs.plot([0.23625,0.23625], [y_axis_min, y_axis_max], alpha = 1,
                     c = theme_colors[6]) # Plot line for cost 
-                axs.text(0.23625, y_axis_min_capex + (y_axis_max_capex - y_axis_min_capex)*0.025, 'Solar capacity', ha='right', va='bottom', #  (5.67 h/day)
+                axs.text(0.23625, y_axis_min + (y_axis_max - y_axis_min)*0.025, 'Solar capacity', ha='right', va='bottom', #  (5.67 h/day)
                     fontsize = SMALL_SIZE, rotation = 90)
             if df_flags.loc['{} production rate'.format(product_name), 'T/F?'] == True:
-                axs.text(x_axis_max*0.1, y_axis_max_capex*0.975, 'Lifetime sales', #.format(product_cost_USD_kgprod*product_rate_kg_day*capacity_factor*365*20/1e6), 
+                axs.text(x_axis_max*0.1, y_axis_max*0.975, 'Lifetime sales', #.format(product_cost_USD_kgprod*product_rate_kg_day*capacity_factor*365*20/1e6), 
                         ha='left', va='top', 
                     fontsize = SMALL_SIZE)
-                axs.plot([x_axis_min, x_axis_max], 
-                    [product_cost_USD_kgprod*df_electrolyzer_assumptions_vs_vbl.loc['Production rate'][0]*capacity_factor*365*20/1e6,
-                    product_cost_USD_kgprod*df_electrolyzer_assumptions_vs_vbl.loc['Production rate'][-1]*capacity_factor*365*20/1e6 ],
+                axs.plot(vbl_range, df_sales_vs_vbl.loc['Total']*lifetime_years,
                     alpha = 1, c = theme_colors[6]) # Plot line for cost 
                 plt.xticks(rotation=35)  # Rotate text labels
             else:
-                axs.text(x_axis_max*0.975, y_axis_max_capex*0.975, 'Lifetime sales: ${:.0f} million'.format(product_cost_USD_kgprod*product_rate_kg_day*capacity_factor*365*20/1e6), ha='right', va='top', 
+                axs.text(x_axis_max*0.975, y_axis_max*0.975, 'Lifetime sales > ${:.0f} million'.format(min(df_sales_vs_vbl.loc['Total', df_sales_vs_vbl.loc['Total'] > 0]*lifetime_years)/1e6), ha='right', va='top', 
                     fontsize = SMALL_SIZE)
             
             cumsum = 0
