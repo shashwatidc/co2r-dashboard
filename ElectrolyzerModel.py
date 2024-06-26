@@ -319,9 +319,9 @@ def cell_voltage(
         "FE {} at 0% SPC".format(product_name) : [FE_CO2R_0, ''],
         "Current density": [j_total_mA_cm2, 'mA/cm2'],
         "Specific ohmic resistance": [R_ohmcm2, 'ohm.cm2'],
-        'Modeled FE?': [{0: None, 
-                         1: 'Hawks', 
-                         2: 'Kas'}[model_FE], ''],
+        'Modeled FE?': [{None: 0, 
+                        'Hawks': 1, 
+                         'Kas':2}[model_FE], ''],
         'FE {}'.format(product_name): [FE_product, ''],
         '{} (overridden)'.format(overridden_vbl): [overridden_value, overridden_unit],
         'Run optimization?': [override_optimization, ''],
@@ -421,10 +421,10 @@ def SPC_check(FE_product_specified,
     max_SPC = z_product*FE_CO2R_0 / (z_product*FE_CO2R_0 + crossover_ratio*n_product)
 
     if SPC > max_SPC:
+        print('Specified SPC {} is impossibly high given the crossover! Instead, using {}; max SPC is {}'.format(SPC, np.NaN, max_SPC) )
         SPC = np.NaN
         FE_product = np.NaN
-        print('Specified SPC {} is impossibly high given the crossover! Instead, using {}; max SPC is {}'.format(SPC_tried, np.NaN, max_SPC) )
-      
+        
     ### Run SPC-FE tradeoff model 
     # If at this stage, the SPC is a number, then proceed to model FE. Otherwise both SPC and FE were reset to NaN above
     if not np.isnan(SPC):         
