@@ -1269,6 +1269,7 @@ with middle_column:
         df_capex_BM_vs_vbl = pd.DataFrame()
         df_capex_totals_vs_vbl = pd.DataFrame()
         df_costing_assumptions_vs_vbl = pd.DataFrame()
+        df_sales_vs_vbl = pd.DataFrame()
 
         #### Loop through variable
         for i, vbl in enumerate(vbl_range):
@@ -1380,7 +1381,9 @@ with middle_column:
                                         df_capex_totals['Cost ($)']], axis = 1) # Store capex for plotting
             df_costing_assumptions_vs_vbl = pd.concat([df_costing_assumptions_vs_vbl, 
                                         df_costing_assumptions['Cost']], axis = 1) # Store costing assumptions for plotting
-
+            df_sales_vs_vbl = pd.concat([df_sales_vs_vbl, 
+                                        df_opex['Cost ($/kg {})'.format(product_name)]], axis = 1) # Store opex for plotting
+            
             ### Adjust FE_product, SPC, capacity_factor and variable back to their original values in globals()
             if vbl_name != 'Cell voltage' and vbl_name != 'Cathodic overpotential' and vbl_name != 'Anodic overpotential':
                 globals()[df_flags.loc[vbl_name,'Python variable']] = value_original
@@ -1394,6 +1397,7 @@ with middle_column:
         for df in [df_energy_vs_vbl, df_potentials_vs_vbl,  df_emissions_vs_vbl,
                         df_electrolyzer_assumptions_vs_vbl, df_outlet_assumptions_vs_vbl, df_costing_assumptions_vs_vbl, 
                         df_capex_BM_vs_vbl, df_capex_totals_vs_vbl, df_opex_vs_vbl, df_opex_totals_vs_vbl, 
+                        df_sales_vs_vbl
                         ]:
             df.columns = vbl_range_text # rename columns
 
@@ -1418,6 +1422,10 @@ with middle_column:
         df_opex_vs_vbl.index = df_opex.index
         df_opex_vs_vbl_2 = df_opex_vs_vbl.copy()
         df_opex_vs_vbl_2.insert(0, 'Units', '$/kg {}'.format(product_name))
+
+        df_sales_vs_vbl.index = df_sales.index
+        df_sales_vs_vbl_2 = df_sales_vs_vbl.copy()
+        df_sales_vs_vbl_2.insert(0, 'Units', '$/yr')
 
         df_capex_BM_vs_vbl.index = df_capex_BM.index
         df_capex_BM_vs_vbl_2 = df_capex_BM_vs_vbl.copy()
@@ -1514,20 +1522,20 @@ if not st.session_state.is_active_error_CO:
             axs.set_ylim([y_axis_min_capex,y_axis_max_capex])
 
             ## Plot series
-            if df_flags.loc['Capacity factor', 'T/F?'] == True or df_flags.loc['Renewables capacity factor', 'T/F?'] == True:
-                axs.plot([0.23625,0.23625], [y_axis_min, y_axis_max], alpha = 1,
+            if df_flags.loc['Capacity factor', 'T/F?']:
+                axs.plot([0.23625,0.23625], [y_axis_min_capex, y_axis_max_capex], alpha = 1,
                     c = theme_colors[6]) # Plot line for cost 
-                axs.text(0.23625, y_axis_min + (y_axis_max - y_axis_min)*0.025, 'Solar capacity', ha='right', va='bottom', #  (5.67 h/day)
+                axs.text(0.23625, y_axis_min_capex + (y_axis_max_capex - y_axis_min_capex)*0.025, 'Solar capacity', ha='right', va='bottom', #  (5.67 h/day)
                     fontsize = SMALL_SIZE, rotation = 90)
             if df_flags.loc['{} production rate'.format(product_name), 'T/F?'] == True:
-                axs.text(x_axis_max*0.1, y_axis_max*0.975, 'Lifetime sales', #.format(product_cost_USD_kgprod*product_rate_kg_day*capacity_factor*365*20/1e6), 
+                axs.text(x_axis_max*0.1, y_axis_max_capex*0.975, 'Lifetime sales', #.format(product_cost_USD_kgprod*product_rate_kg_day*capacity_factor*365*20/1e6), 
                         ha='left', va='top', 
                     fontsize = SMALL_SIZE)
                 axs.plot(vbl_range, df_sales_vs_vbl.loc['Total']*lifetime_years,
                     alpha = 1, c = theme_colors[6]) # Plot line for cost 
                 plt.xticks(rotation=35)  # Rotate text labels
             else:
-                axs.text(x_axis_max*0.975, y_axis_max*0.975, 'Lifetime sales > ${:.0f} million'.format(min(df_sales_vs_vbl.loc['Total', df_sales_vs_vbl.loc['Total'] > 0]*lifetime_years)/1e6), ha='right', va='top', 
+                axs.text(x_axis_max*0.975, y_axis_max_capex*0.975, 'Lifetime sales > ${:.0f} million'.format(min(df_sales_vs_vbl.loc['Total', df_sales_vs_vbl.loc['Total'] > 0]*lifetime_years)/1e6), ha='right', va='top', 
                     fontsize = SMALL_SIZE)
             
             cumsum = 0
@@ -1630,9 +1638,9 @@ if not st.session_state.is_active_error_CO:
                     c = theme_colors[6]) # Plot line for solar 
                 axs.text(0.23625, y_axis_max_levelized*0.975, 'Average solar', ha='right', va='top', 
                     fontsize = SMALL_SIZE, rotation = 90)
-        #     axs.plot([0.0677,0.0677], [y_axis_min, y_axis_max], alpha = 1,
+        #     axs.plot([0.0677,0.0677], [y_axis_min_levelized, y_axis_max_levelized], alpha = 1,
         #              c = theme_colors[6]) # Plot line for solar 
-        #     axs.text(0.0677, y_axis_max*0.975, 'Texas (EIA, Jul 2023)', ha='right', va='top', 
+        #     axs.text(0.0677, y_axis_max_levelized*0.975, 'Texas (EIA, Jul 2023)', ha='right', va='top', 
         #               fontsize = SMALL_SIZE, rotation = 90)
 
             axs.plot(vbl_range[df_opex_totals_vs_vbl.loc['Levelized cost'] > 0], 
@@ -1657,10 +1665,10 @@ if not st.session_state.is_active_error_CO:
 
             if df_flags.loc['Electricity cost', 'T/F?'] == True:
                 axs.text(df_utility_imports.loc['Electricity - current US mix','Cost ($/kWh)'], 
-                        y_axis_max*0.975, 'U.S. average industrial', ha='right', va='top', 
+                        y_axis_max_levelized*0.975, 'U.S. average industrial', ha='right', va='top', 
                     fontsize = SMALL_SIZE, rotation = 90)
                 axs.plot([df_utility_imports.loc['Electricity - current US mix', 'Cost ($/kWh)'], df_utility_imports.loc['Electricity - current US mix', 'Cost ($/kWh)']], 
-                        [y_axis_min, y_axis_max], alpha = 1,
+                        [y_axis_min_levelized, y_axis_max_levelized], alpha = 1,
                     c = theme_colors[6]) # Plot line for cost 
 
             ## Legend
