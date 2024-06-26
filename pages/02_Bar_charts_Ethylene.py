@@ -1879,7 +1879,10 @@ if not st.session_state.is_active_error_ethylene:
     st.subheader('Opex')
     df_opex_vs_vbl_2
     df_opex_totals_vs_vbl_2
-
+    
+    st.subheader('Sales')
+    df_sales_vs_vbl_2
+    
     st.subheader('Electrolyzer model')
     df_potentials_vs_vbl_2    
 

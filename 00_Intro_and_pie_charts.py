@@ -1225,6 +1225,9 @@ if not np.isnan(FE_product_checked):
     st.subheader('Opex')
     df_opex
     df_opex_totals
+        
+    st.subheader('Sales')
+    df_sales
 
     st.subheader('Electrolyzer model')
     df_potentials    
