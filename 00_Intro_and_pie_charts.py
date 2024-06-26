@@ -719,7 +719,6 @@ with st.sidebar:
                 FE_CO2R_0= FE_CO2R_0,
                 product_name=product_name,
                 model_FE= model_FE,
-                override_optimization=override_optimization,
                 df_products=df_products,
                 crossover_ratio=crossover_ratio)
         st.latex(r'''
