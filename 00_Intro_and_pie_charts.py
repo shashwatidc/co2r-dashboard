@@ -673,8 +673,8 @@ with st.sidebar:
         st.write('Model for selectivity tradeoff versus single-pass conversion')
         answer = st.radio(label = 'FE-SPC model',
                 options = [option_1,
-                        option_2, ],
-                        # option_3 ],
+                        option_2, 
+                        option_3 ],
                 index = 0,
                 label_visibility= 'collapsed')
         if answer == option_1:
@@ -879,7 +879,7 @@ capex_default, opex_default, levelized_default, potential_default, energy_defaul
                         j_total_mA_cm2 = default_j_total_mA_cm2,SPC = default_SPC, 
                         crossover_ratio = default_crossover_ratio, model_FE = 'Hawks',  
                         overridden_vbl = '', overridden_value = np.NaN, overridden_unit = '', 
-                        override_optimization =  False, P = default_P, T_streams = default_T_streams, 
+                        override_optimization =  override_optimization, P = default_P, T_streams = default_T_streams, 
                         R_ohmcm2 = default_R_ohmcm2, an_E_eqm = default_an_E_eqm, MW_CO2 = MW_CO2, 
                         MW_H2O = MW_H2O, MW_O2 = MW_O2,  MW_MX = MW_K2CO3,
                         cathode_outlet_humidity = default_cathode_outlet_humidity,

@@ -1007,8 +1007,8 @@ with st.sidebar:
         st.write('Model for selectivity tradeoff versus single-pass conversion')
         answer = st.radio(label = 'FE-SPC model',
                 options = [option_1,
-                        option_2, ],
-                        # option_3 ],
+                        option_2, 
+                        option_3 ],
                 index = 0,
                 label_visibility= 'collapsed')
         if answer == option_1:

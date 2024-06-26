@@ -450,6 +450,7 @@ def SPC_check(FE_product_specified,
                 # print(root, infodict, flag_converged, message)
             else:
                 print(root, infodict, flag_converged, message)
+                SPC = np.NaN
                 FE_product = np.NaN
                 print('Model failed')
             
@@ -471,8 +472,6 @@ def SPC_check(FE_product_specified,
             #     else:
             #         FE_product = np.NaN
             #         print('Model failed')
-            #         # if override_optimization:
-            #             # FE_product = 0  
             
         elif model_FE == 'Kas':
             FE_product = FE_CO2R_0 - scaling*(SPC**exponent)
