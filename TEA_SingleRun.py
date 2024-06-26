@@ -90,7 +90,6 @@ def single_run(product_name,
                                 df_products = df_products,
                                 crossover_ratio = crossover_ratio,
                                 model_FE = model_FE,
-                                override_optimization = override_optimization,
                                 )
 
     ## Generate electrolyzer model
