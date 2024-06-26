@@ -422,17 +422,7 @@ def SPC_check(FE_product_specified,
         SPC = np.NaN
         FE_product = np.NaN
         print('Specified SPC {} is impossibly high given the crossover! Instead, using {}; max SPC is {}'.format(SPC_tried, np.NaN, max_SPC) )
-        
-    # Get minimum allowed FE
-    # By mass balance, the minimum FE = Ṅ_CO2R/ (Ṅ_CO2R + Ṅ_carbonate) = (z*FE_CO2R*i/n_CO2R*F) / ((z*FE_CO2R*i/n_CO2R*F) + (c*i/F))
-    min_FE = (n_product*crossover_ratio/z_product)*(SPC/(1-SPC)) 
-    
-    # Check that FE specified is high enough for mass balance
-    if FE_product < min_FE:
-        print('Resulting FE {} is impossibly low given the crossover (must be > {})! Instead, using {}'.format(FE_product, min_FE, np.NaN)) # FE_product_specified) )
-        SPC = np.NaN
-        FE_product = np.NaN # FE_product_specified
-        
+      
     ### Run SPC-FE tradeoff model 
     # If at this stage, the SPC is a number, then proceed to model FE. Otherwise both SPC and FE were reset to NaN above
     if not np.isnan(SPC):         
@@ -490,7 +480,17 @@ def SPC_check(FE_product_specified,
 #             FE_product = FE_product_specified
         else:
             FE_product = FE_product_specified
+                
+        # Get minimum allowed FE
+        # By mass balance, the minimum FE = Ṅ_CO2R/ (Ṅ_CO2R + Ṅ_carbonate) = (z*FE_CO2R*i/n_CO2R*F) / ((z*FE_CO2R*i/n_CO2R*F) + (c*i/F))
+        min_FE = (n_product*crossover_ratio/z_product)*(SPC/(1-SPC)) 
         
+        # Check that FE specified is high enough for mass balance
+        if FE_product < min_FE:
+            print('Resulting FE {} is impossibly low given the crossover (must be > {})! Instead, using {}'.format(FE_product, min_FE, np.NaN)) # FE_product_specified) )
+            SPC = np.NaN
+            FE_product = np.NaN # FE_product_specified
+  
     print('SPC_check gives SPC = {}%; FE {}% \n'.format(SPC*100, FE_product*100))
 
     return FE_product, SPC
