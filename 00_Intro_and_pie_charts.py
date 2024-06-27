@@ -691,7 +691,7 @@ with st.sidebar:
                     """)
         elif answer == option_3: # TODO I don't think this works rn?
             model_FE = None
-            FE_product_specified = st.slider(label = 'FE_{{{}}}'.format(product_name),
+            FE_product_specified = st.slider(label = 'FE$_{{{}}}$'.format(product_name),
                     min_value = 0.001,
                     max_value = 1.0,
                     step = 0.01, value = FE_CO2R_0,

@@ -1025,7 +1025,7 @@ with st.sidebar:
                     """)
         elif answer == option_3: # TODO I don't think this works rn?
             model_FE = None
-            FE_product_specified = st.slider(label = 'FE_{{{}}}'.format(product_name),
+            FE_product_specified = st.slider(label = 'FE$_{{{}}}$'.format(product_name),
                     min_value = 0.001,
                     max_value = 1.0,
                     step = 0.01, value = FE_CO2R_0,
@@ -1753,7 +1753,7 @@ if not st.session_state.is_active_error_CO:
             axs.scatter(df_outlet_assumptions_vs_vbl.loc['Single-pass conversion'],
                         df_outlet_assumptions_vs_vbl.loc['FE {}'.format(product_name)],
                                     color = theme_colors[3], 
-                                    label = 'FE$_{{CO_2R, 0}}$ = {}'.format(df_products.loc[product_name, 'FECO2R at SPC = 0']),
+                                    label = 'FE$_{{CO_2R, 0}}$ > {}'.format(min(df_electrolyzer_assumptions_vs_vbl.loc['FE {} at 0% SPC'.format(product_name)])),
                                     s = 200, 
                                     alpha = 1, marker = 'o') 
         #     axs.scatter(df_products.loc[product_name, 'Typical SPC']*100, df_products.loc[product_name, 'FECO2R at SPC = 0']*100, 
