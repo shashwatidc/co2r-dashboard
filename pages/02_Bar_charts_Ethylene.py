@@ -1024,10 +1024,13 @@ with st.sidebar:
                     """)
         elif answer == option_3: # TODO I don't think this works rn?
             model_FE = None
-            FE_product_specified = st.slider(label = 'FE_{}'.format(product_name),
+            FE_product_specified = st.slider(label = 'FE_{{{}}}'.format(product_name),
                     min_value = 0.001,
                     max_value = 1.0,
-                    step = 0.01, value = FE_CO2R_0)
+                    step = 0.01, value = FE_CO2R_0,
+                    help = 'Faradaic efficiency, independent of any other variables. \
+                        This is not a recommended or default option, since it neglects electrolyzer geometry.\
+                        Therefore, it artificially lowers costs.')
 
         FE_CO2R_0 = st.slider(label = '$ FE_{CO_2R, \: 0}$, maximum Faradaic efficiency',
                             min_value = 0.001, 
