@@ -1036,7 +1036,7 @@ with st.sidebar:
                             format = '%.2f',
                             help = r'''Maximum Faradaic efficiency achieved in the limit of 0 single-pass conversion or vast excess of CO$_2$,
                             $$$
-                            lim_{{\big X_{{CO_2}} → 0}} FE_{{\scriptsize CO_2R}}
+                            lim_{{X_{{CO_2}} → 0}} FE_{{CO_2R}}
                             $$$
                             ''' +   '\n  Default $ FE_{{CO_2R, \: 0}}$: {}'.format(default_FE_CO2R_0),)
         SPC = st.slider(label = 'Single-pass conversion',
