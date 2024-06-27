@@ -711,7 +711,7 @@ with st.sidebar:
                             max_value = 1.0, 
                             step = 0.01, value = SPC,
                             format = '%.2f')
-        FE_product_checked, __ = SPC_check(FE_product_specified=np.NaN, 
+        FE_product_checked, __ = SPC_check(FE_product_specified=FE_product_specified, 
                 exponent= exponent,
                 scaling = scaling,
                 SPC = SPC,
