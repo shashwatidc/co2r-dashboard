@@ -777,7 +777,7 @@ with st.sidebar:
                             '''.format(product_rate_kg_day, lifetime_years))
         stack_lifetime_years = st.slider(label = 'Stack lifetime (years)',
                             min_value = 0.001, 
-                            max_value = 100.0, 
+                            max_value = 30.0, 
                             step = 1.0, value = stack_lifetime_years,
                             format = '%i',
                             help = '''Stack replacement time in years. The entire electrolyzer must be replacemed at this interval.
