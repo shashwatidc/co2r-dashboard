@@ -60,6 +60,7 @@ def single_run(product_name,
         CO2_cost_USD_tCO2,
         electrolyzer_capex_USD_m2,       
         lifetime_years,
+        stack_lifetime_years,
         capacity_factor,
         battery_capex_USD_kWh,               
         battery_capacity,
@@ -216,13 +217,17 @@ def single_run(product_name,
     df_general = general(df_sales = df_sales)
 
     df_operations = operations(capacity_factor = capacity_factor) # Not used in Sinott
-    df_maintenance = maintenance(C_TDC = C_TDC)  # Not used in Sinott         
+    df_maintenance = maintenance(C_TDC = C_TDC,
+                                 df_capex_BM = df_capex_BM)
+    df_stack_replacement = stack_replacement(df_capex_BM = df_capex_BM,
+                                 stack_lifetime_years = stack_lifetime_years,
+                                 lifetime_years = lifetime_years)      
     df_overhead = overhead(df_maintenance, df_operations)      # Not used in Sinott   
     df_taxes = taxes(C_TDC = C_TDC)     # Not used in Sinott
 
     # Add totals rows to subparts of opex
     for df in [df_feedstocks, df_utilities, df_operations, df_maintenance, df_overhead, 
-               df_taxes, df_depreciation, df_general]:
+               df_taxes, df_depreciation, df_general, df_stack_replacement]:
         totals(df,  product_name = product_name,
                     product_rate_kg_day = product_rate_kg_day,
                     capacity_factor = capacity_factor)
@@ -231,9 +236,11 @@ def single_run(product_name,
     df_opex, df_opex_totals = opex_sinnott(C_ISBL = df_capex_totals.loc['Total bare-module investment', 'Cost ($)'], # currently C_TDC
              df_feedstocks = df_feedstocks,
              df_utilities = df_utilities,
+             df_stack_replacement = df_stack_replacement,
              df_sales = df_sales,
              df_depreciation = df_depreciation,
              df_general = df_general,
+             df_capex_BM = df_capex_BM,
              df_capex_totals = df_capex_totals,
              capacity_factor = capacity_factor,
              lifetime_years = lifetime_years,
@@ -248,15 +255,16 @@ def single_run(product_name,
     #         df_operations = df_operations,
     #         df_capex_totals = df_capex_totals,
     #         df_maintenance = df_maintenance,
+    #         df_stack_replacement = df_stack_replacement,
     #         df_overhead = df_overhead,
     #         df_taxes = df_taxes,
     #         df_depreciation = df_depreciation,
     #         df_general = df_general,
     #         capacity_factor = capacity_factor,
     #         lifetime_years = lifetime_years,
-    #     product_name = product_name,
-    #     product_rate_kg_day = product_rate_kg_day,
-    #     cell_E_V = cell_E_V
+    #         product_name = product_name,
+    #         product_rate_kg_day = product_rate_kg_day,
+    #         cell_E_V = cell_E_V
     #     )
 
     # print('Here')

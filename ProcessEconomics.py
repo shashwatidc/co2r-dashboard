@@ -324,7 +324,8 @@ def operations(
 # %%
 @st.cache_data
 def maintenance(
-    C_TDC
+    C_TDC,
+    df_capex_BM,
 ):
     
     # Create dictionary
@@ -342,12 +343,33 @@ def maintenance(
     df_maintenance.index.name= 'Maintenance'  
 
     # Fill in costs
-    df_maintenance.loc['Maintenance wages and benefits (MW&B)', 'Cost ($/yr)'] = 0.035*C_TDC
+    # WARNING: hardcoded 18% factor on electrolyzer cost contributing to C_TDC
+    df_maintenance.loc['Maintenance wages and benefits (MW&B)', 'Cost ($/yr)'] = 0.035* ( C_TDC - df_capex_BM.loc['Electrolyzer', 'Cost ($)']*1.18 )
     df_maintenance.loc['Maintenance salaries and benefits','Cost ($/yr)'] = 0.25*df_maintenance.loc['Maintenance wages and benefits (MW&B)','Cost ($/yr)']
     df_maintenance.loc['Materials and services', 'Cost ($/yr)'] = 1.00*df_maintenance.loc['Maintenance wages and benefits (MW&B)','Cost ($/yr)']
     df_maintenance.loc['Maintenance overhead', 'Cost ($/yr)'] = 0.05*df_maintenance.loc['Maintenance wages and benefits (MW&B)','Cost ($/yr)']
 
     return df_maintenance
+
+def stack_replacement(df_capex_BM,
+                    stack_lifetime_years,
+                    lifetime_years):
+    # Create dictionary
+    dict_stack_replacement = {
+        'Stack replacement' : ['', 'Full electrolyzer cost after {} years'.format(stack_lifetime_years), np.NaN],
+    }
+
+    # Create dataframe
+    df_stack_replacement = pd.DataFrame(dict_stack_replacement).T
+    df_stack_replacement.columns = ['Stage', 'Description', 'Cost ($/yr)']
+    df_stack_replacement = df_stack_replacement.astype({'Stage':'string', 'Description': 'string', 'Cost ($/yr)':'float64'})
+    df_stack_replacement.index.name= 'Stack replacement'  
+
+    # Fill in costs
+    no_of_replacements = int(lifetime_years) // int(stack_lifetime_years)
+    df_stack_replacement.loc['Stack replacement', 'Cost ($/yr)'] = df_capex_BM.loc['Electrolyzer', 'Cost ($)'] * no_of_replacements / lifetime_years # Total replacement cost / plant lifetime
+  
+    return df_stack_replacement
 
 # %% [markdown]
 # ### 3.5 Operating overhead
@@ -372,6 +394,7 @@ def overhead(df_maintenance,
     df_overhead.index.name= 'Overheads'  
 
     # Fill in costs
+    # WARNING: mo_swb EXCLUDES STACK REPLACEMENT
     mo_swb = df_maintenance.loc['Maintenance wages and benefits (MW&B)','Cost ($/yr)'] + df_operations.loc['Direct wages and benefits (DW&B)','Cost ($/yr)'] + df_maintenance.loc['Maintenance salaries and benefits','Cost ($/yr)'] + df_operations.loc['Direct salaries and benefits','Cost ($/yr)'] 
     df_overhead.loc['General plant overhead', 'Cost ($/yr)'] = 0.071*mo_swb
     df_overhead.loc['Mechanical department services','Cost ($/yr)'] = 0.024*mo_swb
@@ -495,6 +518,7 @@ def opex_seider(df_feedstocks,
         df_sales,
         df_operations,
         df_maintenance,
+        df_stack_replacement,
         df_overhead,
         df_taxes,
         df_depreciation,
@@ -519,6 +543,7 @@ def opex_seider(df_feedstocks,
 
     df_opex.loc['Operations'] =  df_operations.loc['Total', 'Cost ($/yr)']
     df_opex.loc['Maintenance'] = df_maintenance.loc['Total', 'Cost ($/yr)']
+    df_opex.loc['Stack replacement'] = df_stack_replacement.loc['Total', 'Cost ($/yr)']
     df_opex.loc['Operating overhead'] =  df_overhead.loc['Total', 'Cost ($/yr)']
     df_opex.loc['Property taxes and insurance'] =  df_taxes.loc['Total', 'Cost ($/yr)']
     # df_opex.loc['Depreciation'] = df_depreciation.loc['Total', 'Cost ($/yr)']
@@ -557,8 +582,10 @@ def opex_sinnott(C_ISBL, # currently C_TDC
                  df_feedstocks,
                  df_utilities,
                  df_sales,
+                 df_stack_replacement,
                  df_depreciation,
                  df_general,
+                 df_capex_BM,
                  df_capex_totals,
                  lifetime_years,
                  capacity_factor,
@@ -587,8 +614,11 @@ def opex_sinnott(C_ISBL, # currently C_TDC
     df_opex.loc['Direct salary overhead', 'Cost ($/yr)'] =  0.5 * (df_opex.loc['Operating labor', 'Cost ($/yr)'] + df_opex.loc['Supervision', 'Cost ($/yr)'])
     df_opex.loc['Direct salary overhead', 'Description'] =  '50% of operating labor + supervision'
     
-    df_opex.loc['Maintenance', 'Cost ($/yr)'] = 0.04 * C_ISBL
+    df_opex.loc['Maintenance', 'Cost ($/yr)'] = 0.04 * (C_ISBL - 1.18 * df_capex_BM.loc['Electrolyzer', 'Cost ($)'])
     df_opex.loc['Maintenance', 'Description'] =  '4% of ISBL plant cost'
+    
+    df_opex.loc['Stack replacement', 'Cost ($/yr)'] = df_stack_replacement.loc['Total', 'Cost ($/yr)']
+    df_opex.loc['Stack replacement', 'Description'] = 'See Stack replacement'
     
     df_opex.loc['Operating overhead', 'Cost ($/yr)'] = 0.65 * (df_opex.loc['Operating labor', 'Cost ($/yr)'] + df_opex.loc['Supervision', 'Cost ($/yr)']+ df_opex.loc['Maintenance', 'Cost ($/yr)'])
     df_opex.loc['Operating overhead', 'Description'] = '65% of operating labor + supervision + maintenance'
