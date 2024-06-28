@@ -1046,8 +1046,7 @@ with st.sidebar:
                             $$$
                             lim_{{X_{{CO_2}} → 0}} FE_{{CO_2R}}
                             $$$
-                            ''' +   '\n  Default $ FE_{{CO_2R, \: 0}}$: {}'.format(default_FE_CO2R_0),
-                            disabled = answer == option_3)
+                            ''' +   '\n  Default $ FE_{{CO_2R, \: 0}}$: {}'.format(default_FE_CO2R_0),)
         SPC = st.slider(label = 'Single-pass conversion',
                             min_value = 0.001, 
                             max_value = 1.0, 
