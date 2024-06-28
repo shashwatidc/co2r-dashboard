@@ -366,7 +366,7 @@ def stack_replacement(df_capex_BM,
     df_stack_replacement.index.name= 'Stack replacement'  
 
     # Fill in costs
-    no_of_replacements = lifetime_years // stack_lifetime_years
+    no_of_replacements = lifetime_years // stack_lifetime_years - 1
     df_stack_replacement.loc['Stack replacement', 'Cost ($/yr)'] = df_capex_BM.loc['Electrolyzer', 'Cost ($)'] * no_of_replacements / lifetime_years # Total replacement cost / plant lifetime
   
     return df_stack_replacement
