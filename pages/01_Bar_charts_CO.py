@@ -1222,28 +1222,28 @@ with st.sidebar:
     if answer:            
         # Handle battery to flatten curve and maximize capacity
         is_additional_capex = True
-        additional_capex_USD = st.slider(label = 'Additional operating cost (\$/kg {})'.format(product_name), 
+        additional_capex_USD = st.slider(label = 'Additional capital cost (\$ million)' ,
                             min_value = 0.0, 
                             max_value = 5.0, 
                             step = 0.01, value = 0,
                             format = '%i', disabled = not is_additional_opex,
-                            help = '''Optional operating cost for any custom expenses. Convert daily costs to $/kg {} as follows:
-                                        $$$
-                                        \displayfrac \frac{\$ \text{opex}}{\text{year}} = \displayfrac \frac{\$ \text{opex}}{\text{day}} \cdot CF \cdot 365 \cdot \text{plant lifetime}
-                                        $$$'''.format(product_name))
+                            help = '''Optional additional capex. Default value: \${} million.
+                            '''.format(0))
         
     answer = st.toggle('Add custom opex', value = False,
                          help = 'Optional operating cost')
     if answer:            
         # Handle battery to flatten curve and maximize capacity
         is_additional_opex = True
-        additional_opex_USD_kg = st.slider(label = 'Additional capital cost (\$ million)' , 
+        additional_opex_USD_kg = st.slider(label = 'Additional operating cost (\$/kg {})'.format(product_name),  
                             min_value = 0.0, 
                             max_value = 500.0, 
                             step = 1.0, value = 0,
                             format = '%i', disabled = not is_additional_capex,
-                            help = '''Optional additional capex. Default value: \${} million.
-                            '''.format(0))       
+                            help = '''Optional operating cost for any custom expenses. Convert daily costs to $/kg {} as follows:
+                                        $$$
+                                        \displayfrac \frac{\$ \text{opex}}{\text{year}} = \displayfrac \frac{\$ \text{opex}}{\text{day}} \cdot CF \cdot 365 \cdot \text{plant lifetime}
+                                        $$$''')       
         
 with st.sidebar:
     st.subheader('Emissions assessment')
