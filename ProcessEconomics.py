@@ -87,6 +87,7 @@ def capex(
     electrolyzer_capex_USD_m2, # electrolyzer_capex_USD_kW
     battery_capacity,
     kJ_per_kWh,
+    is_additional_capex,
     additional_capex_USD,
 ):
 
@@ -101,8 +102,7 @@ def capex(
         'Cathode PSA - CO$_2$/products' : ['Separations', 'Scaling factor 0.7 to Shin Jiao Nat Sust 2021', np.NaN] ,
         'Cathode PSA - Products/H$_2$' : ['Separations', 'Scaling factor 0.7 to Shin Jiao Nat Sust 2021', np.NaN] ,
         'Anode PSA - CO$_2$/O$_2$' : ['Separations', 'Scaling factor 0.7 to Shin Jiao Nat Sust 2021', np.NaN] ,
-        'Additional' : ['Custom capital', 'User input', additional_capex_USD]
-    }
+        }
 
     # Create dataframe for bare-module costs
     df_capex_BM = pd.DataFrame(dict_capex_BM).T
@@ -130,6 +130,9 @@ def capex(
         df_capex_BM.loc['Anode PSA - CO$_2$/O$_2$', 'Cost ($)']  = 1989043 * (df_streams.loc['Anode PSA inlet', 'Volumetric flow rates (m3/s)']*(60*60)/1000)**0.7 # relative to 1000 m3/hr 
     else:
         df_capex_BM.loc['Anode PSA - CO$_2$/O$_2$', 'Cost ($)']  = 0
+    if is_additional_capex:
+        df_capex_BM.loc['Additional', 'Cost ($)'] = additional_capex_USD
+        df_capex_BM.loc['Additional', 'Description'] = 'User input'
     
     # Create dataframe for capex summary
     df_capex_totals = pd.DataFrame(dict_capex_BM, columns = ['Capex summary', 'Stage', 
@@ -532,6 +535,7 @@ def opex_seider(df_feedstocks,
         product_name,
         product_rate_kg_day,
         cell_E_V,
+        is_additional_opex,
         additional_opex_USD_kg
         ):
     
@@ -553,7 +557,8 @@ def opex_seider(df_feedstocks,
     df_opex.loc['Property taxes and insurance'] =  df_taxes.loc['Total', 'Cost ($/yr)']
     # df_opex.loc['Depreciation'] = df_depreciation.loc['Total', 'Cost ($/yr)']
     df_opex.loc['General expenses'] =  df_general.loc['Total', 'Cost ($/yr)']
-    df_opex.loc['Additional operating cost'] =  additional_opex_USD_kg
+    if is_additional_opex:
+        df_opex.loc['Additional operating cost'] =  additional_opex_USD_kg
 
     if np.isclose(df_utilities.loc['Total', 'Cost ($/kg {})'.format(product_name)], 0.00): # if process does not exist (NaNs in FE/SPC for instance)
         df_opex['Cost ($/yr)'] = np.NaN

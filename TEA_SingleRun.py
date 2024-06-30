@@ -64,6 +64,8 @@ def single_run(product_name,
         capacity_factor,
         battery_capex_USD_kWh,               
         battery_capacity,
+        is_additional_capex,
+        is_additional_opex,
         additional_opex_USD_kg,
         additional_capex_USD,
         model_FE,
@@ -205,6 +207,7 @@ def single_run(product_name,
         electrolyzer_capex_USD_m2 = electrolyzer_capex_USD_m2 ,
         battery_capacity = battery_capacity,
         kJ_per_kWh = kJ_per_kWh,
+        is_additional_capex = is_additional_capex,
         additional_capex_USD = additional_capex_USD)
 
     ## Generate subparts of opex - SEIDER TEXTBOOK       
@@ -250,6 +253,7 @@ def single_run(product_name,
              lifetime_years = lifetime_years,
              product_name = product_name,
              product_rate_kg_day = product_rate_kg_day,
+             is_additional_opex = is_additional_opex,
              additional_opex_USD_kg= additional_opex_USD_kg
              )
 
@@ -270,6 +274,7 @@ def single_run(product_name,
     #         product_name = product_name,
     #         product_rate_kg_day = product_rate_kg_day,
     #         cell_E_V = cell_E_V,
+    #         is_additional_opex = is_additional_opex,
     #         additional_opex_USD_kg = additional_opex_USD_kg
     #     )
 
