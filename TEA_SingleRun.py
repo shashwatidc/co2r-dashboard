@@ -191,6 +191,7 @@ def single_run(product_name,
                                                 CO2_cost_USD_tCO2 = CO2_cost_USD_tCO2,
                                                 electrolyzer_capex_USD_m2 = electrolyzer_capex_USD_m2,
                                                 lifetime_years = lifetime_years,
+                                                stack_lifetime_years = stack_lifetime_years,
                                                 capacity_factor = capacity_factor)
     ## Generate capex
     df_capex_BM, df_capex_totals, C_TDC, C_alloc = capex(product_name = product_name,

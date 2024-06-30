@@ -1226,7 +1226,7 @@ with st.sidebar:
                             min_value = 0.0, 
                             max_value = 500.0, 
                             step = 1.0, value = 0.0,
-                            format = '%i', disabled = not is_additional_opex,
+                            format = '%i', disabled = not is_additional_capex,
                             help = '''Optional additional capex. Default value: \${} million.
                             '''.format(0))
         
@@ -1239,7 +1239,7 @@ with st.sidebar:
                             min_value = 0.0, 
                             max_value = 5.0, 
                             step = 0.1, value = 0.0,
-                            format = '%i', disabled = not is_additional_capex,
+                            format = '%i', disabled = not is_additional_opex,
                             help = '''Optional operating cost for any custom expenses. Convert daily costs to $/kg {} as follows:
                                         $$$
                                         \displayfrac \frac{\$ \text{opex}}{\text{year}} = \displayfrac \frac{\$ \text{opex}}{\text{day}} \cdot CF \cdot 365 \cdot \text{plant lifetime}
