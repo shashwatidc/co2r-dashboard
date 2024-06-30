@@ -1043,13 +1043,13 @@ if not np.isnan(FE_product_checked):
     if is_battery:
         BM_capex_colors.append((0.65, 0.65, 0.65, 1)) # add in battery         
     if is_additional_capex:
-        BM_capex_colors.append((0.75, 0.75, 0.75, 1)) # add in battery 
+        BM_capex_colors.append((0.85, 0.85, 0.85, 1)) # add in battery 
         
     # Blues from 0.2 to 1 not bad but low contrast; YlGnbu not but looks jank with PuOr; winter_r is best
     # Opex colors
     opex_colors = [PuOr(i) for i in np.linspace(0, 0.85, len(df_opex.index) - flag[is_additional_opex]) ]
     if is_additional_opex:
-        opex_colors.append((0.75, 0.75, 0.75, 1)) # add in battery 
+        opex_colors.append((0.85, 0.85, 0.85, 1)) # add in battery 
 
     levelized_colors = opex_colors + BM_capex_colors
 
