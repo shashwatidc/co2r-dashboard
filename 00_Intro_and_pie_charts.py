@@ -1041,12 +1041,20 @@ if not np.isnan(FE_product_checked):
         # Capex colors for bare modules
         BM_capex_colors = [summer_r(i) for i in np.linspace(0, 1, len(df_capex_BM.index)-1)] # battery gets its own color, so 1 less than capex length for other units
         BM_capex_colors.append((0.65, 0.65, 0.65, 1)) # add in battery 
+        if is_additional_capex:
+            BM_capex_colors.append((0.75, 0.75, 0.75, 1)) # add in battery 
+
     else:
         # Capex colors
         BM_capex_colors = [summer_r(i) for i in np.linspace(0, 1, len(df_capex_BM.index))]
+        if is_additional_capex:
+            BM_capex_colors.append((0.75, 0.75, 0.75, 1)) # add in battery 
         
     # Opex colors
     opex_colors = [PuOr(i) for i in np.linspace(0, 0.85, len(df_opex.index))]
+    if is_additional_opex:
+        opex_colors.append((0.75, 0.75, 0.75, 1)) # add in battery 
+
     levelized_colors = opex_colors + BM_capex_colors
 
     # Potentials colors

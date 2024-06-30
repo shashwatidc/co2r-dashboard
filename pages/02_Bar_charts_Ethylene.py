@@ -1544,14 +1544,22 @@ if not st.session_state.is_active_error_ethylene:
     if is_battery:
         # Capex colors for bare modules
         BM_capex_colors = [summer_r(i) for i in np.linspace(0, 1, len(df_capex_BM_vs_vbl.index)-1)] # battery gets its own color, so 1 less than capex length for other units
-        BM_capex_colors.append((0.65, 0.65, 0.65, 1)) # add in battery 
+        BM_capex_colors.append((0.65, 0.65, 0.65, 1)) # add in battery         
+        if is_additional_capex:
+            BM_capex_colors.append((0.75, 0.75, 0.75, 1)) # add in battery 
+
     else:
         # Capex colors
         BM_capex_colors = [summer_r(i) for i in np.linspace(0, 1, len(df_capex_BM_vs_vbl.index))]
+        if is_additional_capex:
+            BM_capex_colors.append((0.75, 0.75, 0.75, 1)) # add in battery 
         
     # Blues from 0.2 to 1 not bad but low contrast; YlGnbu not but looks jank with PuOr; winter_r is best
     # Opex colors
     opex_colors = [PuOr(i) for i in np.linspace(0, 0.85, len(df_opex_vs_vbl.index))]
+    if is_additional_opex:
+        opex_colors.append((0.75, 0.75, 0.75, 1)) # add in battery 
+
     #PuOr okay but low contrast at ends
     # Emissions colors
     emissions_colors = [RdYlBu(i) for i in np.linspace(0, 1, sum(~df_emissions_vs_vbl.T.isnull().all()) - 2)  ] # len(df_energy_vs_vbl.index) - 2)] # last rows are totals
