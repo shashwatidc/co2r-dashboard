@@ -602,7 +602,8 @@ def opex_sinnott(C_ISBL, # currently C_TDC
                  capacity_factor,
                  product_name,
                  product_rate_kg_day,
-                 additional_opex_USD_kg
+                 additional_opex_USD_kg,
+                 is_additional_opex,
                  ):
     
     ## SINNOTT TEXTBOOK
