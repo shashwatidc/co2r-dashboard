@@ -558,7 +558,7 @@ def opex_seider(df_feedstocks,
     # df_opex.loc['Depreciation'] = df_depreciation.loc['Total', 'Cost ($/yr)']
     df_opex.loc['General expenses'] =  df_general.loc['Total', 'Cost ($/yr)']
     if is_additional_opex:
-        df_opex.loc['Additional operating cost'] =  additional_opex_USD_kg
+        df_opex.loc['Additional operating cost'] =  additional_opex_USD_kg/(product_rate_kg_day*365*capacity_factor)
 
     if np.isclose(df_utilities.loc['Total', 'Cost ($/kg {})'.format(product_name)], 0.00): # if process does not exist (NaNs in FE/SPC for instance)
         df_opex['Cost ($/yr)'] = np.NaN

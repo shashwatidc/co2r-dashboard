@@ -1247,7 +1247,7 @@ with st.sidebar:
                             step = 1.0, value = 0.0,
                             format = '%i', disabled = not is_additional_capex,
                             help = '''Optional additional capex. Default value: \${} million.
-                            '''.format(0))
+                            '''.format(0))*1e6
         
     answer = st.toggle('Add custom opex', value = False,
                          help = 'Optional operating cost')
