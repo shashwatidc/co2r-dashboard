@@ -585,8 +585,8 @@ SPC = df_products.loc[product_name, 'Optimal SPC @ 7.6 c/kWh, Hawks model']  #0.
 default_SPC = SPC
 cat_Tafel_slope = df_products.loc[product_name, 'Tafel slope (mV/dec)']
 default_cat_Tafel_slope = cat_Tafel_slope
-additional_capex_USD = additional_capex_USD
-additional_opex_USD_kg = additional_opex_USD_kg
+additional_capex_USD = 0.0
+additional_opex_USD_kg = 0.0
 
 # Save variables that may be adjusted
 SPC_original = SPC
