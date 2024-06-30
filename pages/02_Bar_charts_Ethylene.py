@@ -1224,8 +1224,8 @@ with st.sidebar:
         is_additional_capex = True
         additional_capex_USD = st.slider(label = 'Additional capital cost (\$ million)' ,
                             min_value = 0.0, 
-                            max_value = 5.0, 
-                            step = 0.01, value = 0,
+                            max_value = 500.0, 
+                            step = 1.0, value = 0.0,
                             format = '%i', disabled = not is_additional_opex,
                             help = '''Optional additional capex. Default value: \${} million.
                             '''.format(0))
@@ -1237,8 +1237,8 @@ with st.sidebar:
         is_additional_opex = True
         additional_opex_USD_kg = st.slider(label = 'Additional operating cost (\$/kg {})'.format(product_name),  
                             min_value = 0.0, 
-                            max_value = 500.0, 
-                            step = 1.0, value = 0,
+                            max_value = 5.0, 
+                            step = 0.1, value = 0.0,
                             format = '%i', disabled = not is_additional_capex,
                             help = '''Optional operating cost for any custom expenses. Convert daily costs to $/kg {} as follows:
                                         $$$
