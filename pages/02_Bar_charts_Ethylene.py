@@ -1239,7 +1239,7 @@ with st.sidebar:
         is_additional_capex = True
         additional_capex_USD = st.slider(label = 'Additional capital cost (\$ million)' ,
                             min_value = 0.0, 
-                            max_value = 500.0, 
+                            max_value = 100.0, 
                             step = 1.0, value = 0.0,
                             format = '%i', disabled = not is_additional_capex,
                             help = '''Optional additional capex. Default value: \${} million.
