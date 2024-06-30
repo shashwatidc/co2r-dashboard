@@ -44,6 +44,7 @@ def costing_assumptions(
     water_cost_USD_kg,
     CO2_cost_USD_tCO2,
     lifetime_years ,
+    stack_lifetime_years,
     electrolyzer_capex_USD_m2,
     capacity_factor
 ): 
