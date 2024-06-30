@@ -581,6 +581,9 @@ default_scaling = scaling
 exponent = 5.4936 ## TODO: Move this option for modeling elsewhere
 default_exponent = exponent
 
+additional_capex_USD = additional_capex_USD
+additional_opex_USD_kg = additional_opex_USD_kg
+
 ##### CHOICE OF x-AXIS VARIABLE
 options_list  = ['Cell voltage', 
                                     'Cathodic overpotential',
