@@ -651,7 +651,7 @@ def opex_sinnott(C_ISBL, # currently C_TDC
     # df_opex.loc['Depreciation', 'Cost ($/yr)'] = df_depreciation.loc['Total', 'Cost ($/yr)']
     # df_opex.loc['Depreciation', 'Description'] = 'See Depreciation - used Seider book'
     if is_additional_opex:
-        df_opex.loc['Additional', 'Cost ($/yr)'] =  additional_opex_USD_kg/(product_rate_kg_day*365*capacity_factor)
+        df_opex.loc['Additional', 'Cost ($/yr)'] =  additional_opex_USD_kg * (product_rate_kg_day*365*capacity_factor)
         df_opex.loc['Additional', 'Description'] =  '${}/kg {}'.format(additional_opex_USD_kg, product_name)
 
     if np.isclose(C_ISBL, 0.00): # if process does not exist (NaNs in FE/SPC for instance)

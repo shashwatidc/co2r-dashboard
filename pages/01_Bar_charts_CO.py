@@ -1248,7 +1248,10 @@ with st.sidebar:
                             format = '%i', disabled = not is_additional_capex,
                             help = '''Optional additional capex. Default value: \${} million.
                             '''.format(0))*1e6
-        
+    else:
+        is_additional_capex = False
+        additional_capex_USD = 0 
+
     answer = st.toggle('Add custom opex', value = False,
                          help = 'Optional operating cost')
     if answer:            
@@ -1263,7 +1266,10 @@ with st.sidebar:
                                         $$$
                                         \frac{\$ \text{opex}}{\text{year}} = \frac{\$ \text{opex}}{\text{day}} \cdot CF \cdot 365 \cdot \text{plant lifetime}
                                         $$$''')       
-        
+    else:
+        is_additional_opex = False
+        additional_opex_USD_kg = 0 
+
 with st.sidebar:
     st.subheader('Emissions assessment')
     electricity_emissions_kgCO2_kWh = st.slider(label = 'Grid CO$_2$ intensity (kg$_{CO_2}$/kWh)',
