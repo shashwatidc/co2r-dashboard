@@ -201,7 +201,8 @@ def single_run(product_name,
         battery_capex_USD_kWh = battery_capex_USD_kWh,        
         electrolyzer_capex_USD_m2 = electrolyzer_capex_USD_m2 ,
         battery_capacity = battery_capacity,
-        kJ_per_kWh = kJ_per_kWh)
+        kJ_per_kWh = kJ_per_kWh,
+        additional_capex_USD = additional_capex_USD)
 
     ## Generate subparts of opex - SEIDER TEXTBOOK       
     df_sales = sales(product_name = product_name,
@@ -245,7 +246,8 @@ def single_run(product_name,
              capacity_factor = capacity_factor,
              lifetime_years = lifetime_years,
              product_name = product_name,
-             product_rate_kg_day = product_rate_kg_day
+             product_rate_kg_day = product_rate_kg_day,
+             additional_opex_USD_kg= additional_opex_USD_kg
              )
 
     #     ## Generate opex - SEIDER TEXTBOOK
@@ -264,7 +266,8 @@ def single_run(product_name,
     #         lifetime_years = lifetime_years,
     #         product_name = product_name,
     #         product_rate_kg_day = product_rate_kg_day,
-    #         cell_E_V = cell_E_V
+    #         cell_E_V = cell_E_V,
+    #         additional_opex_USD_kg = additional_opex_USD_kg
     #     )
 
     # print('Here')

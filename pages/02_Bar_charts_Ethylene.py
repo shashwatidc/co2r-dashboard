@@ -532,6 +532,8 @@ override_animation = False
 override_single = False
 model_FE = 'Kas'
 is_battery = False
+is_additional_capex = False
+is_additional_opex = False
 st.session_state.is_active_error_ethylene = False
 product_name = 'Ethylene' # default
 range_selection = 'Linear' # default
@@ -1213,7 +1215,36 @@ with st.sidebar:
                             format = '%i', disabled = not is_battery,
                             help = '''Default value: \${}/kWh, based on 4-hour storage.
                             '''.format(default_battery_capex_USD_kWh))
+
+    ##### CUSTOM CAPEX OR OPEX  
+    answer = st.toggle('Add custom capex', value = False,
+                         help = 'Optional bare-module capital cost for any custom units')
+    if answer:            
+        # Handle battery to flatten curve and maximize capacity
+        is_additional_capex = True
+        additional_capex_USD = st.slider(label = 'Additional operating cost (\$/kg {})'.format(product_name), 
+                            min_value = 0.0, 
+                            max_value = 5.0, 
+                            step = 0.01, value = 0,
+                            format = '%i', disabled = not is_additional_opex,
+                            help = '''Optional operating cost for any custom expenses. Convert daily costs to $/kg {} as follows:
+                                        $$$
+                                        \displayfrac \frac{\$ \text{opex}}{\text{year}} = \displayfrac \frac{\$ \text{opex}}{\text{day}} \cdot CF \cdot 365 \cdot \text{plant lifetime}
+                                        $$$'''.format(product_name))
         
+    answer = st.toggle('Add custom opex', value = False,
+                         help = 'Optional operating cost')
+    if answer:            
+        # Handle battery to flatten curve and maximize capacity
+        is_additional_opex = True
+        additional_opex_USD_kg = st.slider(label = 'Additional capital cost (\$ million)' , 
+                            min_value = 0.0, 
+                            max_value = 500.0, 
+                            step = 1.0, value = 0,
+                            format = '%i', disabled = not is_additional_capex,
+                            help = '''Optional additional capex. Default value: \${} million.
+                            '''.format(0))       
+
 with st.sidebar:
     st.subheader('Emissions assessment')
     electricity_emissions_kgCO2_kWh = st.slider(label = 'Grid CO$_2$ intensity (kg$_{CO_2}$/kWh)',

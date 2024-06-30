@@ -86,6 +86,7 @@ def capex(
     electrolyzer_capex_USD_m2, # electrolyzer_capex_USD_kW
     battery_capacity,
     kJ_per_kWh,
+    additional_capex_USD,
 ):
 
     ## Battery limits ("on-site") are the electrolysis and separations only. 
@@ -99,6 +100,7 @@ def capex(
         'Cathode PSA - CO$_2$/products' : ['Separations', 'Scaling factor 0.7 to Shin Jiao Nat Sust 2021', np.NaN] ,
         'Cathode PSA - Products/H$_2$' : ['Separations', 'Scaling factor 0.7 to Shin Jiao Nat Sust 2021', np.NaN] ,
         'Anode PSA - CO$_2$/O$_2$' : ['Separations', 'Scaling factor 0.7 to Shin Jiao Nat Sust 2021', np.NaN] ,
+        'Additional' : ['Custom capital', 'User input', additional_capex_USD]
     }
 
     # Create dataframe for bare-module costs
@@ -528,7 +530,8 @@ def opex_seider(df_feedstocks,
         lifetime_years,
         product_name,
         product_rate_kg_day,
-        cell_E_V
+        cell_E_V,
+        additional_opex_USD_kg
         ):
     
     ## SEIDER TEXTBOOK
@@ -549,6 +552,7 @@ def opex_seider(df_feedstocks,
     df_opex.loc['Property taxes and insurance'] =  df_taxes.loc['Total', 'Cost ($/yr)']
     # df_opex.loc['Depreciation'] = df_depreciation.loc['Total', 'Cost ($/yr)']
     df_opex.loc['General expenses'] =  df_general.loc['Total', 'Cost ($/yr)']
+    df_opex.loc['Additional operating cost'] =  additional_opex_USD_kg
 
     if np.isclose(df_utilities.loc['Total', 'Cost ($/kg {})'.format(product_name)], 0.00): # if process does not exist (NaNs in FE/SPC for instance)
         df_opex['Cost ($/yr)'] = np.NaN
@@ -591,7 +595,8 @@ def opex_sinnott(C_ISBL, # currently C_TDC
                  lifetime_years,
                  capacity_factor,
                  product_name,
-                 product_rate_kg_day
+                 product_rate_kg_day,
+                 additional_opex_USD_kg
                  ):
     
     ## SINNOTT TEXTBOOK
@@ -638,6 +643,9 @@ def opex_sinnott(C_ISBL, # currently C_TDC
     
     # df_opex.loc['Depreciation', 'Cost ($/yr)'] = df_depreciation.loc['Total', 'Cost ($/yr)']
     # df_opex.loc['Depreciation', 'Description'] = 'See Depreciation - used Seider book'
+
+    df_opex.loc['Additional operating cost', 'Cost ($/yr)'] =  additional_opex_USD_kg/(product_rate_kg_day*365*capacity_factor)
+    df_opex.loc['Additional operating cost', 'Description'] =  '${}/kg {}'.format(additional_opex_USD_kg, product_name)
 
     if np.isclose(C_ISBL, 0.00): # if process does not exist (NaNs in FE/SPC for instance)
         df_opex['Cost ($/yr)'] = np.NaN
