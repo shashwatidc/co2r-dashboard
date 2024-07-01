@@ -1444,7 +1444,7 @@ with middle_column:
             df_energy_vs_vbl = pd.concat([df_energy_vs_vbl, 
                                         df_energy['Energy (kJ/kg {})'.format(product_name)]], axis = 1) # Store energy utility for plotting
             df_emissions_vs_vbl = pd.concat([df_emissions_vs_vbl, 
-                                                pd.concat([df_energy['Emissions (kg CO2/kg {})'.format(product_name)], pd.Series(df_outlet_assumptions.loc['Carbon capture loss', 'Value'])]) ], 
+                                                pd.concat([df_energy['Emissions (kg CO2/kg {})'.format(product_name)], pd.Series(df_outlet_assumptions.loc['Carbon capture loss', 'Value']) ] ) ], 
                                             axis = 1) # Store emissions for plotting
             df_electrolyzer_assumptions_vs_vbl = pd.concat([df_electrolyzer_assumptions_vs_vbl, 
                                                             df_electrolyzer_assumptions['Value']], axis = 1) # Store assumptions
