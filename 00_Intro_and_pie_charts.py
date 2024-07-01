@@ -919,7 +919,7 @@ with st.sidebar:
                             max_value = 5.0, 
                             step = 0.1, value = 0.0,
                             format = '%.1f', disabled = not is_additional_opex,
-                            help = '''Optional operating cost for any custom expenses. Convert daily costs to $/kg {} as follows:
+                            help = '''Optional operating cost for any custom expenses. Convert daily costs to $/kg product as follows:
                                         $$$
                                         \\\ \frac{{\$ \text{{opex}}}}{{\text{{year}}}} = \frac{{\$ \text{{opex}}}}{{\text{{day}}}} \cdot CF \cdot 365 \cdot \text{{plant lifetime}}
                                         $$$
