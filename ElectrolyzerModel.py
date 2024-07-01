@@ -1,18 +1,15 @@
 # %% [markdown]
-# ## Running notes
-# Date updated: 2024/06/11 \
-# Update notes: Strict function inputs\
-# Contact: Shashwati da Cunha
+# # Electrolyzer model: notes
+# Date updated: 2024/07/01 \
+# Update notes: Allow manual FE specification \
+# Contact: Shashwati da Cunha, [shashwatidc@utexas.edu](mailto:shashwatidc@utexas.edu)
 # 
-# ## Instructions
+# ### Instructions
 # 1. Not designed for standalone run - this is only a collection of functions. Other notebooks call it.
 # 
-# #### Notes:
+# ### Notes:
 # This is broken into functions to allow modular running - can run different sections by themselves depending on what data is available. As a result of this structure, there is some redundancy where the same function will be run more than once by an "overall" call
 # 
-# #### To do:
-# 1. Correct $E^{0}$ by pH and reactant activity
-# 2. Membrane and pH are related - add PEM/AEM/BPM options
 
 # %% [markdown]
 # ## 0. Imports and setup
@@ -27,10 +24,10 @@ import numpy as np
 from scipy import optimize
 
 # %% [markdown]
-# ## 2. Electrolyzer model
+# ## 1. Polarization curve model
 
 # %% [markdown]
-# ### 2.1 Conversions for flow rates and basis
+# ### 1.1 Conversions for flow rates and basis
 
 # %%
 ### Other units
@@ -38,6 +35,8 @@ from scipy import optimize
 def kg_day_to_kg_s(rate_kg_day):
     """
     Convert mass flow rate in kg/day to kg/s
+    Arguments: mass flow rate (kg/day)
+    Returns: mass flow rate (kg/s)
     """
     
     rate_kg_s = rate_kg_day/(24*60*60)
@@ -48,7 +47,8 @@ def kg_day_to_kg_s(rate_kg_day):
 def kg_s_to_mol_s(rate_kg_s, MW):
     """
     Convert mass flow rate in kg/s to mole flow rate in mol/s
-    Input molecular weight in g/mol
+    Arguments: mass flow rate (kg/s), molecular weight (g/mol)
+    Returns: molar flow rate (mol/s)
     """
     
     rate_mol_s = rate_kg_s/(MW/1000)
@@ -58,19 +58,23 @@ def kg_s_to_mol_s(rate_kg_s, MW):
 @st.cache_data
 def mol_s_to_sccm(rate_mol_s, R, P = 101325, T = 298.15):
     """
-    Convert mole flow rate in mol/s to volumetric flow rate in standard cubic cm per minute
-    Input pressure in Pa, temperature in K for standard conditions
+    Convert molar flow rate in mol/s to volumetric flow rate in standard cubic cm per minute
+    Arguments: molar flow rate (mol/s), gas constant , pressure for standard conditions, temperature for standard conditions. 
+                Units should match (e.g. J/mol K, Pa, K)
+    Returns: volumetric flow rate (standard cubic centimers per minute), where standard conditions are defined by P and T inputs 
+            to this function
     """    
     
-    rate_sccm = rate_mol_s/60 * R * T / P
+    rate_sccm = rate_mol_s/60 * (R * T / P) * 100**3
     
     return rate_sccm
 
 @st.cache_data
 def mol_s_to_mA(rate_mol_s, n, F):
     """
-    Convert mole flow rate in mol/s to current in mA
-    Input number of transferred electrons in mol e-/ mol product
+    Convert product mole flow rate in mol/s to current in mA
+    Arguments: molar flow rate of product (mol/s), number of transferred electrons (mol e-/ mol product), Faraday's constant (C/mol e-)
+    Returns: current density (mA)
     """    
     
     i_mA = rate_mol_s * n * F *1000
@@ -78,14 +82,15 @@ def mol_s_to_mA(rate_mol_s, n, F):
     return i_mA
 
 # %% [markdown]
-# ### 2.2 Electrolyzer area
+# ### 1.2 Electrolyzer area
 
 # %%
 @st.cache_data
 def electrolyzer_area(i_total_mA, j_total_mA_cm2):
     """
     Use maximum allowed current density and desired current to compute total area
-    Returns area in m2
+    Arguments: total current (mA), total current density (mA/cm2)
+    Returns: active area (m2)
     """    
     
     area_cm2 = i_total_mA/j_total_mA_cm2 # cm2. Area = i/j
@@ -94,7 +99,7 @@ def electrolyzer_area(i_total_mA, j_total_mA_cm2):
     return area_m2
 
 # %% [markdown]
-# ### 2.3 Currents
+# ### 1.3 Currents
 
 # %%
 @st.cache_data
@@ -106,15 +111,14 @@ def currents(
 ):
     """
     Get all the currents based on product flow rate and selectivities
-    Inputs: product molar flow rate (mol/s), FE to product (%), n (mol e-/ mol product), 
-    total current density (mA/cm2)
+    Arguments: product molar flow rate (mol/s), FE to product (), n (mol e-/ mol product), Faraday's constant (C/mol e-)
     Outputs: product current (mA), total current (mA), HER current (mA), OER current (mA)
     """    
     
     i_product_mA = mol_s_to_mA(product_rate_mol_s, n_product, F)
     # TODO: make this into a df and assign a product-by-product current breakddown
 
-    # From Tom Moore's code:
+    # From Moore Hahn Joule 2023 code:
     #     eta = Single_Pass_Conversion_CO2 * (1 + n_CO2R*Fraction_Charge_Carried_by_CO32/((1-FE_H2_0)*s_CO2R*Charge_Carbonate_Ion))    #Single Pass CO2 Consumption
     #     i_CO2R = -i_CO2R_0 * eta/np.log(1-eta)                  #CO2R Partial Current Density, A/m2
 
@@ -126,17 +130,23 @@ def currents(
     return i_product_mA, i_total_mA, i_H2_mA, i_O2_mA
     
 
-# %% [markdown]
-# ## 3. Electrolyzer model
-
 # %%
 @st.cache_data
 def voltage_to_energy(E_V, i_total_mA, product_rate_kg_s, product_rate_mol_s):
+    """
+    Compute power and energy from P = i.V
+    Arguments: voltage (V), total current (mA), resulting product mass flow rate (kg/s), corresponding product mole flow rate (mol/s)
+    Returns: power used to generate product (kW), energy required per unit product (kJ/kg product), 
+    energy required per mole product (kJ/mol product)
+    """
     power_kW = (E_V * i_total_mA/1000)/1000 # P = IV
     energy_kJ_kgproduct = power_kW/product_rate_kg_s 
     energy_kJ_molproduct = power_kW/product_rate_mol_s 
     
     return power_kW, energy_kJ_kgproduct, energy_kJ_molproduct
+
+# %% [markdown]
+# ### 1.4 Voltage
 
 # %%
 @st.cache_data
@@ -158,21 +168,25 @@ def cell_voltage(
     overridden_value,
     overridden_unit,
     override_optimization,
-    SPC,
-    R,
     F
 ):
     
     """
     Electrolyzer voltage model, using product of choice and production rate as a basis.
-    Inputs: product of choice, production basis in kg product/day, 
-    Faradaic efficiency (selectivity)  to product, total assumed current density, specific cell resistance (ohm.cm2), 
-    product data as a dataframe containing [product name, molecular weight, 
-    electron transfers for product (mol e-/ mol product), stoichiometry as mol CO2/ mol product],
-    anode equilibrium potential, whether or not to override cell voltage model,
-    whether or not to override B-V model for cathode, whether or not to override B-V model for anode,
-    value of the overriden potential if it exists, unit of the overridden potential if it exists
-    Returns dataframe of assumed inputs, and dataframe of generated potentials, currents and power 
+
+    Arguments: product name of choice, production basis (kg product/day), 
+    Faradaic efficiency (selectivity)  to product, specified selectivity (rarely used), 
+    which model was used to compute selectivity from SPC,
+    total current density (mA/cm2), specific cell resistance (ohm.cm2), 
+    product data as a dataframe containing [product name, molecular weight (g/mol), 
+    electron transfers for product (mol e-/ mol product), stoichiometry (mol CO2/ mol product), equilibrium potential (V), 
+    reference overpotential (V), Tafel slope (mV/dec), reference current density (mA/cm2) ],
+    anode equilibrium potential (V), anode reference overpotential (V),
+    anode Tafel slope (mV/dec), anode reference current density (mA/cm2),
+    any inputs that were overwritten, the value of the overwritten input, 
+    the units of the overwritten input, whether an optimization was used (bool), Faraday's constant (C/mol e-)
+
+    Returns: dataframe of assumed inputs, and dataframe of generated potentials, currents and power 
     """
     
     ### Extract data on specific product
@@ -185,7 +199,7 @@ def cell_voltage(
     ### Convert rates into currents
     product_rate_kg_s = kg_day_to_kg_s(product_rate_kg_day)
     product_rate_mol_s = kg_s_to_mol_s(product_rate_kg_s, MW = MW_product)
-    product_rate_sccm = mol_s_to_sccm(rate_mol_s = product_rate_mol_s, R = R)
+    # product_rate_sccm = mol_s_to_sccm(rate_mol_s = product_rate_mol_s, R = R)
 
     ### Calculate all currents
     i_product_mA, i_total_mA, i_H2_mA, i_O2_mA = currents(product_rate_mol_s, FE_product, n_product, F)
@@ -207,14 +221,14 @@ def cell_voltage(
         cell_E_V = overridden_value
         cat_E_eqm = np.NaN
         cat_E_V = np.NaN
-        cat_power_kW = np.NaN
+        # cat_power_kW = np.NaN
         BV_eta_cat_V = np.NaN
         BV_eta_an_V = np.NaN
         an_E_eqm = np.NaN
         an_E_V = np.NaN
-        an_power_kW = np.NaN
+        # an_power_kW = np.NaN
         ohmic_E_V = np.NaN
-        ohmic_power_kW = np.NaN
+        # ohmic_power_kW = np.NaN
         
     else:
         
@@ -244,23 +258,23 @@ def cell_voltage(
                 BV_eta_an_V = overridden_value
         
         # Equilibrium cell voltage
-        cell_E_eqm_V = cat_E_eqm - an_E_eqm # full standard cell voltage
+        # cell_E_eqm_V = cat_E_eqm - an_E_eqm # full standard cell voltage
 
         # Ohmic loss
         ohmic_E_V = -i_total_mA/1000 * R_ohmcm2/area_cm2 # V = IR. Assumes MEA => membrane resistance only
-        ohmic_power_kW = (ohmic_E_V * i_total_mA/1000)/1000 # P = IV
+        # ohmic_power_kW = (ohmic_E_V * i_total_mA/1000)/1000 # P = IV
         
         # Cathode power
         cat_E_V = cat_E_eqm + BV_eta_cat_V
-        cat_power_kW = (cat_E_V * i_total_mA/1000)/1000 # P = IV
-#         cat_energy_kJ_kgproduct = cat_power_kW/product_rate_kg_s 
-#         cat_energy_kJ_molproduct = cat_power_kW/product_rate_mol_s 
+        # cat_power_kW = (cat_E_V * i_total_mA/1000)/1000 # P = IV
+        # cat_energy_kJ_kgproduct = cat_power_kW/product_rate_kg_s 
+        # cat_energy_kJ_molproduct = cat_power_kW/product_rate_mol_s 
         
         # Anode power
         an_E_V = an_E_eqm + BV_eta_an_V
-        an_power_kW = (an_E_V * i_total_mA/1000)/1000 # P = IV
-#         an_energy_kJ_kgproduct = an_power_kW/product_rate_kg_s 
-#         an_energy_kJ_molproduct = an_power_kW/product_rate_mol_s 
+        # an_power_kW = (an_E_V * i_total_mA/1000)/1000 # P = IV
+        # an_energy_kJ_kgproduct = an_power_kW/product_rate_kg_s 
+        # an_energy_kJ_molproduct = an_power_kW/product_rate_mol_s 
 
         # Cell voltage
         cell_E_V = cat_E_V - an_E_V + ohmic_E_V 
@@ -320,8 +334,8 @@ def cell_voltage(
         "Current density": [j_total_mA_cm2, 'mA/cm2'],
         "Specific ohmic resistance": [R_ohmcm2, 'ohm.cm2'],
         'Modeled FE?': [{None: 0, 
-                        'Hawks': 1, 
-                         'Kas':2}[model_FE], ''],
+                         'Hawks': 1, 
+                         'Kas': 2}[model_FE], ''],
         'FE {}'.format(product_name): [FE_product, ''],
         '{} (overridden)'.format(overridden_vbl): [overridden_value, overridden_unit],
         'Run optimization?': [override_optimization, ''],
@@ -334,43 +348,35 @@ def cell_voltage(
     
     return df_electrolyzer_assumptions, df_potentials
 
-# %%
-@st.cache_data
-def potential_to_energy(V, 
-                        i, 
-                        prod_rate):
-    
-    """
-    Calculate energy (kJ/kg or kJ/mol)
-    Inputs: voltage (V), current (mA), product rate (per second - can be kg or mol)
-    Returns energy for given cell in kJ/kg or kJ/mol
-    """
-    
-    energy = V*(i/1000)/prod_rate / 1000 
-    return energy
-  
+# %% [markdown]
+# ## 2. Selectivity model
 
 # %% [markdown]
-# ## 4. Stream compositions
+# ### 2.1 Equation for Hawks, Baker (ACS Energy Lett. 2021) model
 
 # %%
 @st.cache_data
 def eqn_known_SPC_jtotal(FE_product,
-             j_total,
-             FE_CO2R_0,
+            j_total,
+            FE_CO2R_0,
             product_name,
             SPC,
-            df_products ,
+            df_products,
             crossover_ratio,
             ):
 
     """
-    Inputs: given FE, total current (constant over range of SPCs), 
-    product of choice, product data as a dataframe containing [product name, electron transfers for product (mol e-/ mol product), 
-    stoichiometry as mol CO2/ mol product], crossover ratio (mol CO2 crossed/ mol e-), 
-    Returns LHS - RHS = ratio (iCO2R/iCO2R0)+ xi/ln(1-xi), xi = fraction of CO2 consumed by all rxns, iCO2R0 is the CO2R 
+    Equation = 0 to be solved to compute FE_CO2R as a function of single-pass conversion
+
+    Arguments: FE_CO2R (), total current (constant over range of SPCs) (mA/cm2), 
+    product name of choice, product data as a dataframe containing [product name, electron transfers for product (mol e-/ mol product), 
+    stoichiometry as mol CO2/ mol product], crossover ratio (mol CO2 crossed/ mol e-).
+
+    Returns: LHS - RHS = ratio (iCO2R/iCO2R0)+ xi/ln(1-xi), xi = fraction of CO2 consumed by all rxns, iCO2R0 is the CO2R 
     current at limiting case of SPC -> 0
-    Assumes no product distribution beyond 1 CO2R product and H2; constant electrolyzer area
+
+    Assumes no product distribution beyond a single CO2R product and H2, constant electrolyzer area, all assumptions of Hawks et al, 
+    and that FE_CO2R,0 is measured at the same total current density as the FE we are trying to calculate 
 
     """
 
@@ -382,10 +388,11 @@ def eqn_known_SPC_jtotal(FE_product,
     frac_CO2_consumed = SPC*(1 + (crossover_ratio*n_product/(z_product*FE_product)))
 
     LHS = (j_total*FE_product)/(j_total * FE_CO2R_0) + frac_CO2_consumed/np.log(1-frac_CO2_consumed)
-#     print('Error: ', LHS-0)
-#     print('\n')
     
     return LHS
+
+# %% [markdown]
+# ### 2.2 Mass balance check and all model execution
 
 # %%
 @st.cache_data
@@ -403,10 +410,18 @@ def SPC_check(FE_product_specified,
 
     """
     Check FE and SPC to meet carbon mass balance; model their tradeoff if desired
-    product of choice, electrolyzer data containing whether or not to model the tradeoff, 
+
+    Arguments: specified selectivity if not using any tradeoff model (not typical) (), 
+    exponent () and scaling () if using curve fit to Kas, Smith (ACS Sust. Chem. Eng. 2021),
+    single-pass conversion of CO2 to product (), total current density (mA/cm2),
+    FE_CO2R in the limit of 0 single-pass conversion,
+    product name of choice, choice of model for selectivity as a function of SPC,
     product data as a dataframe containing [product name, electron transfers for product (mol e-/ mol product), 
-    stoichiometry as mol CO2/ mol product], crossover ratio (mol CO2 crossed/ mol e-), 
-    Returns FE, SPC and updated dataframe for electrolyzer assumptions
+    stoichiometry as mol CO2/ mol product], 
+    crossover ratio (mol CO2 crossed/ mol e-)
+
+    Returns: FE_CO2R (modeled or assumed, depending on choice of model_FE), SPC
+
     This function is called directly from the integrated model to adjust inputs into other functions, not indirectly by the electrolyzer model
     """
 
@@ -450,8 +465,8 @@ def SPC_check(FE_product_specified,
                 # print(root, infodict, flag_converged, message)
             else:
                 print(root, infodict, flag_converged, message)
-                SPC = np.NaN
                 FE_product = np.NaN
+                SPC = np.NaN
                 print('Model failed')
             
             # except ValueError:
@@ -474,13 +489,11 @@ def SPC_check(FE_product_specified,
             #         print('Model failed')
             
         elif model_FE == 'Kas':
-            FE_product = FE_CO2R_0 - scaling*(SPC**exponent)
-#             FE_product = FE_CO2R_0 - 4.7306*(SPC**5.4936)
+            FE_product = FE_CO2R_0 - scaling*(SPC**exponent)         # FE_product = FE_CO2R_0 - 4.7306*(SPC**5.4936)
             print('Using Kas Smith 2021 tradeoff with exponent = {}, scaling = {}'.format(exponent, scaling))
-            # 20240105: testing out Kas Smith 2021 tradeoff. Remove lines above and restore below to proceed
-#             FE_product = FE_product_specified
         else:
             FE_product = FE_product_specified
+            print('Using manually specified FE_product = {}'.format(FE_product))
                 
         # Get minimum allowed FE
         # By mass balance, the minimum FE = Ṅ_CO2R/ (Ṅ_CO2R + Ṅ_carbonate) = (z*FE_CO2R*i/n_CO2R*F) / ((z*FE_CO2R*i/n_CO2R*F) + (c*i/F))
@@ -492,9 +505,12 @@ def SPC_check(FE_product_specified,
             SPC = np.NaN
             FE_product = np.NaN # FE_product_specified
   
-    print('SPC_check gives SPC = {}%; FE {}% \n'.format(SPC*100, FE_product*100))
+    print('SPC_check returned SPC = {}%; FE {}% \n'.format(SPC*100, FE_product*100))
 
     return FE_product, SPC
+
+# %% [markdown]
+# ## 3. Mass balance around electrolyzer
 
 # %%
 @st.cache_data
@@ -512,17 +528,21 @@ def electrolyzer_SS_mass_balance(
     df_products , # product data - MW, n, z
     carbon_capture_efficiency,
     MW_CO2, 
-    R,
     F
 ):
     
     """
-    Steady-state mass balance on electrolyzer streams using product of choice and production rate as a basis.
-    Inputs: product of choice, production basis in kg product/day, 
-    Faradaic efficiency (selectivity)  to product, single-pass conversion, crossover ratio (mol CO2 crossed/ mol e-), 
-    total assumed current density, product data as a dataframe containing [product name, molecular weight, 
-    electron transfers for product (mol e-/ mol product), stoichiometry as mol CO2/ mol product]
-    Returns a dataframe of molar flow rates for all 6 possible inlet and outlet streams in electrolyzer
+    Steady-state mass balance on electrolyzer streams and adjacent streams using product of choice and production rate as a basis.
+
+    Arguments: product name of choice, production basis (kg product/day), Faradaic efficiency (selectivity)  to product (), 
+    single-pass conversion (), dataframe from voltage model containing [], crossover ratio (mol CO2 crossed/ mol e-), 
+    molar ratio of liquid water supplied to anode versus product flow rate (),
+    total assumed current density (mA/cm2), product data as a dataframe containing [product name, molecular weight, 
+    electron transfers for product (mol e-/ mol product), stoichiometry as mol CO2/ mol product],
+    carbon capture efficiency (fraction of CO2 produced that gets captured), molar mass of CO2 (g/mol),
+    Faraday's constant (C/mol e-)
+    
+    Returns: dataframe of assumptions used in stream calculations, dataframe of molar flow rates of inlet and outlet streams of electrolyzer
     """
     
     ### Extract data on specific product
@@ -532,7 +552,7 @@ def electrolyzer_SS_mass_balance(
     ### Convert rates
     product_rate_kg_s = kg_day_to_kg_s(product_rate_kg_day)
     product_rate_mol_s = kg_s_to_mol_s(product_rate_kg_s, MW = MW_product)
-    product_rate_sccm = mol_s_to_sccm(rate_mol_s = product_rate_mol_s, R = R)
+    # product_rate_sccm = mol_s_to_sccm(rate_mol_s = product_rate_mol_s, R = R)
         
     # Get current for crossover calculation
     i_H2_mA = df_potentials.loc['H2 current', 'Value']
@@ -615,7 +635,7 @@ def electrolyzer_SS_mass_balance(
     }
          
     df_electrolyzer_streams_mol_s = pd.Series(dict_electrolyzer_streams_mol_s) # convert to dataframe
-
+    
     if np.isnan(SPC):
         df_electrolyzer_streams_mol_s.loc[:] = np.NaN
 

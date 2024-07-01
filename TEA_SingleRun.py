@@ -1,16 +1,11 @@
 # %% [markdown]
-# ## Running notes
+# # Single model run: Notes
 # Date updated: 2024/06/11 \
 # Update notes: Strict function inputs\
-# Contact: Shashwati da Cunha
+# Contact: Shashwati da Cunha, [shashwatidc@utexas.edu](mailto:shashwatidc@utexas.edu)
 # 
-# ## Instructions
-# 1. This is only a collection of functions. Please call it externally.
-# 
-# #### Notes:
-# 
-# #### To do:
-# 
+# ### Instructions
+# 1. Not designed for standalone run - this is only a collection of functions. Other notebooks call it.
 
 # %%
 # Uncommment to run notebook standalone
@@ -84,6 +79,9 @@ def single_run(product_name,
         K_to_C = 273.15,
         kJ_per_kWh = 3.60E+03,
         ):
+    """
+    Returns all outputs from a single run of the physics-informed technoeconomic model.
+    """
 
     FE_product, SPC = SPC_check(FE_product_specified = FE_product_specified,
                                 exponent = exponent,
@@ -116,8 +114,6 @@ def single_run(product_name,
         overridden_unit = overridden_unit,
         model_FE = model_FE,
         override_optimization =  override_optimization,
-        SPC = SPC,
-        R = R,
         F = F
         ) 
 
@@ -136,7 +132,6 @@ def single_run(product_name,
         df_products = df_products,     
         carbon_capture_efficiency = carbon_capture_efficiency ,
         MW_CO2 = MW_CO2,
-        R = R,
         F = F,
         ) 
 
@@ -198,9 +193,8 @@ def single_run(product_name,
                                                 stack_lifetime_years = stack_lifetime_years,
                                                 capacity_factor = capacity_factor)
     ## Generate capex
-    df_capex_BM, df_capex_totals, C_TDC, C_alloc = capex(product_name = product_name,
-        area_m2 = df_potentials.loc['Area', 'Value'],
-        df_utilities = df_utilities,
+    df_capex_BM, df_capex_totals, C_TDC, C_alloc = capex(area_m2 = df_potentials.loc['Area', 'Value'],
+        electricity_kJ_per_kg = df_utilities.loc['Electricity', 'Energy (kJ/kg {})'.format(product_name)],
         df_streams = df_streams,
         product_rate_kg_day = product_rate_kg_day,
         battery_capex_USD_kWh = battery_capex_USD_kWh,        
@@ -210,6 +204,7 @@ def single_run(product_name,
         is_additional_capex = is_additional_capex,
         additional_capex_USD = additional_capex_USD)
 
+
     ## Generate subparts of opex - SEIDER TEXTBOOK       
     df_sales = sales(product_name = product_name,
                     df_streams = df_streams,
@@ -217,28 +212,29 @@ def single_run(product_name,
                     H2_cost_USD_kgH2 = H2_cost_USD_kgH2,
                     product_rate_kg_day = product_rate_kg_day,
                     capacity_factor = capacity_factor)
-    df_feedstocks = feedstocks(df_costing_assumptions,
-                              df_streams,
-                          capacity_factor)
+    df_feedstocks = feedstocks(CO2_cost_USD_tCO2 = CO2_cost_USD_tCO2,
+                               water_cost_USD_kg = water_cost_USD_kg,
+                            df_streams = df_streams,
+                            capacity_factor = capacity_factor)
     df_depreciation = depreciation(C_TDC = C_TDC, C_alloc = C_alloc) 
-    df_general = general(df_sales = df_sales)
+    df_general = general(sales_USD_year = df_sales.loc['Total', 'Earnings ($/yr)'])
 
     df_operations = operations(capacity_factor = capacity_factor) # Not used in Sinott
     df_maintenance = maintenance(C_TDC = C_TDC,
-                                 df_capex_BM = df_capex_BM)
-    df_stack_replacement = stack_replacement(df_capex_BM = df_capex_BM,
-                                 stack_lifetime_years = stack_lifetime_years,
+                                 C_electrolyzer = df_capex_BM.loc['Electrolyzer', 'Cost ($)'])
+    df_stack_replacement = stack_replacement(stack_lifetime_years = stack_lifetime_years,
+                                 C_electrolyzer = df_capex_BM.loc['Electrolyzer', 'Cost ($)'],
                                  lifetime_years = lifetime_years)      
     df_overhead = overhead(df_maintenance, df_operations)      # Not used in Sinott   
     df_taxes = taxes(C_TDC = C_TDC)     # Not used in Sinott
 
     # Add totals rows to subparts of opex
-    for df in [df_feedstocks, df_utilities, df_operations, df_maintenance, df_overhead, 
+    for df in [df_feedstocks, df_operations, df_maintenance, df_overhead, df_utilities,
                df_taxes, df_depreciation, df_general, df_stack_replacement]:
         totals(df,  product_name = product_name,
                     product_rate_kg_day = product_rate_kg_day,
                     capacity_factor = capacity_factor)
-    
+
     ## Generate opex - SINNOTT TEXTBOOK
     df_opex, df_opex_totals = opex_sinnott(C_ISBL = df_capex_totals.loc['Total bare-module investment', 'Cost ($)'], # currently C_TDC
              df_feedstocks = df_feedstocks,
@@ -273,16 +269,12 @@ def single_run(product_name,
     #         lifetime_years = lifetime_years,
     #         product_name = product_name,
     #         product_rate_kg_day = product_rate_kg_day,
-    #         cell_E_V = cell_E_V,
     #         is_additional_opex = is_additional_opex,
     #         additional_opex_USD_kg = additional_opex_USD_kg
     #     )
+# For now, NPV, IRR and breakeven cost are not displayed. Save computation time by not calculating them
 
-    # print('Here')
-
-    # For now, NPV, IRR and breakeven cost are not displayed. Save computation time by not calculating them
-
-    # Calculate NPV at 15% interest rate
+    # # Calculate NPV at 15% interest rate
     # df_cashflows, cashflows, NPV = cashflow_years(    
     #     plant_lifetime = int(lifetime_years),
     #     depreciation_schedule = 'linear', # 'MACRS' or 'linear'
@@ -298,7 +290,7 @@ def single_run(product_name,
     #     t = 0.2, # tax in % per year,
     #     )
 
-    ## Calculate IRR at 0 salvage value
+    # ## Calculate IRR at 0 salvage value
     # IRR = calculate_IRR(    
     #     plant_lifetime = int(lifetime_years),
     #     depreciation_schedule = 'linear', # 'MACRS' or 'linear'
@@ -322,8 +314,10 @@ def single_run(product_name,
     #     interest  = 0.15, # interest %
     #     f = 0.03, # typical inflation %
     #     product_rate_kg_day = product_rate_kg_day, # production in kg/day
+    #     H2_rate_kg_day = df_streams.loc['H2 outlet', 'Mass flow rate (kg/day)'], # production in kg/day
     #     capacity_factor = capacity_factor, # capacity factor as a fraction of days in a year
     #     production_cost = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
+    #     H2_price_USD_kgH2 = H2_cost_USD_kgH2,
     #     C_TDC = df_capex_totals.loc['Total depreciable capital', 'Cost ($)'], # df_capex_totals.loc['Total depreciable capital', 'Cost ($)'] 
     #     C_WC = df_capex_totals.loc['Working capital', 'Cost ($)'],
     #     t = 0.2, # tax in % per year,
@@ -331,6 +325,6 @@ def single_run(product_name,
     
     return df_capex_BM, df_capex_totals, df_costing_assumptions, df_depreciation, df_electrolyzer_assumptions, df_electrolyzer_streams_mol_s,\
             df_energy, df_feedstocks, df_general, df_maintenance, df_operations, df_opex, df_opex_totals, df_outlet_assumptions,\
-            df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities 
-    #  df_cashflows, \
-    #         cashflows, NPV, IRR, breakeven_price_USD_kgprod
+            df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities
+    # , df_cashflows, \
+            # cashflows, NPV, IRR, breakeven_price_USD_kgprod

@@ -1,23 +1,18 @@
 # %% [markdown]
-# ## Running notes
+# # Downstream model: Notes
 # Date updated: 2024/06/11 \
 # Update notes: Strict function inputs\
-# Contact: Shashwati da Cunha
+# Contact: Shashwati da Cunha, [shashwatidc@utexas.edu](mailto:shashwatidc@utexas.edu)
 # 
-# ## Instructions
-# 1. This is only a collection of functions. Please call it externally.
+# ### Instructions
+# 1. Not designed for standalone run - this is only a collection of functions. Other notebooks call it.
 # 
-# #### Note on LaTeX:
-# Be careful of fonts with `$\{}$` . It will use the default LaTeX font for the Greek characters, unless you use `$\mathregular{'command'}$`.
-# 
-# 
-# #### To do:
 
 # %% [markdown]
 # ## 0. Imports and setup
 
 # %% [markdown]
-# ### 0.1. Imports and styling
+# ### 0.1 Imports and styling
 
 # %%
 # UNCOMMENT TO RUN STANDALONE
@@ -37,7 +32,9 @@ import numpy as np
 def blank_stream_table(product_name):
     """
     Generates a skeleton dataframe for streams and hard codes stream numbers. These are based on the assumed PFD
-    Inputs: product of choice
+
+    Arguments: product name of choice
+    
     Returns: empty dataframe with rows = streams and columns = stream variables; a few variables may be added on later
     """
   
@@ -102,11 +99,16 @@ def update_stream_table(product_name,
                         K_to_C):
     
     """
-    Fill in stream table for given product, electrolyzer streams run
-    Inputs: product of choice, product data df with molecular weights,
-    df_streams dataframe with stream names filled in and product mole flow rates and mole fraction columns. This will be overwritten in the mentioned columns;
-    electrolyzer streams, MW for CO2, MW for H2O, MW for O2
-    Returns a dataframe of molar flow rates and mole fractions for all streams
+    Fills in stream table for given product, electrolyzer streams run
+    
+    Arguments: product name of choice, product dataframe with [product name, molecular weights (g/mol)],
+    blank df_streams dataframe with stream names filled in and product mole flow rates and mole fraction columns, 
+    (this will be filled with data), dataframe with mole flow rates for electrolyzer streams, electrolyte concentration (M),
+    electrolyte density (kg/m3), humidity of the cathode outlet stream (), temperature of streams (K), temperature of separation inlets (K),
+    pressure of all streams (Pa), molecular weight for CO2 (g/mol), molecular weight for H2O (g/mol), molecular weight for O2 (g/mol),
+    molecular weight of electrolyte salt (g/mol), gas constant (J/mol.K), conversion from K to C (273.15)
+
+    Returns a dataframe of flow rates and mole fractions for all streams
     """
 
     ### Extract data on specific product
@@ -384,10 +386,10 @@ def update_stream_table(product_name,
     return df_streams
 
 # %% [markdown]
-# ### 1.2 Separation energies
+# ## 2. Energies
 
 # %% [markdown]
-# #### 1.2.1 Ideal work of separation
+# ### 2.1 Separation energies
 
 # %%
 @st.cache_data
@@ -398,7 +400,12 @@ def work_of_sep_kJ(x,
 ):
     """
     Calculate real work of separation for binary mixture based on ideal work and second-law efficiency
-    Inputs: mole fraction of species, second-law efficiency
+    
+    Arguments: mole fraction of species (), second-law efficiency of separation (), 
+    temperature of stream to separate (K), gas constant (J/mol.K)
+
+    Returns: real work of separation
+    
     """
     
     if x == 0 or x == 1:
@@ -408,6 +415,9 @@ def work_of_sep_kJ(x,
         ideal_work_of_sep = R*T_sep*(x*np.log(x) + (1-x)*np.log(1-x))/1000 # note that np.log is ln
     real_work_of_sep = ideal_work_of_sep / PSA_second_law_efficiency
     return real_work_of_sep
+
+# %% [markdown]
+# ### 2.2 Energy table
 
 # %%
 @st.cache_data
@@ -427,15 +437,19 @@ def energy_table(product_name,
     
     """
     Create energy table for given product and electrolyzer stream compositions
-    Inputs: product of choice, product data df with molecular weights, E0's and LHVs,
-    df_streams dataframe, second-law efficiency for pressure swing adsorption. This is the ONLY df that is allowed to have NaN's,
-    which are placeholders for unknown values
+
+    Arguments: product name of choice, product data dataframe with [product names, molecular weights (g/mol), LHVs (kJ/kg prod),
+    dataframe with energy of electrolyzer (kJ/kg product), dataframe of stream table, second-law efficiency (), 
+    separations temperature (K), electricity cost ($/kWh), heat cost ($/kWh), electricity emissions or carbon intensity (kg CO2/ kWh), 
+    heat emissions or carbon intensity (kg CO2/kWh), conversion of kJ/kWh, gas constant (J/mol.K)
+    
+    Returns: dataframe for energy table
     """
     
     ## Extract data on a specific product
     MW_product = df_products.loc[product_name, 'Molecular weight (g/mol)']
     prod_LHV_kJ_kg = df_products.loc[product_name, 'LHV (kJ/kg product)']
-    prod_E0_V = df_products.loc[product_name, 'Standard potential (V vs RHE)']
+    # prod_E0_V = df_products.loc[product_name, 'Standard potential (V vs RHE)']
     
     ## CO2-product separation
     CO2_prod_sep_kJ_molmix = work_of_sep_kJ(df_streams.loc['Cathode PSA1 inlet', 'x_CO2'], PSA_second_law_efficiency, T_sep, R ) 
@@ -457,11 +471,11 @@ def energy_table(product_name,
     'Stage' : [ 'Electrolyte makeup', 'CO2 electrolysis', # 'Compression', 'Carbon capture', 
               'CO2 electrolysis',  'CO2 electrolysis','CO2 electrolysis',  'CO2 electrolysis','CO2 electrolysis',
               'Gas separations', 'Gas separations', 'Gas separations',
-               'CO2 electrolysis'], 
+               ], 
     'Unit': [  'Deionization', 'Cell heating', #'Other', 'Carbon capture and transportation',
              'Cathode equilibrium potential', 'Anode equilibrium potential', 'Cathodic overpotential' , 'Anodic overpotential', 'Ohmic loss',
             'Cathode PSA - CO$_2$/products','Cathode PSA - {}/H$_2$'.format(product_name), 'Anode PSA - CO$_2$/O$_2$',
-             'Cell potential'],
+             ],
                  }
     
     df_energy = pd.DataFrame(dict_energy)
@@ -476,8 +490,9 @@ def energy_table(product_name,
     
     ## Assign utility types
     df_energy.loc[['Deionization', 'Cathode equilibrium potential', 'Anode equilibrium potential', 
-                   'Cathodic overpotential' , 'Anodic overpotential', 'Ohmic loss', 'Cell potential',
-                     'Cathode PSA - CO$_2$/products','Cathode PSA - {}/H$_2$'.format(product_name), 'Anode PSA - CO$_2$/O$_2$'],
+                   'Cathodic overpotential' , 'Anodic overpotential', 'Ohmic loss',
+                   'Cathode PSA - CO$_2$/products','Cathode PSA - {}/H$_2$'.format(product_name), 
+                   'Anode PSA - CO$_2$/O$_2$'],
                   'Description'] = 'Electricity'
     # df_energy.loc[['Cell heating',
     #                  ], 'Description'] = 'Heat'
@@ -494,17 +509,23 @@ def energy_table(product_name,
     df_energy.loc['Cathode PSA - {}/H$_2$'.format(product_name), 'Energy (kJ/kg {})'.format(product_name, product_name)] = prod_H2_sep_kJ_kgprod
     df_energy.loc['Anode PSA - CO$_2$/O$_2$', 'Energy (kJ/kg {})'.format(product_name)] = CO2_O2_sep_kJ_kgprod
     
-    df_energy.loc['Total'] = abs(df_energy.select_dtypes(include=['int64', 'float64'])).sum(axis=0)
+    df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)] = abs(df_energy.loc[:, 'Energy (kJ/kg {})'.format(product_name)]).sum(axis=0)
     df_energy.loc['Total', ['Stage', 'Description']] = ''
 
     # Store overall cell potential after taking totals, so that it is not double counted
     df_energy.loc['Cell potential', 'Energy (kJ/kg {})'.format(product_name)] = df_potentials.loc['Electrolyzer energy per kg', 'Value']
-    # Account for cases where the cell potential is "overwritten", i.e. a cell potential is specified but no equilibrium potentials/ ohmic resistances/ etc
-    if ~np.isnan(df_energy.loc['Cell potential', 'Energy (kJ/kg {})'.format(product_name)]) and np.isnan(df_energy.loc['Cathode equilibrium potential', 'Energy (kJ/kg {})'.format(product_name)]): # if cell voltage is overridden directly
-        df_energy.loc['Total'] = abs(df_energy.select_dtypes(include=['int64', 'float64'])).sum(axis=0)
+    df_energy.loc['Cell potential', ['Stage', 'Description']] = ''
 
+    # Account for cases where the cell potential is "overwritten", i.e. a cell potential is specified but no equilibrium potentials/ ohmic resistances/ etc
+    if np.isnan(df_energy.loc['Cathode equilibrium potential', 'Energy (kJ/kg {})'.format(product_name)]) and ~np.isnan(df_energy.loc['Cell potential', 'Energy (kJ/kg {})'.format(product_name)]): # if cell voltage is overridden directly
+        # Recalculate the total, this time including the cell potential in the total
+        df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)] = abs(df_energy.loc[:, 'Energy (kJ/kg {})'.format(product_name)]).sum(axis=0)
+        # Actually consider the cell potential as an electric outlay
+        df_energy.loc['Cell potential', 'Description'] = 'Electricity'
+    
     # Calculate emissions
-    df_energy.loc[df_energy['Description'] == 'Electricity', 'Emissions (kg CO2/kg {})'.format(product_name)] = np.abs(df_energy.loc[df_energy['Description'] == 'Electricity']['Energy (kJ/kg {})'.format(product_name)]) / kJ_per_kWh * electricity_emissions_kgCO2_kWh
+    df_energy.loc[df_energy['Description'] == 'Electricity', 
+                  'Emissions (kg CO2/kg {})'.format(product_name)] = np.abs(df_energy.loc[df_energy['Description'] == 'Electricity']['Energy (kJ/kg {})'.format(product_name)]) / kJ_per_kWh * electricity_emissions_kgCO2_kWh
     df_energy.loc[df_energy['Description'] == 'Heat', 'Emissions (kg CO2/kg {})'.format(product_name)] = np.abs(df_energy.loc[df_energy['Description'] == 'Heat']['Energy (kJ/kg {})'.format(product_name)]) / kJ_per_kWh * heat_emissions_kgCO2_kWh
         
     # Calculate costs
@@ -513,13 +534,15 @@ def energy_table(product_name,
     
     # Calculate efficiency
     if not np.isnan(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)]):
-        df_energy.loc['Efficiency vs LHV'] = prod_LHV_kJ_kg  / abs(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)]) # LHV / process energy
+        df_energy.loc['Efficiency vs LHV', 'Energy (kJ/kg {})'.format(product_name)] = prod_LHV_kJ_kg  / abs(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)]) # LHV / process energy
     else:
-        df_energy.loc['Efficiency vs LHV'] = np.NaN
+        df_energy.loc['Efficiency vs LHV', 'Energy (kJ/kg {})'.format(product_name)] = np.NaN
         
     df_energy.loc['Efficiency vs LHV', ['Stage', 'Description']] = ''
-    df_energy.loc['Cell potential', 'Description'] = '' # Blank description for 'Cell potential', otherwise utilities() function will treat it as an electricity cost
-    
+
+    df_energy.loc['Total', 'Cost ($/kg {})'.format(product_name)] = abs(df_energy.loc[:, 'Cost ($/kg {})'.format(product_name)]).sum(axis=0)
+    df_energy.loc['Total', 'Emissions (kg CO2/kg {})'.format(product_name)] = abs(df_energy.loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)]).sum(axis=0)
+   
     return df_energy
 
 

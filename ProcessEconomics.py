@@ -1,26 +1,18 @@
 # %% [markdown]
-# ## Running notes
+# # Technoeconomic model: Notes
 # Date updated: 2024/06/11 \
 # Update notes: Strict function inputs\
-# Contact: Shashwati da Cunha
+# Contact: Shashwati da Cunha, [shashwatidc@utexas.edu](mailto:shashwatidc@utexas.edu)
 # 
-# ## Instructions
-# 1. This is only a collection of functions. Please call it externally.
+# ### Instructions
+# 1. Not designed for standalone run - this is only a collection of functions. Other notebooks call it.
 # 
-# #### Note on LaTeX:
-# Be careful of fonts with `$\{}$` . It will use the default LaTeX font for the Greek characters, unless you use `$\mathregular{'command'}$`.
-# 
-# #### To do:
-# 1. Label functions with text
-# 2. Check costing for DI, ASPEN
-# 3. Add separations bare-module factors
 
 # %% [markdown]
 # ## 0. Imports and setup
 
 # %%
 # UNCOMMENT TO RUN STANDALONE
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -48,6 +40,14 @@ def costing_assumptions(
     electrolyzer_capex_USD_m2,
     capacity_factor
 ): 
+    """
+    Store all costing assumptions
+
+    Arguments: product name of choice, product selling price ($/kg product), H2 selling price ($/kg H2), electricity cost ($/kWh), water cost ($/kg water), 
+    CO2 cost ($/ton CO2), lifetime of plant (years), stack lifetime (years), capex of electrolyzer ($/m^2), capacity factor of plant operation () 
+
+    Returns: dataframe of costing assumptions
+    """
     
     df_costing_assumptions = pd.DataFrame(
     {
@@ -78,9 +78,8 @@ def costing_assumptions(
 # %%
 @st.cache_data
 def capex(
-    product_name,
     area_m2 , 
-    df_utilities,
+    electricity_kJ_per_kg,
     df_streams,
     product_rate_kg_day,
     battery_capex_USD_kWh ,
@@ -90,7 +89,16 @@ def capex(
     is_additional_capex,
     additional_capex_USD,
 ):
+    """
+    Calculate unit (bare-module) capital costs, and cumulative capital costs mostly according to the method of Seider, Lewin et. al.
 
+    Arguments: electrolyzer area (m^2), electricity required per kg product, dataframe of stream table, production basis (kg/day),
+    battery capex ($/kWh), electrolyzer capex ($/m^2), battery pseudo-"capacity factor" or fraction of time when battery powers plant (), 
+    kJ/kWh conversion
+
+    Returns: dataframe of bare-module costs per unit, and summary capital costs
+    """
+    
     ## Battery limits ("on-site") are the electrolysis and separations only. 
     # => There are no off-site units included, i.e. feedstocks (CO2, DI water) and utilities (electricity) come from external vendors 
     
@@ -102,7 +110,7 @@ def capex(
         'Cathode PSA - CO$_2$/products' : ['Separations', 'Scaling factor 0.7 to Shin Jiao Nat Sust 2021', np.NaN] ,
         'Cathode PSA - Products/H$_2$' : ['Separations', 'Scaling factor 0.7 to Shin Jiao Nat Sust 2021', np.NaN] ,
         'Anode PSA - CO$_2$/O$_2$' : ['Separations', 'Scaling factor 0.7 to Shin Jiao Nat Sust 2021', np.NaN] ,
-        }
+    }
 
     # Create dataframe for bare-module costs
     df_capex_BM = pd.DataFrame(dict_capex_BM).T
@@ -154,7 +162,7 @@ def capex(
     # Battery storage - $200/kWh from NREL 2021 report, mid costing scenario. 
     # Battery cost is NOT included in total bare-module investment, which is used for calculating parts of opex; we include it in df_capex_BM only for plotting
     if battery_capacity > 0:
-        battery_cost = (df_utilities.loc['Electricity', 'Energy (kJ/kg {})'.format(product_name)] * product_rate_kg_day) / kJ_per_kWh * battery_capex_USD_kWh * battery_capacity
+        battery_cost = (electricity_kJ_per_kg * product_rate_kg_day) / kJ_per_kWh * battery_capex_USD_kWh * battery_capacity
         df_capex_BM.loc['Battery storage', ['Stage', 'Description', 'Cost ($)']] = '', '${}/kWh'.format(battery_capex_USD_kWh), battery_cost 
         # Assumes that avbl_renewables is a fraction per day, and the battery needs to store this amount daily, and that its lifetime = process lifetime
         df_capex_BM.loc['Battery storage', ['Stage', 'Description']] = 'Battery', 'NOT included in total bare-module investment - shown here for figure generation only'  
@@ -198,7 +206,15 @@ def sales(
     product_rate_kg_day ,
     capacity_factor
 ):
+    """
+    Calculate sales from mass balance
 
+    Arguments: product name of choice, dataframe of stream table, product selling price ($/kg product), H2 selling price ($/kg H2), 
+    production basis (kg product/ day), capacity factor of plant operation () 
+
+    Returns: dataframe of sales 
+    """
+    
     # Create dictionary
     dict_sales = {
         '{}'.format(product_name) : ['Separations', '{}/kg {}'.format(product_cost_USD_kgprod, product_name), np.NaN],
@@ -236,11 +252,19 @@ def sales(
 # %%
 @st.cache_data
 def feedstocks(
-    df_costing_assumptions,
+    CO2_cost_USD_tCO2,
+    water_cost_USD_kg,
     df_streams,
     capacity_factor
 ):
+    """
+    Calculate feedstock costs from mass balance
 
+    Arguments: CO2 cost ($/ton), DI water cost ($/kg), dataframe of stream table, capacity factor of plant operation () 
+
+    Returns: dataframe of feedstock costs
+    """
+    
     # Create dictionary
     dict_feedstocks = {
         'Captured CO2' : ['Carbon capture', '', np.NaN],
@@ -254,8 +278,8 @@ def feedstocks(
     df_feedstocks.index.name= 'Feedstocks'
 
     # Fill in costs # TODO: fix this whole section to be more precise
-    df_feedstocks.loc['Captured CO2', 'Cost ($/yr)'] = df_costing_assumptions.loc['CO2', 'Cost']/1000*df_streams.loc['Fresh CO2 feed', 'Mass flow rate (kg/day)']*365*capacity_factor
-    df_feedstocks.loc['Deionized water','Cost ($/yr)'] = df_costing_assumptions.loc['Water', 'Cost']*df_streams.loc['Fresh water feed', 'Mass flow rate (kg/day)']*365*capacity_factor #df_streams[]
+    df_feedstocks.loc['Captured CO2', 'Cost ($/yr)'] = CO2_cost_USD_tCO2/1000*df_streams.loc['Fresh CO2 feed', 'Mass flow rate (kg/day)']*365*capacity_factor
+    df_feedstocks.loc['Deionized water','Cost ($/yr)'] = water_cost_USD_kg*df_streams.loc['Fresh water feed', 'Mass flow rate (kg/day)']*365*capacity_factor #df_streams[]
 
     df_feedstocks
     
@@ -273,21 +297,26 @@ def utilities(df_energy,
               product_rate_kg_day,
               capacity_factor,
              product_name):
-    
+    """
+    Calculate utility costs from energy balance
+
+    Arguments: dataframe of energy table, production basis (kg product/ day), capacity factor of plant operation (), product name of choice
+
+    Returns: dataframe of utility costs
+    """
+        
     # Create dataframe
-    df_utilities = pd.DataFrame(columns = df_energy.columns)
+    df_utilities = pd.DataFrame()
     
     # Calculate costs and emissions per utility
-    df_utilities.loc['Electricity'] = abs(df_energy.loc[df_energy['Description'] == 'Electricity', ['Energy (kJ/kg {})'.format(product_name), 'Cost ($/kg {})'.format(product_name), 'Emissions (kg CO2/kg {})'.format(product_name)]]).sum(axis = 0) 
-    # Account for cases where the cell potential is "overwritten", i.e. a cell potential is specified but no equilibrium potentials/ ohmic resistances/ etc
-    if ~np.isnan(df_energy.loc['Cell potential', 'Energy (kJ/kg {})'.format(product_name)]) and np.isnan(df_energy.loc['Cathode equilibrium potential', 'Energy (kJ/kg {})'.format(product_name)]): # if cell voltage is overridden directly
-        df_utilities.loc['Electricity'] += abs(df_energy.loc['Cell potential', ['Energy (kJ/kg {})'.format(product_name), 'Cost ($/kg {})'.format(product_name), 'Emissions (kg CO2/kg {})'.format(product_name)]]) 
-    df_utilities.loc['Heat'] = abs(df_energy.loc[df_energy['Description'] == 'Heat', ['Energy (kJ/kg {})'.format(product_name), 'Cost ($/kg {})'.format(product_name), 'Emissions (kg CO2/kg {})'.format(product_name)]]).sum(axis = 0)
+    df_utilities.loc['Electricity', ['Cost ($/kg {})'.format(product_name),
+                                     'Energy (kJ/kg {})'.format(product_name)]] = abs(df_energy.loc[df_energy['Description'] == 'Electricity', ['Cost ($/kg {})'.format(product_name),
+                                                                                                                                                'Energy (kJ/kg {})'.format(product_name)]]).sum(axis = 0) 
+    # df_utilities.loc['Heat', 'Cost ($/kg {})'.format(product_name)] = abs(df_energy.loc[df_energy['Description'] == 'Heat', 'Cost ($/kg {})'.format(product_name)]).sum(axis = 0) 
     
-    # Calculate annual emissions; annual costs are calculated at the end
-    df_utilities['Emissions (kg CO2/yr)'] = df_utilities['Emissions (kg CO2/kg {})'.format(product_name)]*product_rate_kg_day*365*capacity_factor
-    df_utilities.index.name = 'Utilities'
-
+    df_utilities.loc[:, 'Cost ($/yr)']  = df_utilities.loc[:,'Cost ($/kg {})'.format(product_name) ] * product_rate_kg_day * 365 * capacity_factor
+    df_utilities.loc['Total', 'Energy (kJ/kg {})'.format(product_name)] = df_utilities.loc[:, 'Energy (kJ/kg {})'.format(product_name)].sum(axis=0)
+   
     return df_utilities
 
 # %% [markdown]
@@ -298,6 +327,13 @@ def utilities(df_energy,
 def operations(
     capacity_factor,
 ):
+    """
+    Calculate operations costs (labor) based on Seider, Lewin et. al.
+
+    Arguments: capacity factor of plant operation () 
+
+    Returns: dataframe of operations (labor) costs
+    """
     
     ## SEIDER BOOK
     
@@ -332,9 +368,16 @@ def operations(
 @st.cache_data
 def maintenance(
     C_TDC,
-    df_capex_BM,
+    C_electrolyzer,
 ):
-    
+    """
+    Calculate maintenance costs based on Seider, Lewin et. al.
+
+    Arguments: total depreciable capital ($), electrolyzer installed bare-module cost ($)
+
+    Returns: dataframe of maintenance cost
+    """
+        
     # Create dictionary
     dict_maintenance = {
         'Maintenance wages and benefits (MW&B)' : ['', '3.5% of C_TCD - fluids handling process', np.NaN],
@@ -351,16 +394,28 @@ def maintenance(
 
     # Fill in costs
     # WARNING: hardcoded 18% factor on electrolyzer cost contributing to C_TDC
-    df_maintenance.loc['Maintenance wages and benefits (MW&B)', 'Cost ($/yr)'] = 0.035* ( C_TDC - df_capex_BM.loc['Electrolyzer', 'Cost ($)']*1.18 )
+    df_maintenance.loc['Maintenance wages and benefits (MW&B)', 'Cost ($/yr)'] = 0.035* ( C_TDC - C_electrolyzer*1.18 )
     df_maintenance.loc['Maintenance salaries and benefits','Cost ($/yr)'] = 0.25*df_maintenance.loc['Maintenance wages and benefits (MW&B)','Cost ($/yr)']
     df_maintenance.loc['Materials and services', 'Cost ($/yr)'] = 1.00*df_maintenance.loc['Maintenance wages and benefits (MW&B)','Cost ($/yr)']
     df_maintenance.loc['Maintenance overhead', 'Cost ($/yr)'] = 0.05*df_maintenance.loc['Maintenance wages and benefits (MW&B)','Cost ($/yr)']
 
     return df_maintenance
 
-def stack_replacement(df_capex_BM,
+# %%
+@st.cache_data
+def stack_replacement(C_electrolyzer,
                     stack_lifetime_years,
                     lifetime_years):
+    """
+    Calculate stack replacement cost, annualized
+
+    Arguments: electrolyzer installed bare-module cost ($), stack lifetime after which full replacement is necessary (years), 
+    total plant lifetime (years)
+
+    Returns: dataframe of stack replacement cost
+    """
+         
+    
     # Create dictionary
     dict_stack_replacement = {
         'Stack replacement' : ['', 'Full electrolyzer cost after {} years'.format(stack_lifetime_years), np.NaN],
@@ -373,8 +428,8 @@ def stack_replacement(df_capex_BM,
     df_stack_replacement.index.name= 'Stack replacement'  
 
     # Fill in costs
-    no_of_replacements = max(0, (lifetime_years // stack_lifetime_years - 1))
-    df_stack_replacement.loc['Stack replacement', 'Cost ($/yr)'] = df_capex_BM.loc['Electrolyzer', 'Cost ($)'] * no_of_replacements / lifetime_years # Total replacement cost / plant lifetime
+    no_of_replacements = max( 0, (lifetime_years // stack_lifetime_years - 1))
+    df_stack_replacement.loc['Stack replacement', 'Cost ($/yr)'] = C_electrolyzer * no_of_replacements / lifetime_years # Total replacement cost / plant lifetime
   
     return df_stack_replacement
 
@@ -385,6 +440,13 @@ def stack_replacement(df_capex_BM,
 @st.cache_data
 def overhead(df_maintenance,
             df_operations):
+    """
+    Calculate operating overheads according to Seider, Lewin et. al.
+
+    Arguments: dataframe of maintenance expenses, dataframe of operating expenses
+
+    Returns: dataframe of overheads
+    """
     
     # Create dictionary
     dict_overhead = {
@@ -415,7 +477,15 @@ def overhead(df_maintenance,
 
 # %%
 @st.cache_data
-def taxes(C_TDC):
+def taxes(C_TDC):    
+    """
+    Calculate taxes according to Seider, Lewin et. al.
+
+    Arguments: total depreciable cost or inside battery limits capital cost
+    
+    Returns: dataframe of tax expenses
+    """
+    
     # Create dataframe
     df_taxes = pd.DataFrame(columns = [ 'Stage', 'Description', 'Cost ($/yr)']).astype({'Stage':'string', 
                                                                                         'Description':'string', 
@@ -437,7 +507,14 @@ def depreciation(
     C_TDC,
     C_alloc
 ):
-    
+    """
+    Calculate depreciation with a linear rate for roughly 12 year depreciation period
+
+    Arguments: total depreciable cost (or inside battery limits capital cost), allocated cost (or outside battery limits capital cost)
+
+    Returns: dataframe of depreciation expenses
+    """
+        
     # Create dictionary
     dict_depreciation = {
         'Direct plant' : ['', '8% of (C_TDC – 1.18 C_alloc)', np.NaN],
@@ -462,8 +539,15 @@ def depreciation(
 # %%
 @st.cache_data
 def general(
-    df_sales
+    sales_USD_year
 ):
+    """
+    Calculate general expenses according to Seider, Lewin et. al.
+
+    Arguments: dataframe of sales
+
+    Returns: dataframe of general expenses
+    """
     
     # Create dictionary
     dict_general = {
@@ -481,11 +565,11 @@ def general(
     df_general.index.name= 'General costs'  
 
     # Fill in costs
-    df_general.loc['Selling (or transfer) expense', 'Cost ($/yr)'] = 0.01*(df_sales.loc['Total', 'Earnings ($/yr)'])
-    df_general.loc['Direct research','Cost ($/yr)'] = 0.048*(df_sales.loc['Total', 'Earnings ($/yr)'])
-    df_general.loc['Allocated research','Cost ($/yr)'] = 0.005*(df_sales.loc['Total', 'Earnings ($/yr)'])
-    df_general.loc['Administrative expense','Cost ($/yr)'] = 0.02*(df_sales.loc['Total', 'Earnings ($/yr)'])
-    df_general.loc['Management incentive compensation','Cost ($/yr)'] = 0.0125*(df_sales.loc['Total', 'Earnings ($/yr)'])
+    df_general.loc['Selling (or transfer) expense', 'Cost ($/yr)'] = 0.01*(sales_USD_year)
+    df_general.loc['Direct research','Cost ($/yr)'] = 0.048*(sales_USD_year)
+    df_general.loc['Allocated research','Cost ($/yr)'] = 0.005*(sales_USD_year)
+    df_general.loc['Administrative expense','Cost ($/yr)'] = 0.02*(sales_USD_year)
+    df_general.loc['Management incentive compensation','Cost ($/yr)'] = 0.0125*(sales_USD_year)
 
     return df_general
 
@@ -498,17 +582,25 @@ def general(
 # %%
 # For all subparts of opex, calculate totals 
 
-# @st.cache_data
+@st.cache_data
 def totals(df,
           product_name,
           product_rate_kg_day ,
           capacity_factor):
-    df.loc['Total'] = df.select_dtypes(include=['int64', 'float64']).sum(axis=0) #FIXME
-    df.loc['Total', ['Stage', 'Description']] = np.NaN
+    """
+    Adds a totals row to a given df and fills in columns for cost/kg product, cost/day and cost/year
+
+    Arguments: dataframe, product name of choice, production basis (kg product/day), capacity factor of plant operation ()
+
+    Returns: None
+    """
+
+    df.loc['Total', 'Cost ($/yr)'] = df.select_dtypes(include=['int64', 'float64']).loc[:, 'Cost ($/yr)'].sum(axis=0)
+
     try:
         df['Cost ($/kg {})'.format(product_name)] = df['Cost ($/yr)']/(product_rate_kg_day*365*capacity_factor) # for utilities, this is calculated directly
         df['Cost ($/day)'] = df['Cost ($/yr)']/(365*capacity_factor)                
-    except KeyError:
+    except KeyError: # for some, cost was calculated per kg, and we now want to calculate it per day
         df['Cost ($/day)'] = df['Cost ($/kg {})'.format(product_name)]*product_rate_kg_day                
         df['Cost ($/yr)'] = df['Cost ($/day)']*(365*capacity_factor)                
     
@@ -520,7 +612,6 @@ def totals(df,
 # %%
 @st.cache_data
 def opex_seider(df_feedstocks,
-        df_capex_totals,
         df_utilities,
         df_sales,
         df_operations,
@@ -530,15 +621,25 @@ def opex_seider(df_feedstocks,
         df_taxes,
         df_depreciation,
         df_general,
-        capacity_factor,
+        df_capex_totals,
         lifetime_years,
+        capacity_factor,
         product_name,
         product_rate_kg_day,
-        cell_E_V,
         is_additional_opex,
         additional_opex_USD_kg
         ):
-    
+    """
+    Calculates operating costs, mostly according to Seider, Lewin et. al.
+
+    Arguments: Dataframe of feedstock cost, dataframe of utility cost, dataframe of sales, dataframe of operations costs, dataframe of maintenance costs,
+    dataframe of stack replacement costs, dataframe of tax costs, dataframe of operating overheads, dataframe of depreciation costs, dataframe of general costs, 
+    dataframe of total capital costs, plant lifetime (year), capacity factor of plant operation (),
+    product name of choice, production basis (kg product/ day)
+
+    Returns: dataframe of operating cost breakdown, dataframe of summarized total operating and levelized costs
+    """
+
     ## SEIDER TEXTBOOK
     
     df_opex = pd.DataFrame(columns = ['Opex', 'Cost ($/yr)', 'Description']).astype({'Cost ($/yr)':'float64'})
@@ -573,18 +674,10 @@ def opex_seider(df_feedstocks,
     df_opex_totals.loc['Production cost'] = df_opex['Cost ($/yr)'].sum(axis=0)
     df_opex_totals.loc['Levelized cost'] = df_opex_totals.loc['Production cost'] + df_capex_totals.loc['Total permanent investment', 'Cost ($)']/lifetime_years
     df_opex_totals.loc['Profit'] = df_sales.loc['Total', 'Earnings ($/yr)'] - df_opex_totals.loc['Levelized cost']
-                                                            
+                                                           
     df_opex_totals['Cost ($/kg {})'.format(product_name)] = df_opex_totals['Cost ($/yr)']/(product_rate_kg_day*365*capacity_factor)
     df_opex_totals['Cost ($/day)'] = df_opex_totals['Cost ($/yr)']/(365*capacity_factor)
 
-#     df_opex_totals.loc['Cost of manufacture'] = df_opex['Cost ($/yr)'].sum(axis=0)
-#     df_opex_totals.loc['Production cost'] =  df_opex_totals.loc['Cost of manufacture', 'Cost ($/yr)'] + df_opex.loc['General expenses', 'Cost ($/yr)']
-
-#     df_opex_totals['Cost ($/kg {})'.format(product_name)] = df_opex_totals['Cost ($/yr)']/(product_rate_kg_day*365*capacity_factor)
-#     df_opex_totals['Cost ($/day)'] = df_opex_totals['Cost ($/yr)']/(365*capacity_factor)
-
-    display(df_opex)
-    
     return df_opex, df_opex_totals   
 
 # %%
@@ -605,7 +698,17 @@ def opex_sinnott(C_ISBL, # currently C_TDC
                  additional_opex_USD_kg,
                  is_additional_opex,
                  ):
-    
+    """
+    Calculates operating costs, mostly according to Sinnott and Towler.
+
+    Arguments: Inside-battery-limits capital cost ($), dataframe of feedstock cost, dataframe of utility cost, 
+    dataframe of sales, dataframe of stack replacement costs, dataframe of depreciation costs, dataframe of general costs, 
+    dataframe of bare-module capex, dataframe of total capital costs, plant lifetime (year), capacity factor of plant operation (),
+    product name of choice, production basis (kg product/ day)
+
+    Returns: dataframe of operating cost breakdown, dataframe of summarized total operating and levelized costs
+    """
+
     ## SINNOTT TEXTBOOK
 
     # Many costs are estimated based on the inside battery limits cost (ISBL), which excludes offsite, engineering and construction, and contingency costs
@@ -670,12 +773,6 @@ def opex_sinnott(C_ISBL, # currently C_TDC
 
     df_opex_totals['Cost ($/kg {})'.format(product_name)] = df_opex_totals['Cost ($/yr)']/(product_rate_kg_day*365*capacity_factor)
     df_opex_totals['Cost ($/day)'] = df_opex_totals['Cost ($/yr)']/(365*capacity_factor)
-
-#     df_opex_totals.loc['Cost of manufacture'] = df_opex['Cost ($/yr)'].sum(axis=0)
-#     df_opex_totals.loc['Production cost'] =  df_opex_totals.loc['Cost of manufacture', 'Cost ($/yr)'] + df_opex.loc['General expenses', 'Cost ($/yr)']
-
-#     df_opex_totals['Cost ($/kg {})'.format(product_name)] = df_opex_totals['Cost ($/yr)']/(product_rate_kg_day*365*capacity_factor)
-#     df_opex_totals['Cost ($/day)'] = df_opex_totals['Cost ($/yr)']/(365*capacity_factor)
     
     return df_opex, df_opex_totals
 
@@ -701,6 +798,17 @@ def cashflow_years(
     C_WC, # = 0,
     t, # = 4/100, # tax in % per year,
 ):
+    """
+    Calculate cashflow table for annual balance sheet
+    
+    Arguments: Plant lifetime (years), depreciation schedule - only 'linear' is programmed for now, 
+    depreciation rate for MACRS (), depreciation period (years), salvage value ($), interest rate on invested returns (),
+    inflation rate (), annual sales ($/year), production cost or annual opex ($/yr), 
+    total depreciable capital ($), working capital ($), annual tax rate () 
+
+    Returns: dataframe of cashflows
+    """
+    
     df_cashflows = pd.DataFrame(columns = ['Year', 'Capital cost', 'Working capital',
                                           'Production cost', 'Sales', 'Depreciation',
                                           'Salvage', 'Cash flow', 'Discounted cash flow', 'Cumulative']).astype(float)
@@ -716,12 +824,13 @@ def cashflow_years(
     else:
         
         for i in range(1, plant_lifetime+1):  
-    
+            # First year - capital
             if i == 1:
                 capital_i = C_TDC
             else:
                 capital_i = 0
             
+            # First and last year - working capital
             if i == 1:
                 WC_i = C_WC
             elif i == plant_lifetime:
@@ -729,21 +838,28 @@ def cashflow_years(
             else:
                 WC_i = 0
     
+            # Production cost 
             C_i = production_cost
+
+            # Sales
             S_i = sales
             
+            # Depreciation
             if depreciation_schedule == 'MACRS':
                 depreciation_i = D*C_TDC
             else:
                 depreciation_i = (1 - salvage_value)*C_TDC/depreciation_lifetime
-    
+
+            # Salvage value
             if i == plant_lifetime:
                 salvage_i = salvage_value*C_TDC
             else:
                 salvage_i = 0
             
+            # Overall cash flow
             cashflow_i = (1-t) * (S_i-C_i)  + depreciation_i - capital_i - WC_i  + salvage_i
             
+            # Format into dataframe
             df_cashflows = pd.concat([df_cashflows, pd.DataFrame([[ i , capital_i,  WC_i,  C_i,  S_i,  depreciation_i,  salvage_i,  cashflow_i , 
                                                                            (cashflow_i - depreciation_i)*(discount_factor**(i-1)) + depreciation_i*(discount_factor_depreciation**(i-1)),
                                                                            0]], columns=df_cashflows.columns) ]
@@ -774,20 +890,29 @@ def eqn_IRR(
     C_WC, # = 0,
     t, # = 4/100, # tax in % per year,
     ):
+    """
+    Equation NPV = 0 for calculating the internal rate of return such that NPV = 0.
 
-    df_cashflows, cashflows, NPV = cashflow_years(    
-        plant_lifetime,
-        depreciation_schedule, # 'MACRS' or 'linear'
-        D, # optional, used for MACRS only - depreciation%
-        depreciation_lifetime, # optional, used for linear only - total time before salvage value is recovered
-        salvage_value, # optional, used for linear only - fraction of original capital that is recovered
-        x, # determine interest rate (IRR)
-        f, # inflation %
-        sales, # = df_sales.loc['Total', 'Earnings ($/yr)'],
-        production_cost,  # = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
-        C_TDC, # = df_capex_totals.loc['Total plant', 'Cost ($)'],
-        C_WC, # = 0,
-        t, # = 4/100, # tax in % per year,
+    Arguments: Interest rate on invested returns (), plant lifetime (years), depreciation schedule - only 'linear' is programmed for now, 
+    depreciation rate for MACRS (), depreciation period (years), salvage value ($), inflation rate (), annual sales ($/yr), production cost or annual opex ($/yr),
+    production basis (kg/day), capacity factor of plant operation (), total depreciable capital ($), working capital ($), annual tax rate () 
+
+    Returns: LHS of equation NPV = 0 
+    """
+
+    __, __, NPV = cashflow_years(    
+        plant_lifetime = plant_lifetime,
+        depreciation_schedule = depreciation_schedule, # 'MACRS' or 'linear'
+        D = D, # optional, used for MACRS only - depreciation%
+        depreciation_lifetime = depreciation_lifetime, # optional, used for linear only - total time before salvage value is recovered
+        salvage_value = salvage_value, # optional, used for linear only - fraction of original capital that is recovered
+        interest = x, # determine interest rate (IRR)
+        f = f, # inflation %
+        sales = sales, # = df_sales.loc['Total', 'Earnings ($/yr)'],
+        production_cost = production_cost,  # = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
+        C_TDC = C_TDC, # = df_capex_totals.loc['Total plant', 'Cost ($)'],
+        C_WC = C_WC, # = 0,
+        t = t, # = 4/100, # tax in % per year,
         )
     
     LHS = NPV
@@ -809,6 +934,16 @@ def calculate_IRR(
     C_WC, # = 0,
     t, # = 4/100, # tax in % per year,
     ):
+    """
+    Calculate the internal rate of return such that NPV = 0.
+
+    Arguments: Plant lifetime (years), depreciation schedule - only 'linear' is programmed for now, depreciation rate for MACRS (),
+    depreciation period (years), salvage value ($), interest rate on invested returns (), inflation rate (), total annual sales ($/yr),
+    production cost or process opex ($/year), production basis (kg/day), capacity factor of plant operation (),
+    total depreciable capital ($), working capital ($), annual tax rate () 
+
+    Returns: internal rate of return, IRR ()
+    """
 
     if plant_lifetime < 2:
         IRR = np.NaN
@@ -847,28 +982,41 @@ def eqn_breakeven_price(
     interest, # interest %
     f, # inflation %
     product_rate_kg_day, # production in kg/day
+    H2_rate_kg_day, # df_streams.loc['', '']
     capacity_factor, # capacity factor as a fraction of days in a year
     production_cost, # = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
+    H2_price_USD_kgH2, 
     C_TDC, # = df_capex_totals.loc['Total plant', 'Cost ($)'],
     C_WC, # = 0,
     t, # = 4/100, # tax in % per year,
     ):
+    """
+    Equation NPV = 0 for calculating the breakeven selling price such that NPV = 0.
+    
+    Arguments: Product price ($/kg product), plant lifetime (years), depreciation schedule - only 'linear' is programmed for now, 
+    depreciation rate for MACRS (), depreciation period (years), salvage value ($), interest rate on invested returns (), 
+    inflation rate (), production basis (kg/day), hydrogen production rate (kg/day), capacity factor of plant operation (), 
+    production cost or process opex ($/year), hydrogen sale price ($/kg H2), total depreciable capital ($), 
+    working capital ($), annual tax rate () 
 
-    sales = product_rate_kg_day * capacity_factor * 365 * x
+    Returns: LHS - RHS of the equation NPV = 0
+    """
 
-    df_cashflows, cashflows, NPV = cashflow_years(    
-        plant_lifetime,
-        depreciation_schedule, # 'MACRS' or 'linear'
-        D, # optional, used for MACRS only - depreciation%
-        depreciation_lifetime, # optional, used for linear only - total time before salvage value is recovered
-        salvage_value, # optional, used for linear only - fraction of original capital that is recovered
-        interest, # interest %
-        f, # inflation %
-        sales, # = df_sales.loc['Total', 'Earnings ($/yr)'],
-        production_cost, # = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
-        C_TDC, # = df_capex_totals.loc['Total plant', 'Cost ($)'],
-        C_WC, # = 0,
-        t, # = 4/100, # tax in % per year,
+    sales = (product_rate_kg_day * capacity_factor * 365 * x) + (H2_rate_kg_day * capacity_factor * 365 * H2_price_USD_kgH2)
+
+    __, __, NPV = cashflow_years(    
+        plant_lifetime = plant_lifetime,
+        depreciation_schedule = depreciation_schedule, # 'MACRS' or 'linear'
+        D = D, # optional, used for MACRS only - depreciation%
+        depreciation_lifetime = depreciation_lifetime, # optional, used for linear only - total time before salvage value is recovered
+        salvage_value = salvage_value, # optional, used for linear only - fraction of original capital that is recovered
+        interest = interest, # interest %
+        f = f, # inflation %
+        sales = sales, # = df_sales.loc['Total', 'Earnings ($/yr)'],
+        production_cost  =production_cost, # = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
+        C_TDC = C_TDC, # = df_capex_totals.loc['Total plant', 'Cost ($)'],
+        C_WC = C_WC, # = 0,
+        t = t, # = 4/100, # tax in % per year,
         )
         
     LHS = NPV
@@ -886,61 +1034,74 @@ def calculate_breakeven_price(
     interest, # interest %
     f, # inflation %
     product_rate_kg_day, # production in kg/day
+    H2_rate_kg_day, # df_streams.loc['', '']
     capacity_factor, # capacity factor as a fraction of days in a year
     production_cost, # = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
+    H2_price_USD_kgH2, 
     C_TDC, # = df_capex_totals.loc['Total plant', 'Cost ($)'],
     C_WC, # = 0,
     t, # = 4/100, # tax in % per year,
     ):
+    
+    """
+    Calculate the breakeven selling price such that NPV = 0.
+
+    Arguments: Plant lifetime (years), depreciation schedule - only 'linear' is programmed for now, depreciation rate for MACRS (), 
+    depreciation period (years), salvage value ($), interest rate on invested returns (), inflation rate (), production basis (kg/day), 
+    hydrogen production rate (kg/day), capacity factor of plant operation (), production cost or process opex ($/year), 
+    hydrogen sale price ($/kg H2), total depreciable capital ($), working capital ($), annual tax rate () 
+    
+    Returns: breakeven selling price of product ($/kg product)
+    """
 
     if plant_lifetime < 2:
         breakeven_price_USD_kgprod = np.NaN
         
     else:
         breakeven_price_USD_kgprod = optimize.root_scalar(f = eqn_breakeven_price,  
-                                x0 = 1, x1 = 2,
-                               args = (plant_lifetime,
-                                        depreciation_schedule, # 'MACRS' or 'linear'
-                                        D, # optional, used for MACRS only - depreciation%
-                                        depreciation_lifetime, # optional, used for linear only - total time before salvage value is recovered
-                                        salvage_value, # optional, used for linear only - fraction of original capital that is recovered
-                                        interest, # interest %
-                                        f, # inflation %
-                                        product_rate_kg_day, # production in kg/day
-                                        capacity_factor, # capacity factor as a fraction of days in a year
-                                        production_cost, # = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
-                                        C_TDC, # = df_capex_totals.loc['Total plant', 'Cost ($)'],
-                                        C_WC, # = 0,
-                                        t, # = 4/100, # tax in % per year,
+                              x0 = 1, x1 = 2,
+                              args = (plant_lifetime,
+                                      depreciation_schedule, # 'MACRS' or 'linear'
+                                      D, # optional, used for MACRS only - depreciation%
+                                      depreciation_lifetime, # optional, used for linear only - total time before salvage value is recovered
+                                      salvage_value, # optional, used for linear only - fraction of original capital that is recovered
+                                      interest, # interest %
+                                      f, # inflation %
+                                      product_rate_kg_day, # production in kg/day
+                                      H2_rate_kg_day, # df_streams.loc['', '']
+                                      capacity_factor, # capacity factor as a fraction of days in a year
+                                      production_cost, # = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
+                                      H2_price_USD_kgH2, 
+                                      C_TDC, # = df_capex_totals.loc['Total plant', 'Cost ($)'],
+                                      C_WC, # = 0,
+                                      t, # = 4/100, # tax in % per year,
                                       ),
-                                        xtol = 1e-200
-                                        ).root
+                                      xtol = 1e-200
+                                      ).root
     return breakeven_price_USD_kgprod
 
 # %%
-@st.cache_data
-def approx_ROI(
-    S, # = df_sales.loc['Total', 'Earnings ($/yr)'],
-    C, #= df_opex`_totals.loc['Production cost', 'Cost ($/yr)'], 
-    C_TCI, # = df_capex_totals.loc['Total plant', 'Cost ($)']
-    t, # = 4/100, # tax in % per year
-    i # interest rate
-        ):
+# def approx_ROI(
+#     S, # = df_sales.loc['Total', 'Earnings ($/yr)'],
+#     C, #= df_opex`_totals.loc['Production cost', 'Cost ($/yr)'], 
+#     C_TCI, # = df_capex_totals.loc['Total plant', 'Cost ($)']
+#     t, # = 4/100, # tax in % per year
+#     i # interest rate
+#         ):
     
-    ROI = (1-t) * (S-C) / C_TCI # net earnings / total capital investment
-    return ROI
+#     ROI = (1-t) * (S-C) / C_TCI # net earnings / total capital investment
+#     return ROI
 
 # %%
-@st.cache_data
-def approx_PBP(
-        C_TDC,
-        S, # = df_sales.loc['Total', 'Earnings ($/yr)'],
-        C, # = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
-        t, # = 4/100, # tax in % per year
-        D, # = 8/100, # straight-line depreciation, % per year)
-        ):
+# def approx_PBP(
+#         C_TDC,
+#         S, # = df_sales.loc['Total', 'Earnings ($/yr)'],
+#         C, # = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
+#         t, # = 4/100, # tax in % per year
+#         D, # = 8/100, # straight-line depreciation, % per year)
+#         ):
     
-    PBP = C_TDC/ ((1-t)*(S-C) + D)
-    return PBP
+#     PBP = C_TDC/ ((1-t)*(S-C) + D)
+#     return PBP
 
 
