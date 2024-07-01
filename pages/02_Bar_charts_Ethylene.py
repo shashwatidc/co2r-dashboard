@@ -1522,7 +1522,7 @@ with middle_column:
         df_energy_vs_vbl_2.index.name  = 'Energy'
         df_energy_vs_vbl_2.insert(0, 'Units', 'kJ/kg {}'.format(product_name))
 
-        df_emissions_vs_vbl.index = np.append('Carbon capture', df_energy.index)
+        df_emissions_vs_vbl.index = np.append(df_energy.index, 'Carbon capture')
         df_emissions_vs_vbl_2 = df_emissions_vs_vbl.copy()  
         df_emissions_vs_vbl_2.index.name  = 'Emissions'
         df_emissions_vs_vbl_2.insert(0, 'Units', 'kg CO2/kg {}'.format(product_name))
