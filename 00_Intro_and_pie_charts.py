@@ -921,8 +921,9 @@ with st.sidebar:
                             format = '%.1f', disabled = not is_additional_opex,
                             help = '''Optional operating cost for any custom expenses. Convert daily costs to $/kg {} as follows:
                                         $$$
-                                        \frac{\$ \text{opex}}{\text{year}} = \frac{\$ \text{opex}}{\text{day}} \cdot CF \cdot 365 \cdot \text{plant lifetime}
-                                        $$$''')     
+                                        \\\ \frac{{\$ \text{{opex}}}}{{\text{{year}}}} = \frac{{\$ \text{{opex}}}}{{\text{{day}}}} \cdot CF \cdot 365 \cdot \text{{plant lifetime}}
+                                        $$$
+                                        ''')     
     else:
         is_additional_opex = False
         additional_opex_USD_kg = 0 
