@@ -26,7 +26,7 @@ Single run execution: `TEA_SingleRun.py`
 
 **Data**
 
-Data for constants, utilities and products: `DataForTEA.xlsx`
+Data for constants, utilities and products: `Supplementary Workbook.xlsx`
 
 
 **Other**
