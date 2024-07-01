@@ -1248,7 +1248,7 @@ if not np.isnan(FE_product_checked):
         st.subheader('Emissions')
         if electricity_emissions_kgCO2_kWh > 0:
             # st.write('Total emissions: {:.2f} kg$_{CO_2}$/kg$_{{{}}}$'.format(sum(df_energy.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)]), product_name ) )
-            st.metric(label = 'Emissions', value = r'{:.2f} kg CO2/kg {}'.format(sum(df_energy.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)]), product_name ) ,
+            st.metric(label = 'Emissions', value = r'{:.2f} kg CO2/kg {}'.format(sum(df_emissions.fillna(0).drop(['Total', 'Cell potential', 'Efficiency vs LHV'], inplace = False, errors = 'ignore')), product_name ) ,
                 delta = '{:.2f}%'.format(100*(sum(df_energy.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)])  - emissions_default)/emissions_default),
                 delta_color = delta_color, label_visibility='collapsed') 
             if not override_cell_voltage:
@@ -1256,7 +1256,8 @@ if not np.isnan(FE_product_checked):
                     emissions_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
 
                     wedges, __, __ = axs.pie(df_emissions.drop(['Total', 'Cell potential', 'Efficiency vs LHV'], inplace = False, errors = 'ignore').loc[~np.isnan(df_emissions)], 
-                                # labels = df_emissions.loc[~np.isnan(df_emissions)].index, labeldistance = 1.1,
+                                labels = df_emissions.drop(['Total', 'Cell potential', 'Efficiency vs LHV'], inplace = False, errors = 'ignore').loc[~np.isnan(df_emissions)].index, 
+                                labeldistance = 1.1,
                                 autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
                                 pctdistance = 0.8,
                                 colors = emissions_colors, startangle = 0, 
@@ -1269,31 +1270,6 @@ if not np.isnan(FE_product_checked):
                     'Emissions: \n {:.2f} kg$_{{CO_2}}$/kg$_{{{}}}$'.format(sum(df_emissions.fillna(0).drop(['Total', 'Cell potential', 'Efficiency vs LHV'], inplace = False, errors = 'ignore')), product_name), # All capex except working capital, which is recovered during operation
                     ha='center', va='center', 
                     fontsize = MEDIUM_SIZE)  
-                                            
-                    # Label pie chart with arrows
-                    box_properties = dict(boxstyle="square,pad=0.3", fc="none", lw=0)
-                    label_properties_away = dict(arrowprops=dict(arrowstyle="-"),
-                                        bbox=box_properties, zorder=0, va="center")
-                    for i, wedge in enumerate(wedges):
-                        middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1 # in degrees
-                        y_posn = np.sin(np.deg2rad(middle_angle))
-                        x_posn = np.cos(np.deg2rad(middle_angle))
-                        verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
-                        if (wedge.theta2 - wedge.theta1) < 15:
-                            alternating = -alternating
-                            horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
-                            connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
-                            label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
-                            axs.annotate(df_emissions.drop(['Total', 'Cell potential', 'Efficiency vs LHV'], inplace = False, errors = 'ignore').loc[~np.isnan(df_emissions)].index[i], xy=(x_posn, y_posn), 
-                                        xytext=(far_near[alternating]*0.7*np.sign(x_posn), 3.5*y_posn),
-                                        horizontalalignment=horizontalalignment, verticalalignment = 'center',
-                                        **label_properties_away)
-                        else:                            
-                            horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
-                            axs.text(2.3*x_posn, 2.3*y_posn,
-                                        df_emissions.loc[~np.isnan(df_emissions)].index[i],
-                                        horizontalalignment=horizontalalignment,
-                                        verticalalignment=verticalalignment)
                 
                     st.pyplot(emissions_pie_fig, transparent = True, use_container_width = True)   
 
