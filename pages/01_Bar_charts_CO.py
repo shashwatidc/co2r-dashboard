@@ -1938,7 +1938,7 @@ if not st.session_state.is_active_error_CO:
 
                 cumsum = 0
                 counter = 0
-                for i, category in enumerate(df_emissions_vs_vbl.iloc[:-3].index):
+                for i, category in enumerate(df_emissions_vs_vbl.drop(['Total', 'Cell potential', 'Efficiency vs LHV'], inplace = False, errors = 'ignore').index):
                     if not df_emissions_vs_vbl.loc[category].isnull().all():
                         axs.bar(vbl_range, abs(df_emissions_vs_vbl.fillna(0).loc[category]), label=category , 
                                 bottom = cumsum, width = barwidth, color = emissions_colors[counter],
