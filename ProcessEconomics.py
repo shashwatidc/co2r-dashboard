@@ -582,7 +582,6 @@ def general(
 # %%
 # For all subparts of opex, calculate totals 
 
-@st.cache_data
 def totals(df,
           product_name,
           product_rate_kg_day ,

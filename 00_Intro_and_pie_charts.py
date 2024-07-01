@@ -1057,11 +1057,11 @@ if not np.isnan(FE_product_checked):
     # Potentials colors
     potentials_colors = [RdYlBu(i) for i in np.linspace(0, 1, np.shape(df_potentials.iloc[2:7])[0] )  ] # last rows are totals
 
-    # Energy colors
-    energy_colors = [RdYlBu(i) for i in np.linspace(0, 1,  sum(~df_energy['Energy (kJ/kg {})'.format(product_name)].isnull()) - 3)  ] # last rows are totals
-
     # Emissions colors
     emissions_colors = [RdYlBu(i) for i in np.linspace(0, 1, sum(~df_energy['Emissions (kg CO2/kg {})'.format(product_name)].isnull()) + 1)  ] # len(df_energy_vs_vbl.index) - 2)] # last rows are totals
+
+    # Energy colors
+    energy_colors = emissions_colors
   
     @st.cache_data
     def delta_color_checker(df_capex_totals):

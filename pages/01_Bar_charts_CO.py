@@ -1570,7 +1570,7 @@ if not st.session_state.is_active_error_CO:
     potentials_colors = [RdYlBu(i) for i in np.linspace(0, 1, np.shape(df_potentials_vs_vbl.iloc[2:7])[0] )  ] # last rows are totals
 
     # Energy colors
-    energy_colors = [RdYlBu(i) for i in np.linspace(0, 1,  sum(~df_energy_vs_vbl.T.isnull().all()) - 3)  ] # last rows are totals
+    energy_colors = emissions_colors
 
     x_axis_major_ticks = x_axis_formatting(x_axis_min, x_axis_max, x_axis_num)
 
