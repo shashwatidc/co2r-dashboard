@@ -303,7 +303,6 @@ _render_lock = threading.RLock()
 st.set_page_config(page_title = 'CO2R Costing Dashboard - Home', 
                    page_icon = ":test_tube:",
                    initial_sidebar_state= 'expanded',
-                   menu_items= {'Report a bug': 'mailto:shashwatidc@utexas.edu', },
                    layout="wide")
 
 # Plot formatting for Matplotlib - rcParams. All options at https://matplotlib.org/stable/api/matplotlib_configuration_api.html#matplotlib.rcParams
@@ -451,7 +450,7 @@ st.write('''This tool generates the capital and operating cost for a CO₂ reduc
         ''')
 st.write("**Cite this work: __**")
 st.write('Copyright © {} Shashwati C da Cunha. All rights reserved.'.format(datetime.now().date().strftime("%Y")))
-st.write("Questions, collaborations, requests? Contact Shashwati da Cunha ([shashwatidc@utexas.edu](mailto:shashwatidc@utexas.edu)).")
+st.write("Questions, collaborations, requests? Contact Shashwati da Cunha ([shashwati.dacunha@austin.utexas.edu](mailto:shashwati.dacunha@austin.utexas.edu)).")
 # st.write(
 #     '<img width=100 src="https://emojipedia-us.s3.amazonaws.com/source/skype/289/squid_1f991.png" style="margin-left: 5px; filter: hue-rotate(230deg) brightness(1.1);">',
 #     unsafe_allow_html=True,
