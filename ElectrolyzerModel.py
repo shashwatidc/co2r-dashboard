@@ -2,7 +2,7 @@
 # # Electrolyzer model: notes
 # Date updated: 2024/07/01 \
 # Update notes: Allow manual FE specification \
-# Contact: Shashwati da Cunha, [shashwatidc@utexas.edu](mailto:shashwatidc@utexas.edu)
+# Contact: Shashwati da Cunha, [shashwati.dacunha@austin.utexas.edu](mailto:shashwati.dacunha@austin.utexas.edu)
 # 
 # ### Instructions
 # 1. Not designed for standalone run - this is only a collection of functions. Other notebooks call it.
