@@ -933,7 +933,7 @@ with st.sidebar:
                             value = 0, label_visibility='collapsed',)
         st.write('Emissions y-axis maximum')
         y_axis_max_emissions = st.text_input(label = 'emissions y-axis maximum',
-                            value = 4, label_visibility='collapsed')
+                            value = 5, label_visibility='collapsed')
         st.write('Number of emissions y-ticks, including endpoints (integer)')
         y_axis_num_emissions = st.text_input(label = 'emissions y-axis ticks',
                             value = 5, label_visibility='collapsed')
