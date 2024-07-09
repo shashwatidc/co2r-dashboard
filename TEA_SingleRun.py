@@ -287,7 +287,7 @@ def single_run(product_name,
     #     production_cost = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
     #     C_TDC = df_capex_totals.loc['Total depreciable capital', 'Cost ($)'], # df_capex_totals.loc['Total depreciable capital', 'Cost ($)'] 
     #     C_WC = df_capex_totals.loc['Working capital', 'Cost ($)'],
-    #     t = 0.2, # tax in % per year,
+    #     t = 0.26, # tax in % per year,
     #     )
 
     # ## Calculate IRR at 0 salvage value
@@ -302,7 +302,7 @@ def single_run(product_name,
     #     production_cost = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
     #     C_TDC = df_capex_totals.loc['Total depreciable capital', 'Cost ($)'], # df_capex_totals.loc['Total depreciable capital', 'Cost ($)'] 
     #     C_WC = df_capex_totals.loc['Working capital', 'Cost ($)'],
-    #     t = 0.2, # tax in % per year,
+    #     t = 0.26, # tax in % per year,
     #     )
 
     # breakeven_price_USD_kgprod = calculate_breakeven_price(
@@ -320,7 +320,7 @@ def single_run(product_name,
     #     H2_price_USD_kgH2 = H2_cost_USD_kgH2,
     #     C_TDC = df_capex_totals.loc['Total depreciable capital', 'Cost ($)'], # df_capex_totals.loc['Total depreciable capital', 'Cost ($)'] 
     #     C_WC = df_capex_totals.loc['Working capital', 'Cost ($)'],
-    #     t = 0.2, # tax in % per year,
+    #     t = 0.26, # tax in % per year,
     #     )
     
     return df_capex_BM, df_capex_totals, df_costing_assumptions, df_depreciation, df_electrolyzer_assumptions, df_electrolyzer_streams_mol_s,\

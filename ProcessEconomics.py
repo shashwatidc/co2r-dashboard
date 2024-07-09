@@ -795,7 +795,7 @@ def cashflow_years(
     production_cost, # = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
     C_TDC, # = df_capex_totals.loc['Total plant', 'Cost ($)'],
     C_WC, # = 0,
-    t, # = 4/100, # tax in % per year,
+    t, # = 26/100, # tax in % per year,
 ):
     """
     Calculate cashflow table for annual balance sheet
@@ -887,7 +887,7 @@ def eqn_IRR(
     production_cost, # = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
     C_TDC, # = df_capex_totals.loc['Total plant', 'Cost ($)'],
     C_WC, # = 0,
-    t, # = 4/100, # tax in % per year,
+    t, # = 26/100, # tax in % per year,
     ):
     """
     Equation NPV = 0 for calculating the internal rate of return such that NPV = 0.
@@ -911,7 +911,7 @@ def eqn_IRR(
         production_cost = production_cost,  # = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
         C_TDC = C_TDC, # = df_capex_totals.loc['Total plant', 'Cost ($)'],
         C_WC = C_WC, # = 0,
-        t = t, # = 4/100, # tax in % per year,
+        t = t, # = 26/100, # tax in % per year,
         )
     
     LHS = NPV
@@ -931,7 +931,7 @@ def calculate_IRR(
     production_cost, # = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
     C_TDC, # = df_capex_totals.loc['Total plant', 'Cost ($)'],
     C_WC, # = 0,
-    t, # = 4/100, # tax in % per year,
+    t, # = 26/100, # tax in % per year,
     ):
     """
     Calculate the internal rate of return such that NPV = 0.
@@ -960,7 +960,7 @@ def calculate_IRR(
                                         production_cost, # = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
                                         C_TDC, # = df_capex_totals.loc['Total plant', 'Cost ($)'],
                                         C_WC, # = 0,
-                                        t, # = 4/100, # tax in % per year,
+                                        t, # = 26/100, # tax in % per year,
                                         ),
                                         xtol = 1e-200
                                         ).root
@@ -987,7 +987,7 @@ def eqn_breakeven_price(
     H2_price_USD_kgH2, 
     C_TDC, # = df_capex_totals.loc['Total plant', 'Cost ($)'],
     C_WC, # = 0,
-    t, # = 4/100, # tax in % per year,
+    t, # = 26/100, # tax in % per year,
     ):
     """
     Equation NPV = 0 for calculating the breakeven selling price such that NPV = 0.
@@ -1015,7 +1015,7 @@ def eqn_breakeven_price(
         production_cost  =production_cost, # = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
         C_TDC = C_TDC, # = df_capex_totals.loc['Total plant', 'Cost ($)'],
         C_WC = C_WC, # = 0,
-        t = t, # = 4/100, # tax in % per year,
+        t = t, # = 26/100, # tax in % per year,
         )
         
     LHS = NPV
@@ -1039,7 +1039,7 @@ def calculate_breakeven_price(
     H2_price_USD_kgH2, 
     C_TDC, # = df_capex_totals.loc['Total plant', 'Cost ($)'],
     C_WC, # = 0,
-    t, # = 4/100, # tax in % per year,
+    t, # = 26/100, # tax in % per year,
     ):
     
     """
@@ -1073,7 +1073,7 @@ def calculate_breakeven_price(
                                       H2_price_USD_kgH2, 
                                       C_TDC, # = df_capex_totals.loc['Total plant', 'Cost ($)'],
                                       C_WC, # = 0,
-                                      t, # = 4/100, # tax in % per year,
+                                      t, # = 26/100, # tax in % per year,
                                       ),
                                       xtol = 1e-200
                                       ).root
@@ -1084,7 +1084,7 @@ def calculate_breakeven_price(
 #     S, # = df_sales.loc['Total', 'Earnings ($/yr)'],
 #     C, #= df_opex`_totals.loc['Production cost', 'Cost ($/yr)'], 
 #     C_TCI, # = df_capex_totals.loc['Total plant', 'Cost ($)']
-#     t, # = 4/100, # tax in % per year
+#     t, # = 26/100, # tax in % per year
 #     i # interest rate
 #         ):
     
@@ -1096,7 +1096,7 @@ def calculate_breakeven_price(
 #         C_TDC,
 #         S, # = df_sales.loc['Total', 'Earnings ($/yr)'],
 #         C, # = df_opex_totals.loc['Production cost', 'Cost ($/yr)'], 
-#         t, # = 4/100, # tax in % per year
+#         t, # = 26/100, # tax in % per year
 #         D, # = 8/100, # straight-line depreciation, % per year)
 #         ):
     
