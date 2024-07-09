@@ -373,7 +373,7 @@ def update_stream_table(product_name,
 
     # Update stream phases
     df_streams['Phase'] = 'Vapor'
-    df_streams.loc[['Anode inlet', 'Anode water recycle', 'Fresh water feed', 'Total DI feed', 'Cathode water recycle'], 'Phase'] = 'Liquid'
+    df_streams.loc[['Anode inlet', 'Anode outlet', 'Anode water recycle', 'Fresh water feed', 'Total DI feed', 'Cathode water recycle'], 'Phase'] = 'Liquid'
 
     # Update stream VFRs
     df_streams.loc[df_streams['Phase'] == 'Vapor', 'Pressure (Pa)'] = P
