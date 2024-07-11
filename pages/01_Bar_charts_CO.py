@@ -442,12 +442,13 @@ Blues = mp.colormaps['Blues']
 
 st.title("CO$_2$R Costing Dashboard: Bar charts for CO$_2$R to CO")
 st.write('''See how the capital and operating cost vary with changes in the process for CO$_2$ reduction to CO. 
-         :red[It is based on the model in our paper [__]()]. 
+         It is based on the model in our paper,
+         > Da Cunha, S.; Resasco, J. Insights from Techno-Economic Analysis Can Guide the Design of Low-Temperature CO₂ Electrolyzers towards Industrial Scaleup; preprint; ChemRxiv, 2024. https://chemrxiv.org/engage/chemrxiv/article-details/668eaa4c01103d79c59ceaf6. 
         ''')
 st.write(':red[**Known issues:** Currently, there is no warning if you enter a numeric value in any text box that is out of  \
          physical range, e.g. capacity factor > 1, single-pass conversion > 1. The displayed results will be physically unreasonable. \
          User is responsible for checking that their inputs are reasonable.]')
-st.write("**Cite this work: __**")
+st.write("**Cite this work: [10.26434/chemrxiv-2024-g76xl](https://chemrxiv.org/engage/chemrxiv/article-details/668eaa4c01103d79c59ceaf6)**")
 st.write('Copyright © {} Shashwati C da Cunha. All rights reserved.'.format(datetime.now().date().strftime("%Y")))
 # st.write(
 #     '<img width=100 src="https://emojipedia-us.s3.amazonaws.com/source/skype/289/squid_1f991.png" style="margin-left: 5px; filter: hue-rotate(230deg) brightness(1.1);">',
