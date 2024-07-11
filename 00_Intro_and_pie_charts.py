@@ -445,13 +445,14 @@ Blues = mp.colormaps['Blues']
 # _lock = RendererAgg.lock # Lock figures so that concurrent users/threads can coexist independently
 
 st.title("CO₂R Costing Dashboard: Home")
+st.write("*Developed by [Shashwati da Cunha](https://shashwatidc.github.io/)) in the [Resasco Catalysis Lab](https://www.resascolab.com/)*")
 st.write('''Generate the capital and operating cost for a CO₂ reduction process converting captured CO₂
          into either CO or ethylene. Modify the settings on the left to see how the results change. 
          This interactive tool is based on our paper,
 > Da Cunha, S.; Resasco, J. Insights from Techno-Economic Analysis Can Guide the Design of Low-Temperature CO₂ Electrolyzers towards Industrial Scaleup; preprint; ChemRxiv, 2024. DOI: [10.26434/chemrxiv-2024-g76xl](https://chemrxiv.org/engage/chemrxiv/article-details/668eaa4c01103d79c59ceaf6). 
          ''')
 st.write("**Cite this work: [10.26434/chemrxiv-2024-g76xl](https://chemrxiv.org/engage/chemrxiv/article-details/668eaa4c01103d79c59ceaf6)**")
-st.write("Questions, collaborations, requests? Contact [Shashwati da Cunha](https://shashwatidc.github.io/) ([shashwati.dacunha@austin.utexas.edu](mailto:shashwati.dacunha@austin.utexas.edu)).")
+st.write("Questions, collaborations, requests? Contact ([shashwati.dacunha@austin.utexas.edu](mailto:shashwati.dacunha@austin.utexas.edu)).")
 # st.write(
 #     '<img width=100 src="https://emojipedia-us.s3.amazonaws.com/source/skype/289/squid_1f991.png" style="margin-left: 5px; filter: hue-rotate(230deg) brightness(1.1);">',
 #     unsafe_allow_html=True,

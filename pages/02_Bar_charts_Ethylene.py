@@ -437,6 +437,7 @@ Blues = mp.colormaps['Blues']
 # _lock = RendererAgg.lock # Lock figures so that concurrent users/threads can coexist independently
 
 st.title("CO$_2$R Costing Dashboard: Bar charts for CO$_2$R to Ethylene")
+st.write("*Developed by [Shashwati da Cunha](https://shashwatidc.github.io/)) in the [Resasco Catalysis Lab](https://www.resascolab.com/)*")
 st.write('''Visualize how the capex and opex respond to a change in a single process parameter for CO₂R to ethylene.
          Pick a parameter and modify the settings on the left to see how the results change. 
          This interactive tool is based on our paper,
@@ -446,7 +447,7 @@ st.write(':red[**Known issues:** Currently, there is no warning if you enter a n
          physical range, e.g. capacity factor > 1, single-pass conversion > 1. The displayed results will be physically unreasonable. \
          User is responsible for checking that their inputs are reasonable.]')
 st.write("**Cite this work: [10.26434/chemrxiv-2024-g76xl](https://chemrxiv.org/engage/chemrxiv/article-details/668eaa4c01103d79c59ceaf6)**")
-st.write("Questions, collaborations, requests? Contact [Shashwati da Cunha](https://shashwatidc.github.io/) ([shashwati.dacunha@austin.utexas.edu](mailto:shashwati.dacunha@austin.utexas.edu)).")
+st.write("Questions, collaborations, requests? Contact ([shashwati.dacunha@austin.utexas.edu](mailto:shashwati.dacunha@austin.utexas.edu)).")
 # st.write(
 #     '<img width=100 src="https://emojipedia-us.s3.amazonaws.com/source/skype/289/squid_1f991.png" style="margin-left: 5px; filter: hue-rotate(230deg) brightness(1.1);">',
 #     unsafe_allow_html=True,
