@@ -445,7 +445,7 @@ Blues = mp.colormaps['Blues']
 # _lock = RendererAgg.lock # Lock figures so that concurrent users/threads can coexist independently
 
 st.title("CO₂R Costing Dashboard: Home")
-st.write("*Developed by [Shashwati da Cunha](https://shashwatidc.github.io/)) in the [Resasco Catalysis Lab](https://www.resascolab.com/)*")
+st.write("*Developed by [Shashwati da Cunha](https://shashwatidc.github.io/) in the [Resasco Catalysis Lab](https://www.resascolab.com/)*")
 st.write('''Generate the capital and operating cost for a CO₂ reduction process converting captured CO₂
          into either CO or ethylene. Modify the settings on the left to see how the results change. 
          This interactive tool is based on our paper,

@@ -437,7 +437,7 @@ Blues = mp.colormaps['Blues']
 # _lock = RendererAgg.lock # Lock figures so that concurrent users/threads can coexist independently
 
 st.title("CO$_2$R Costing Dashboard: Bar charts for CO$_2$R to Ethylene")
-st.write("*Developed by [Shashwati da Cunha](https://shashwatidc.github.io/)) in the [Resasco Catalysis Lab](https://www.resascolab.com/)*")
+st.write("*Developed by [Shashwati da Cunha](https://shashwatidc.github.io/) in the [Resasco Catalysis Lab](https://www.resascolab.com/)*")
 st.write('''Visualize how the capex and opex respond to a change in a single process parameter for CO₂R to ethylene.
          Pick a parameter and modify the settings on the left to see how the results change. 
          This interactive tool is based on our paper,
