@@ -452,7 +452,7 @@ st.write('''Generate the capital and operating cost for a CO₂ reduction proces
 > Da Cunha, S.; Resasco, J. Insights from Techno-Economic Analysis Can Guide the Design of Low-Temperature CO₂ Electrolyzers towards Industrial Scaleup; preprint; ChemRxiv, 2024. DOI: [10.26434/chemrxiv-2024-g76xl](https://chemrxiv.org/engage/chemrxiv/article-details/668eaa4c01103d79c59ceaf6). 
          ''')
 st.write("**Cite this work: [10.26434/chemrxiv-2024-g76xl](https://chemrxiv.org/engage/chemrxiv/article-details/668eaa4c01103d79c59ceaf6)**")
-st.write("Questions, collaborations, requests? Contact ([shashwati.dacunha@austin.utexas.edu](mailto:shashwati.dacunha@austin.utexas.edu)).")
+st.write("Questions, collaborations, requests? Contact [shashwati.dacunha@austin.utexas.edu](mailto:shashwati.dacunha@austin.utexas.edu).")
 # st.write(
 #     '<img width=100 src="https://emojipedia-us.s3.amazonaws.com/source/skype/289/squid_1f991.png" style="margin-left: 5px; filter: hue-rotate(230deg) brightness(1.1);">',
 #     unsafe_allow_html=True,
