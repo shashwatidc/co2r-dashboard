@@ -446,7 +446,7 @@ st.write(':red[**Known issues:** Currently, there is no warning if you enter a n
          physical range, e.g. capacity factor > 1, single-pass conversion > 1. The displayed results will be physically unreasonable. \
          User is responsible for checking that their inputs are reasonable.]')
 st.write("**Cite this work: [10.26434/chemrxiv-2024-g76xl](https://chemrxiv.org/engage/chemrxiv/article-details/668eaa4c01103d79c59ceaf6)**")
-st.write('Copyright © {} Shashwati C da Cunha. All rights reserved.'.format(datetime.now().date().strftime("%Y")))
+st.write("Questions, collaborations, requests? Contact [Shashwati da Cunha](https://shashwatidc.github.io/) ([shashwati.dacunha@austin.utexas.edu](mailto:shashwati.dacunha@austin.utexas.edu)).")
 # st.write(
 #     '<img width=100 src="https://emojipedia-us.s3.amazonaws.com/source/skype/289/squid_1f991.png" style="margin-left: 5px; filter: hue-rotate(230deg) brightness(1.1);">',
 #     unsafe_allow_html=True,
@@ -1980,3 +1980,4 @@ if not st.session_state.is_active_error_ethylene:
     df_products
     df_utility_imports
 
+st.write('Copyright © {} Shashwati C da Cunha. All rights reserved.'.format(datetime.now().date().strftime("%Y")))
