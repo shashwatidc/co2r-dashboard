@@ -447,7 +447,7 @@ Blues = mp.colormaps['Blues']
 st.title("CO₂R Costing Dashboard: Home")
 st.write('''Generate the capital and operating cost for a CO₂ reduction process converting captured CO₂
          into either CO or ethylene. Modify the settings on the left to see how the results change. 
-         This is an interactive version of our paper,
+         This interactive tool is based on our paper,
 > Da Cunha, S.; Resasco, J. Insights from Techno-Economic Analysis Can Guide the Design of Low-Temperature CO₂ Electrolyzers towards Industrial Scaleup; preprint; ChemRxiv, 2024. DOI: [10.26434/chemrxiv-2024-g76xl](https://chemrxiv.org/engage/chemrxiv/article-details/668eaa4c01103d79c59ceaf6). 
          ''')
 st.write("**Cite this work: [10.26434/chemrxiv-2024-g76xl](https://chemrxiv.org/engage/chemrxiv/article-details/668eaa4c01103d79c59ceaf6)**")
