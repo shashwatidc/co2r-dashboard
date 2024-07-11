@@ -445,8 +445,9 @@ Blues = mp.colormaps['Blues']
 # _lock = RendererAgg.lock # Lock figures so that concurrent users/threads can coexist independently
 
 st.title("CO₂R Costing Dashboard: Home")
-st.write('''This tool generates the capital and operating cost for a CO₂ reduction process converting captured CO₂
-         into either CO or ethylene. It is based on the model in our paper,
+st.write('''Generate the capital and operating cost for a CO₂ reduction process converting captured CO₂
+         into either CO or ethylene. Modify the settings on the left to see how the results change. 
+         This is an interactive version of our paper,
 > Da Cunha, S.; Resasco, J. Insights from Techno-Economic Analysis Can Guide the Design of Low-Temperature CO₂ Electrolyzers towards Industrial Scaleup; preprint; ChemRxiv, 2024. DOI: [10.26434/chemrxiv-2024-g76xl](https://chemrxiv.org/engage/chemrxiv/article-details/668eaa4c01103d79c59ceaf6). 
          ''')
 st.write("**Cite this work: [10.26434/chemrxiv-2024-g76xl](https://chemrxiv.org/engage/chemrxiv/article-details/668eaa4c01103d79c59ceaf6)**")
@@ -464,8 +465,10 @@ st.write("Questions, collaborations, requests? Contact Shashwati da Cunha ([shas
 # )
 
 with st.expander("**Help**", expanded = False):
-    st.write("""Adjust the costing assumptions and model in the sidebar. The cost breakdowns will update dynamically every time you change the model.
+    st.write("""Adjust the process parameters in the left sidebar. The cost breakdowns will update dynamically every time you change the model.
            \n By default, the cell voltage will be modeled using Tafel equations, and the Faradaic efficiency based on the single-pass conversion and the maximum Faradaic efficiency.
+             This model and its assumptions are based on our [2024 paper](https://chemrxiv.org/engage/chemrxiv/article-details/668eaa4c01103d79c59ceaf6). If you want to include a change that is not captured 
+             in the model, you can use the toggles in the sidebar to manually specify an additional capex or opex.
          Mouse over the :grey[**?**] next to each input to see the default values for each parameter. Refresh the page to reset all values to their defaults.      
          """)
 

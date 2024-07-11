@@ -441,8 +441,9 @@ Blues = mp.colormaps['Blues']
 # _lock = RendererAgg.lock # Lock figures so that concurrent users/threads can coexist independently
 
 st.title("CO$_2$R Costing Dashboard: Bar charts for CO$_2$R to CO")
-st.write('''See how the capital and operating cost vary with changes in the process for CO$_2$ reduction to CO. 
-         It is based on the model in our paper,
+st.write('''Visualize how the capex and opex respond to a change in a single process parameter for CO₂R to CO.
+         Pick a parameter and modify the settings on the left to see how the results change. 
+         This is an interactive version of our paper,
 > Da Cunha, S.; Resasco, J. Insights from Techno-Economic Analysis Can Guide the Design of Low-Temperature CO₂ Electrolyzers towards Industrial Scaleup; preprint; ChemRxiv, 2024. DOI: [10.26434/chemrxiv-2024-g76xl](https://chemrxiv.org/engage/chemrxiv/article-details/668eaa4c01103d79c59ceaf6). 
          ''')
 st.write(':red[**Known issues:** Currently, there is no warning if you enter a numeric value in any text box that is out of  \
@@ -462,14 +463,14 @@ st.write('Copyright © {} Shashwati C da Cunha. All rights reserved.'.format(dat
 # )
 
 with st.expander("**Help**", expanded = False):
-    st.write("""Select the variable which you want to see the costs respond to, and adjust the costing assumptions and model in the sidebar.
+    st.write("""Select the variable which you want to see the costs respond to, and adjust the costing assumptions and model in the left sidebar.
         Select how many points you want to generate, the range between them, and whether they are linearly or log-spaced. The bar charts breaking down 
-        cost will update dynamically every time you change the model. 
+        cost will update dynamically every time you change the model. This model and its assumptions are based on our [2024 paper](https://chemrxiv.org/engage/chemrxiv/article-details/668eaa4c01103d79c59ceaf6).
         Plot formatting options to change the range and number of ticks (axis labels) can be found in **Plot formatting** in the sidebar.
-            Please note that it can take some time to run a large number of datapoints. 
-           \n By default, the cell voltage will be modeled using Tafel equations, and the Faradaic efficiency based on the single-pass conversion and the maximum Faradaic efficiency.
-         Mouse over the :grey[**?**] next to each input to see the default values for each parameter. Refresh the page to reset all values to their defaults.      
-         """)
+        Please note that it can take some time to run the model for a large number of datapoints. If possible, start with a few points and add more once you have the settings you want. 
+        \n By default, the cell voltage will be modeled using Tafel equations, and the Faradaic efficiency based on the single-pass conversion and the maximum Faradaic efficiency.
+        Mouse over the :grey[**?**] next to each input to see the default values for each parameter. Refresh the page to reset all values to their defaults.      
+        """)
 
 #__________________________________________________________________________________
 
