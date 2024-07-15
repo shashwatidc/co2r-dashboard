@@ -53,7 +53,7 @@ from ProcessEconomics import *
 from TEA_SingleRun import *
 
 # Cache single run of model
-@st.cache_data(ttl = "1d")
+@st.cache_data(ttl = "1h")
 def cached_single_run(product_name,
         product_rate_kg_day,
         df_products,
@@ -170,7 +170,7 @@ def cached_single_run(product_name,
         )
 
 # Cache default model run 
-# @st.cache_data(ttl = "1d")
+# @st.cache_data(ttl = "1h")
 # def default_single_run(product_name,
 #         product_rate_kg_day,
 #         df_products,
@@ -488,7 +488,7 @@ current_date = date_now.strftime("%Y%m%d") # format string
 current_time = time_now.strftime("%I-%M%p") # format string
 
 # Cache Excel sheet reading
-@st.cache_data(ttl = "1d")
+@st.cache_data(ttl = "1h")
 def import_data(file_imports):
     df_constants = pd.DataFrame # Create dataframe for constants
     xlsx = pd.ExcelFile(file_imports) # Read each data Excel file
@@ -624,7 +624,7 @@ middle_column.header('Results')
 right_column.header('_')
 
 # Cache creation of flags dataframe
-@st.cache_data(ttl = "1d")
+@st.cache_data(ttl = "1h")
 def flags(product_name):
     # Create flags for selecting variable
     dict_flags = {   # Formatted as 'override_parameter': 'parameter name', 'unit', 'variable name', 'default value', 'minimum value', 'maximum value', 
@@ -666,7 +666,7 @@ def flags(product_name):
     df_flags['T/F?'] = False # add column for truth value of given override
     return df_flags
 
-@st.cache_data(ttl = "1d")
+@st.cache_data(ttl = "1h")
 def generate_range(df_flags, override_vbl_selection, vbl_min, vbl_max, vbl_num):
     vbl_row = options_list.index(override_vbl_selection) # convert input into integer
     
@@ -695,7 +695,7 @@ def generate_range(df_flags, override_vbl_selection, vbl_min, vbl_max, vbl_num):
     return vbl_name, vbl_unit, vbl_range, vbl_range_text, vbl_min, vbl_max
 
 # Cache creation of axis variables
-@st.cache_data(ttl = "1d")
+@st.cache_data(ttl = "1h")
 def x_axis_formatting(x_axis_min, x_axis_max, x_axis_num):    
     if range_selection == 'Linear':
         x_axis_major_ticks = np.linspace(start = x_axis_min, stop = x_axis_max, num = x_axis_num)
@@ -711,7 +711,7 @@ def x_axis_formatting(x_axis_min, x_axis_max, x_axis_num):
 
     return(x_axis_major_ticks)
 
-@st.cache_data(ttl = "1d")
+@st.cache_data(ttl = "1h")
 def y_axis_formatting(y_axis_min, y_axis_max, y_axis_num):    
     if range_selection == 'Linear':
         y_axis_major_ticks = np.linspace(start = y_axis_min, stop = y_axis_max, num = y_axis_num)

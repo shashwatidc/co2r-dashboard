@@ -31,7 +31,7 @@ from scipy import optimize
 
 # %%
 ### Other units
-@st.cache_data(ttl = "1d")
+@st.cache_data(ttl = "1h")
 def kg_day_to_kg_s(rate_kg_day):
     """
     Convert mass flow rate in kg/day to kg/s
@@ -43,7 +43,7 @@ def kg_day_to_kg_s(rate_kg_day):
     
     return rate_kg_s
 
-@st.cache_data(ttl = "1d")
+@st.cache_data(ttl = "1h")
 def kg_s_to_mol_s(rate_kg_s, MW):
     """
     Convert mass flow rate in kg/s to mole flow rate in mol/s
@@ -55,7 +55,7 @@ def kg_s_to_mol_s(rate_kg_s, MW):
     
     return rate_mol_s
 
-@st.cache_data(ttl = "1d")
+@st.cache_data(ttl = "1h")
 def mol_s_to_sccm(rate_mol_s, R, P = 101325, T = 298.15):
     """
     Convert molar flow rate in mol/s to volumetric flow rate in standard cubic cm per minute
@@ -69,7 +69,7 @@ def mol_s_to_sccm(rate_mol_s, R, P = 101325, T = 298.15):
     
     return rate_sccm
 
-@st.cache_data(ttl = "1d")
+@st.cache_data(ttl = "1h")
 def mol_s_to_mA(rate_mol_s, n, F):
     """
     Convert product mole flow rate in mol/s to current in mA
@@ -85,7 +85,7 @@ def mol_s_to_mA(rate_mol_s, n, F):
 # ### 1.2 Electrolyzer area
 
 # %%
-@st.cache_data(ttl = "1d")
+@st.cache_data(ttl = "1h")
 def electrolyzer_area(i_total_mA, j_total_mA_cm2):
     """
     Use maximum allowed current density and desired current to compute total area
@@ -102,7 +102,7 @@ def electrolyzer_area(i_total_mA, j_total_mA_cm2):
 # ### 1.3 Currents
 
 # %%
-@st.cache_data(ttl = "1d")
+@st.cache_data(ttl = "1h")
 def currents(    
     product_rate_mol_s,
     FE_product,
@@ -131,7 +131,7 @@ def currents(
     
 
 # %%
-@st.cache_data(ttl = "1d")
+@st.cache_data(ttl = "1h")
 def voltage_to_energy(E_V, i_total_mA, product_rate_kg_s, product_rate_mol_s):
     """
     Compute power and energy from P = i.V
@@ -149,7 +149,7 @@ def voltage_to_energy(E_V, i_total_mA, product_rate_kg_s, product_rate_mol_s):
 # ### 1.4 Voltage
 
 # %%
-@st.cache_data(ttl = "1d")
+@st.cache_data(ttl = "1h")
 def cell_voltage(
     product_name,    
     product_rate_kg_day,
@@ -355,7 +355,7 @@ def cell_voltage(
 # ### 2.1 Equation for Hawks, Baker (ACS Energy Lett. 2021) model
 
 # %%
-@st.cache_data(ttl = "1d")
+@st.cache_data(ttl = "1h")
 def eqn_known_SPC_jtotal(FE_product,
             j_total,
             FE_CO2R_0,
@@ -395,7 +395,7 @@ def eqn_known_SPC_jtotal(FE_product,
 # ### 2.2 Mass balance check and all model execution
 
 # %%
-@st.cache_data(ttl = "1d")
+@st.cache_data(ttl = "1h")
 def SPC_check(FE_product_specified,
               exponent, 
               scaling,
@@ -513,7 +513,7 @@ def SPC_check(FE_product_specified,
 # ## 3. Mass balance around electrolyzer
 
 # %%
-@st.cache_data(ttl = "1d")
+@st.cache_data(ttl = "1h")
 def electrolyzer_SS_mass_balance(
     product_name,
     product_rate_kg_day,
