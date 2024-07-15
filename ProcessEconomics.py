@@ -27,7 +27,7 @@ from scipy import optimize
 # %%
 ### Save costs to dataframe
 
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def costing_assumptions(
     product_name,
     product_cost_USD_kgprod,
@@ -76,7 +76,7 @@ def costing_assumptions(
 # ### 1.1 Electrolyzer capex
 
 # %%
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def capex(
     area_m2 , 
     electricity_kJ_per_kg,
@@ -197,7 +197,7 @@ def capex(
 # ## 2. Sales
 
 # %%
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def sales(
     product_name,
     df_streams,
@@ -250,7 +250,7 @@ def sales(
 # ### 3.1 Feedstocks
 
 # %%
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def feedstocks(
     CO2_cost_USD_tCO2,
     water_cost_USD_kg,
@@ -292,7 +292,7 @@ def feedstocks(
 # #### 3.2.1 Get utilities based on energy demands
 
 # %%
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def utilities(df_energy,
               product_rate_kg_day,
               capacity_factor,
@@ -323,7 +323,7 @@ def utilities(df_energy,
 # ### 3.3 Operations
 
 # %%
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def operations(
     capacity_factor,
 ):
@@ -365,7 +365,7 @@ def operations(
 # ### 3.4 Maintenance
 
 # %%
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def maintenance(
     C_TDC,
     C_electrolyzer,
@@ -402,7 +402,7 @@ def maintenance(
     return df_maintenance
 
 # %%
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def stack_replacement(C_electrolyzer,
                     stack_lifetime_years,
                     lifetime_years):
@@ -437,7 +437,7 @@ def stack_replacement(C_electrolyzer,
 # ### 3.5 Operating overhead
 
 # %%
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def overhead(df_maintenance,
             df_operations):
     """
@@ -476,7 +476,7 @@ def overhead(df_maintenance,
 # ### 3.6 Property taxes and insurance
 
 # %%
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def taxes(C_TDC):    
     """
     Calculate taxes according to Seider, Lewin et. al.
@@ -502,7 +502,7 @@ def taxes(C_TDC):
 # ### 3.7 Depreciation
 
 # %%
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def depreciation(
     C_TDC,
     C_alloc
@@ -537,7 +537,7 @@ def depreciation(
 # ### 3.8 General expenses
 
 # %%
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def general(
     sales_USD_year
 ):
@@ -609,7 +609,7 @@ def totals(df,
 # #### 3.9.2 Generate summary tables
 
 # %%
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def opex_seider(df_feedstocks,
         df_utilities,
         df_sales,
@@ -680,7 +680,7 @@ def opex_seider(df_feedstocks,
     return df_opex, df_opex_totals   
 
 # %%
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def opex_sinnott(C_ISBL, # currently C_TDC
                  df_feedstocks,
                  df_utilities,
@@ -782,7 +782,7 @@ def opex_sinnott(C_ISBL, # currently C_TDC
 # ### 4.1 Generate cashflow table
 
 # %%
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def cashflow_years(    
     plant_lifetime,
     depreciation_schedule, # 'MACRS' or 'linear'
@@ -874,7 +874,7 @@ def cashflow_years(
 # ### 4.2 Equation to determine the IRR
 
 # %%
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def eqn_IRR(    
     x, # interest %
     plant_lifetime,
@@ -919,7 +919,7 @@ def eqn_IRR(
     return LHS
 
 # %%
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def calculate_IRR(   
     plant_lifetime,
     depreciation_schedule, # 'MACRS' or 'linear'
@@ -970,7 +970,7 @@ def calculate_IRR(
 # ### 4.3 Calculate breakeven product price
 
 # %%
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def eqn_breakeven_price(  
     x, # product price per kg
     plant_lifetime,
@@ -1023,7 +1023,7 @@ def eqn_breakeven_price(
     return LHS
 
 # %%
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def calculate_breakeven_price(
     plant_lifetime,
     depreciation_schedule, # 'MACRS' or 'linear'

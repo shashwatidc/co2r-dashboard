@@ -22,7 +22,7 @@ from ProcessEconomics import *
 # %%
 ## Check if SPC is reasonable given FE and crossover. Generate FE and SPC - if model_FE is true, FE will be modeled; either way, both will be checked for mass balance
 
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def single_run(product_name,
         product_rate_kg_day,
         df_products,
