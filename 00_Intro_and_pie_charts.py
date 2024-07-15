@@ -54,7 +54,7 @@ from DownstreamProcessModel import *
 from ProcessEconomics import *
 from TEA_SingleRun import *
 
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def cached_single_run(product_name,
         product_rate_kg_day,
         df_products,
@@ -170,7 +170,7 @@ def cached_single_run(product_name,
         kJ_per_kWh = kJ_per_kWh,
         )
 
-@st.cache_data
+@st.cache_data(ttl = "1d")
 def default_single_run(product_name,
         product_rate_kg_day,
         df_products,
@@ -488,7 +488,8 @@ current_date = date_now.strftime("%Y%m%d") # format string
 current_time = time_now.strftime("%I-%M%p") # format string
 
 # Cache Excel sheet reading
-@st.cache_data
+
+@st.cache_data(ttl = "1d")
 def import_data(file_imports):
     df_constants = pd.DataFrame # Create dataframe for constants
     xlsx = pd.ExcelFile(file_imports) # Read each data Excel file
@@ -1065,8 +1066,8 @@ if not np.isnan(FE_product_checked):
 
     # Energy colors
     energy_colors = emissions_colors
-  
-    @st.cache_data
+
+    @st.cache_data(ttl = "1d")
     def delta_color_checker(df_capex_totals):
         if np.isclose(df_capex_totals.loc['Total permanent investment', 'Cost ($)'], capex_default, rtol = 1e-6, equal_nan = True) and np.isclose(df_opex_totals.loc['Production cost', 'Cost ($/kg {})'.format(product_name)], opex_default, rtol = 1e-6, equal_nan = True):
             delta_color = 'off'
