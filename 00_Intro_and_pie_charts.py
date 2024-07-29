@@ -1067,7 +1067,7 @@ if not np.isnan(FE_product_checked):
     # Energy colors
     energy_colors = emissions_colors
 
-    @st.text('Capex: ' + capex_default + ' Opex: ' + opex_default + ' Emissions: ' + emissions_default + ' Potential: ' + potential_default + ' Energy: ' + energy_default)
+    @st.text('Capex: ' + str(capex_default) + ' Opex: ' + str(opex_default) + ' Emissions: ' + str(emissions_default) + ' Potential: ' + str(potential_default) + ' Energy: ' + str(energy_default))
 
     @st.cache_data(ttl = "1h")
     def delta_color_checker(df_capex_totals):
