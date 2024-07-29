@@ -1287,8 +1287,8 @@ if not np.isnan(FE_product_checked):
         st.subheader('Emissions')
         if electricity_emissions_kgCO2_kWh > 0:
             # st.write('Total emissions: {:.2f} kg$_{CO_2}$/kg$_{{{}}}$'.format(sum(df_energy.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)]), product_name ) )
-            st.metric(label = 'Emissions', value = r'{:.2f} kg CO2/kg {}'.format(df_emissions.loc['Total', 'Emissions (kg CO2/kg {})'.format(product_name)]),
-                delta = '{:.2f}%'.format(100*(df_emissions.loc['Total', 'Emissions (kg CO2/kg {})'.format(product_name)]  - emissions_default)/emissions_default),
+            st.metric(label = 'Emissions', value = r'{:.2f} kg CO2/kg {}'.format(df_energy.loc['Total', 'Emissions (kg CO2/kg {})'.format(product_name)]),
+                delta = '{:.2f}%'.format(100*(df_energy.loc['Total', 'Emissions (kg CO2/kg {})'.format(product_name)]  - emissions_default)/emissions_default),
                 delta_color = energy_delta_color, label_visibility='collapsed') 
             if not override_cell_voltage:
                 with _render_lock:
