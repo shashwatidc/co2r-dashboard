@@ -1146,6 +1146,7 @@ if not np.isnan(FE_product_checked):
             axs.text(-3.5, 0, ' ', color = 'white') # make figure bigger
             st.pyplot(opex_pie_fig, transparent = True, use_container_width = True)   
 
+    delta_color = 'off'
     if opex_delta_color == 'inverse' or capex_delta_color == 'inverse':
         delta_color = 'inverse'
 
