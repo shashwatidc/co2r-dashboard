@@ -585,7 +585,7 @@ FE_product_specified = df_products.loc[product_name, 'FECO2R at SPC = 0']  # 0.9
 default_FE_product_specified = FE_product_specified
 j_total_mA_cm2 = float(df_products.loc[product_name, 'Optimal j @ 7.6 c/kWh, Hawks model']) # 300 # mA/cm2
 default_j_total_mA_cm2 = j_total_mA_cm2
-cell_E_V = 3.0  # default cell voltage
+cell_E_V = -3.0  # default cell voltage
 default_cell_E_V = cell_E_V
 BV_eta_cat_V = -0.6
 default_BV_eta_cat_V = BV_eta_cat_V
