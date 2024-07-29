@@ -1075,6 +1075,21 @@ with st.sidebar:
                             max_value = 1.0, 
                             step = 0.01, value = SPC,
                             format = '%.2f')
+        crossover_ratio = st.slider(label = 'Crossover ratio (mol CO$_2$/mol e$^-$)',
+                            min_value = 0.0001, 
+                            max_value = 1.0, 
+                            step = 0.01, value = crossover_ratio,
+                            help = """The amount of CO$_2$ converted into carbonate ions that then crosses the membrane into the anode gas stream. 
+                              \n Default crossover ratio: 0.5
+                              \n This is based on the carbonate equilibrium: 
+                            $$$
+                            \\\  CO_2 + H_2O + 2e^- → CO + 2OH^-  
+                            \\\  2CO_2 + 8H_2O + 12e^- → C_2H_4 + 12OH^-
+                            \\\  2H_2O + 2e^- → H_2 + 2OH^-
+                            \\\   CO_{{2}} + 2OH^{{-}} → HCO_{{3}}^{{-}} + OH^- ⇌ CO_{{3}}^{{2-}} + H_2O 
+                            $$$
+                            """,
+                            format = '%.2f')        
         FE_product_checked, __ = SPC_check(FE_product_specified=FE_product_specified, 
                 exponent= exponent,
                 scaling = scaling,
@@ -1094,21 +1109,6 @@ with st.sidebar:
         st.latex(r'''
                  \footnotesize \implies  FE_{{{}}} = {:.2f}
                  '''.format(product_name, FE_product_checked))
-        crossover_ratio = st.slider(label = 'Crossover ratio (mol CO$_2$/mol e$^-$)',
-                            min_value = 0.0001, 
-                            max_value = 1.0, 
-                            step = 0.01, value = crossover_ratio,
-                            help = """The amount of CO$_2$ converted into carbonate ions that then crosses the membrane into the anode gas stream. 
-                              \n Default crossover ratio: 0.5
-                              \n This is based on the carbonate equilibrium: 
-                            $$$
-                            \\\  CO_2 + H_2O + 2e^- → CO + 2OH^-  
-                            \\\  2CO_2 + 8H_2O + 12e^- → C_2H_4 + 12OH^-
-                            \\\  2H_2O + 2e^- → H_2 + 2OH^-
-                            \\\   CO_{{2}} + 2OH^{{-}} → HCO_{{3}}^{{-}} + OH^- ⇌ CO_{{3}}^{{2-}} + H_2O 
-                            $$$
-                            """,
-                            format = '%.2f')
 
 with st.sidebar:
     st.subheader('Process design')
