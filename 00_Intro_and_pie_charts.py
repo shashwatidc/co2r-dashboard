@@ -975,7 +975,7 @@ capex_default, opex_default, levelized_default, potential_default, energy_defaul
                         heat_cost_USD_kWh = default_heat_cost_USD_kWh,product_cost_USD_kgprod = default_product_cost_USD_kgprod,
                         H2_cost_USD_kgH2 = default_H2_cost_USD_kgH2,water_cost_USD_kg = default_water_cost_USD_kg,
                         CO2_cost_USD_tCO2 = default_CO2_cost_USD_tCO2,lifetime_years = default_lifetime_years,
-                        stack_lifetime_years = stack_lifetime_years,
+                        stack_lifetime_years = default_stack_lifetime_years,
                         electrolyzer_capex_USD_m2 = default_electrolyzer_capex_USD_m2,
                         capacity_factor = default_capacity_factor,battery_capex_USD_kWh = default_battery_capex_USD_kWh,               
                         battery_capacity = default_battery_capacity, exponent=default_exponent, scaling=default_scaling,
@@ -1067,17 +1067,15 @@ if not np.isnan(FE_product_checked):
     # Energy colors
     energy_colors = emissions_colors
 
-    # @st.text('Capex: ' + str(capex_default) + ' Opex: ' + str(opex_default) + ' Emissions: ' + str(emissions_default) + ' Potential: ' + str(potential_default) + ' Energy: ' + str(energy_default))
-
     @st.cache_data(ttl = "1h")
-    def delta_color_checker(df_capex_totals):
-        if np.isclose(df_capex_totals.loc['Total permanent investment', 'Cost ($)'], capex_default, rtol = 1e-6, equal_nan = True) and np.isclose(df_opex_totals.loc['Production cost', 'Cost ($/kg {})'.format(product_name)], opex_default, rtol = 1e-6, equal_nan = True):
+    def capex_delta_color_checker(df_capex_totals, capex_default):
+        if np.isclose(df_capex_totals.loc['Total permanent investment', 'Cost ($)'], capex_default, rtol = 1e-6, equal_nan = True):
             delta_color = 'off'
         else:
             delta_color = 'inverse'       
         return delta_color
 
-    delta_color = delta_color_checker(df_capex_totals = df_capex_totals)    
+    capex_delta_color = capex_delta_color_checker(df_capex_totals = df_capex_totals, capex_default = capex_default)    
 
     alternating = 1
     flag = False
@@ -1089,7 +1087,7 @@ if not np.isnan(FE_product_checked):
         # st.write('Capex: \${:.2f} million'.format(df_capex_totals.loc['Total permanent investment', 'Cost ($)']/1e6) )
         st.metric(label = 'Capex', value = '${:.2f} million'.format(df_capex_totals.loc['Total permanent investment', 'Cost ($)']/1e6), 
                 delta = '{:.2f}%'.format(100*(df_capex_totals.loc['Total permanent investment', 'Cost ($)'] - capex_default)/capex_default),
-                delta_color = delta_color, label_visibility='collapsed') 
+                delta_color = capex_delta_color, label_visibility='collapsed') 
         with _render_lock:
             capex_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
             axs.pie(df_capex_BM.loc[:, 'Cost ($)'], 
@@ -1110,13 +1108,23 @@ if not np.isnan(FE_product_checked):
             # st.image(buffer, width = 400)
             st.pyplot(capex_pie_fig, transparent = True, use_container_width = True)
 
+    @st.cache_data(ttl = "1h")
+    def opex_delta_color_checker(df_opex_totals, opex_default):
+        if np.isclose(df_opex_totals.loc['Production cost', 'Cost ($/kg {})'.format(product_name)], opex_default, rtol = 1e-6, equal_nan = True):
+            delta_color = 'off'
+        else:
+            delta_color = 'inverse'       
+        return delta_color
+
+    opex_delta_color = opex_delta_color_checker(df_opex_totals = df_opex_totals, opex_default = opex_default)    
+
     ###### OPEX PIE CHART 
     with right_column.container(height = 455, border = False): 
         st.subheader('Operating cost')
         # st.write('Opex: \${:.2f}/kg$_{{{}}}$'.format(df_opex_totals.loc['Production cost', 'Cost ($/kg {})'.format(product_name)], product_name) )
         st.metric(label = 'Opex', value = r'${:.2f}/kg {} '.format(df_opex_totals.loc['Production cost', 'Cost ($/kg {})'.format(product_name)], product_name),
                 delta = '{:.2f}%'.format(100*(df_opex_totals.loc['Production cost', 'Cost ($/kg {})'.format(product_name)] - opex_default)/opex_default),
-                delta_color = delta_color, label_visibility = 'collapsed') 
+                delta_color = opex_delta_color, label_visibility = 'collapsed') 
 
         with _render_lock:
             opex_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
@@ -1137,6 +1145,9 @@ if not np.isnan(FE_product_checked):
             axs.text(3.5, 0, ' ', color = 'white') # make figure bigger
             axs.text(-3.5, 0, ' ', color = 'white') # make figure bigger
             st.pyplot(opex_pie_fig, transparent = True, use_container_width = True)   
+
+    if opex_delta_color == 'inverse' or capex_delta_color != 'inverse':
+        delta_color = 'inverse'
 
     ###### LEVELIZED PIE CHART
     with middle_column.container(height = 455, border = False): 
