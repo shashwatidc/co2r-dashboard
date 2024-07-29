@@ -616,12 +616,12 @@ with st.sidebar:
         override_cell_voltage = st.checkbox('Manually specify full-cell voltage', value = False,
                                             disabled = override_eta_an or override_eta_cat or override_ohmic)
         cell_E_V = st.slider(label = 'Cell voltage',
-                            min_value = 0.001, 
-                            max_value = 10.0, 
+                            min_value = -10.0, 
+                            max_value = 0.0001, 
                             step = 0.1, value = cell_E_V,
                             format = '%.1f',
                     help = '''Check the box above to set the full-cell voltage. No underlying voltage model will be used. 
-                    This means that current and voltage have no physical relationship.
+                    This means that current and voltage have no physical relationship. Note that more negative cell potentials indicate worse kinetics or thermodynamics (worse performance).
                       \n Default cell voltage: {} V'''.format(default_cell_E_V),
                     disabled = not override_cell_voltage)
         if override_cell_voltage:
@@ -671,8 +671,8 @@ with st.sidebar:
             override_ohmic = st.checkbox('Specify full-cell area-specific resistance', value = False)
             R_ohmcm2 = st.slider(label = 'Area-specific resistance ($ \Omega \cdot$ cm$^2$',
                             min_value = 0.0, 
-                            max_value = 25.0, 
-                            step = 0.01, value = R_ohmcm2,
+                            max_value = 20.0, 
+                            step = 0.1, value = R_ohmcm2,
                             format = '%.2f',
                             disabled= not override_ohmic,
                             help = '''Check the box above to set the area-specific ohmic resistance of the cell. Thermodynamics and kinetic overpotentials will be modeled. 
@@ -686,8 +686,8 @@ with st.sidebar:
     st.subheader('Electrolyzer operation')
     with st.expander(label = '**Reactor model**', expanded = False):
         j_total_mA_cm2 = st.slider(label = 'Total current density (mA/cm$^2$)',
-                            min_value = 0.001, 
-                            max_value = 2000.0, 
+                            min_value = 0.0001, 
+                            max_value = 1500.0, 
                             step = 1.0, value = j_total_mA_cm2,
                             format = '%i',
                             help = '''Total current density of the cell. This will determine the size and voltage of the cell.
@@ -719,7 +719,7 @@ with st.sidebar:
         elif answer == option_3: # TODO I don't think this works rn?
             model_FE = None
             FE_product_specified = st.slider(label = 'FE$_{{{}}}$'.format(product_name),
-                    min_value = 0.001,
+                    min_value = 0.0001,
                     max_value = 1.0,
                     step = 0.01, value = FE_CO2R_0,
                     help = 'Faradaic efficiency, independent of any other variables. \
@@ -727,7 +727,7 @@ with st.sidebar:
                         Therefore, it artificially lowers costs.')
 
         FE_CO2R_0 = st.slider(label = '$ FE_{CO_2R, \: 0}$, maximum Faradaic efficiency',
-                            min_value = 0.001, 
+                            min_value = 0.0001, 
                             max_value = 1.0, 
                             step = 0.01, value = FE_CO2R_0,
                             format = '%.2f',
@@ -738,7 +738,7 @@ with st.sidebar:
                             ''' +   '\n  Default $ FE_{{CO_2R, \: 0}}$: {}'.format(default_FE_CO2R_0),
                             disabled = answer==option_3)
         SPC = st.slider(label = 'Single-pass conversion',
-                            min_value = 0.001, 
+                            min_value = 0.0001, 
                             max_value = 1.0, 
                             step = 0.01, value = SPC,
                             format = '%.2f')
@@ -756,7 +756,7 @@ with st.sidebar:
                  \footnotesize \implies  FE_{{{}}} = {:.2f}
                  '''.format(product_name, FE_product_checked))
         crossover_ratio = st.slider(label = 'Crossover ratio (mol CO₂/mol e$^-$)',
-                            min_value = 0.001, 
+                            min_value = 0.0001, 
                             max_value = 1.0, 
                             step = 0.01, value = crossover_ratio,
                             help = """The amount of CO₂ converted into carbonate ions that then crosses the membrane into the anode gas stream. 
@@ -775,7 +775,7 @@ with st.sidebar:
     st.subheader('Process design')
     with st.expander(label = '**Plant and separation parameters**', expanded = False):
         product_rate_kg_day = 1000 * st.slider(label = '{} production rate (ton/day)'.format(product_name),
-                            min_value = 0.001 / 1000, 
+                            min_value = 0.0001 / 1000, 
                             max_value = 1.5e6 / 1000, 
                             step = 10.0, value = product_rate_kg_day / 1000,
                             format = '%i',
@@ -783,7 +783,7 @@ with st.sidebar:
                               \n Default value: {} kg$ _{{{}}}$/day
                             '''.format(product_rate_kg_day, product_name))
         capacity_factor = st.slider(label = 'Capacity factor (days per 365 days)',
-                            min_value = 0.001, 
+                            min_value = 0.0001, 
                             max_value = 1.0, 
                             step = 0.01, value = capacity_factor,
                             format = '%.2f',
@@ -791,7 +791,7 @@ with st.sidebar:
                               \n Default value: {:.2f}, based on 350/365 days per year
                             '''.format(default_capacity_factor))
         lifetime_years = st.slider(label = 'Plant lifetime (years)',
-                            min_value = 0.001, 
+                            min_value = 0.0001, 
                             max_value = 100.0, 
                             step = 1.0, value = lifetime_years,
                             format = '%i',
@@ -799,7 +799,7 @@ with st.sidebar:
                               \n Default value: {} years
                             '''.format(product_rate_kg_day, lifetime_years))
         stack_lifetime_years = st.slider(label = 'Stack lifetime (years)',
-                            min_value = 0.001, 
+                            min_value = 0.0001, 
                             max_value = 30.0, 
                             step = 1.0, value = stack_lifetime_years,
                             format = '%i',
@@ -807,7 +807,7 @@ with st.sidebar:
                               \n Default value: {} years
                             '''.format(stack_lifetime_years))
         PSA_second_law_efficiency = st.slider(label = 'Second-law separation efficiency',
-                            min_value = 0.001, 
+                            min_value = 0.0001, 
                             max_value = 1.0, 
                             step = 0.01, value = PSA_second_law_efficiency,
                             format = '%.2f',
@@ -830,7 +830,7 @@ with st.sidebar:
         is_battery = True
         st.write('*Including utility-scale batteries*')
         avbl_renewables = st.slider(label = 'Minimum fraction of time when renewables power the electrolyzer',
-                                    min_value = 0.001, max_value = 1.000, 
+                                    min_value = 0.0001, max_value = 1.000, 
                                     step = 0.01, value = 0.236,
                                     format = '%.2f',
                                     help = '''Fraction of time per day that renewable power is available.
