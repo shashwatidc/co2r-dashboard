@@ -1146,9 +1146,10 @@ if not np.isnan(FE_product_checked):
             axs.text(-3.5, 0, ' ', color = 'white') # make figure bigger
             st.pyplot(opex_pie_fig, transparent = True, use_container_width = True)   
 
-    delta_color = 'off'
     if opex_delta_color == 'inverse' or capex_delta_color == 'inverse':
-        delta_color = 'inverse'
+        levelized_delta_color = 'inverse'
+    else:
+        levelized_delta_color = 'off'
 
     ###### LEVELIZED PIE CHART
     with middle_column.container(height = 455, border = False): 
@@ -1156,7 +1157,7 @@ if not np.isnan(FE_product_checked):
         # st.write('Levelized cost: ${:.2f}/kg$_{{{}}}$'.format(df_opex_totals.loc['Levelized cost', 'Cost ($/kg {})'.format(product_name)], product_name ) )
         st.metric(label = 'Levelized', value = r'${:.2f}/kg {}'.format(df_opex_totals.loc['Levelized cost', 'Cost ($/kg {})'.format(product_name)], product_name),
                 delta = '{:.2f}%'.format(100*(df_opex_totals.loc['Levelized cost', 'Cost ($/kg {})'.format(product_name)] - levelized_default)/levelized_default),
-                delta_color = delta_color, label_visibility='collapsed') 
+                delta_color = levelized_delta_color, label_visibility='collapsed') 
         levelized_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
         
         full_list_of_costs = pd.concat([df_opex.loc[:, 'Cost ($/kg {})'.format(product_name)],
@@ -1209,13 +1210,23 @@ if not np.isnan(FE_product_checked):
     with right_column.container(height = 455, border = False): 
         pass
 
+    @st.cache_data(ttl = "1h")
+    def potential_delta_color_checker(df_potentials, potential_default):
+        if np.isclose(df_potentials.loc['Cell potential', 'Value'], potential_default, rtol = 1e-6, equal_nan = True):
+            delta_color = 'off'
+        else:
+            delta_color = 'inverse'       
+        return delta_color
+
+    potential_delta_color = potential_delta_color_checker(df_potentials = df_potentials, potential_default = potential_default)    
+    
     ###### POTENTIALS PIE CHART
     with middle_column.container(height = 455, border = False):  
         st.subheader('Cell potential')
         # st.write('Full cell potential: {:.2f} V'.format(df_potentials.loc['Cell potential', 'Value']) )
         st.metric(label = 'Cell potential', value = '{:.2f} V'.format(df_potentials.loc['Cell potential', 'Value']),
                 delta = '{:.2f}%'.format(100*(df_potentials.loc['Cell potential', 'Value'] - potential_default)/potential_default),
-                delta_color = delta_color, label_visibility='collapsed') 
+                delta_color = potential_delta_color, label_visibility='collapsed') 
         if not override_cell_voltage:
             with _render_lock:
                 potentials_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
@@ -1235,13 +1246,23 @@ if not np.isnan(FE_product_checked):
                 fontsize = MEDIUM_SIZE)  
                 st.pyplot(potentials_pie_fig, transparent = True, use_container_width = True)
 
-    ###### ENERGY PIE CHART 
+    @st.cache_data(ttl = "1h")
+    def energy_delta_color_checker(df_energy, energy_default):
+        if np.isclose(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)], energy_default, rtol = 1e-6, equal_nan = True):
+            delta_color = 'off'
+        else:
+            delta_color = 'inverse'       
+        return delta_color
+
+    energy_delta_color = energy_delta_color_checker(df_energy= df_energy, energy_default = energy_default)    
+ 
+     ###### ENERGY PIE CHART 
     with right_column.container(height = 455, border = False): 
         st.subheader('Process energy')
         # st.write('Energy required: {:.0f} kJ/kg$_{{{}}}}$'.format(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)], product_name) )
         st.metric(label = 'Energy', value = r'{:.2f} MJ/kg {}'.format(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)]/1000, product_name),
                 delta = '{:.2f}%'.format(100*(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)] - energy_default)/energy_default),
-                delta_color = delta_color, label_visibility='collapsed') 
+                delta_color = energy_delta_color, label_visibility='collapsed') 
         with _render_lock:
             if not override_cell_voltage:
                 energy_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
@@ -1268,7 +1289,7 @@ if not np.isnan(FE_product_checked):
             # st.write('Total emissions: {:.2f} kg$_{CO_2}$/kg$_{{{}}}$'.format(sum(df_energy.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)]), product_name ) )
             st.metric(label = 'Emissions', value = r'{:.2f} kg CO2/kg {}'.format(sum(df_emissions.fillna(0).drop(['Total', 'Cell potential', 'Efficiency vs LHV'], inplace = False, errors = 'ignore')), product_name ) ,
                 delta = '{:.2f}%'.format(100*(sum(df_energy.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)])  - emissions_default)/emissions_default),
-                delta_color = delta_color, label_visibility='collapsed') 
+                delta_color = energy_delta_color, label_visibility='collapsed') 
             if not override_cell_voltage:
                 with _render_lock:
                     emissions_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
