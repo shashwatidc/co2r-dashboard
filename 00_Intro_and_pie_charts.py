@@ -290,7 +290,7 @@ def default_single_run(product_name,
     levelized_default = df_opex_totals_default.loc['Levelized cost', 'Cost ($/kg {})'.format(product_name)]
     potential_default = df_potentials_default.loc['Cell potential', 'Value'] 
     energy_default = df_energy_default.loc['Total', 'Energy (kJ/kg {})'.format(product_name)]
-    emissions_default = sum(df_energy_default.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)])
+    emissions_default = df_energy_default.loc['Total', 'Emissions (kg CO2/kg {})'.format(product_name)]
     return capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default
 
 _render_lock = threading.RLock()
