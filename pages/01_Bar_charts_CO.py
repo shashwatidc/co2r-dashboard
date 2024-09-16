@@ -405,19 +405,34 @@ np.random.seed(19680801)
 theme_colors = ['#bf5700',  '#ffc919', '#8f275d', '#73a3b3', '#193770', '#e35555', '#191f24' ] #ffffff (white)
 
 ## Import colormaps
-summer = mp.colormaps['summer']
-summer_r = mp.colormaps['summer_r']
-PuOr = mp.colormaps['PuOr']
+# summer = mp.colormaps['summer']
+# summer_r = mp.colormaps['summer_r']
+# PuOr = mp.colormaps['PuOr']
 viridis = mp.colormaps['viridis']
-viridis_r = mp.colormaps['viridis_r']
+# viridis_r = mp.colormaps['viridis_r']
 # wistia = mp.colormaps['Wistia']
 # greys = mp.colormaps['gist_yarg'] # 'Gray'
-RdBu = mp.colormaps['RdBu'] # seismic
+# RdBu = mp.colormaps['RdBu'] # seismic
 RdYlBu = mp.colormaps['RdYlBu']
 # inferno = mp.colormaps['inferno_r']
-Blues = mp.colormaps['Blues']
+# Blues = mp.colormaps['Blues']
 # winter = mp.colormaps['winter_r']
 # cool = mp.colormaps['cool_r']
+
+## Custom colormaps
+# Endpoint colors
+colors = [ '#fff01f', '#00503d']  # gold to sherwood green
+bright_summer_r = LinearSegmentedColormap.from_list('custom_cmap', colors) # create colormap
+
+colors = ['#abd5e2', '#190033', '#a60027', theme_colors[1]  ] #  
+diverging = LinearSegmentedColormap.from_list('diverging_cmap', colors) # create colormap
+
+# colors = ['#a60027', theme_colors[1], theme_colors[3], '#012469'  ] #  
+# RdYlBu = LinearSegmentedColormap.from_list('diverging_cmap', colors)
+
+colors = ['#a60027', '#ffefdc', '#012469'  ] #  
+RdBu = LinearSegmentedColormap.from_list('diverging_cmap', colors)
+
 
 # st.markdown(
 #     """
