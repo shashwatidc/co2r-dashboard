@@ -1592,7 +1592,7 @@ if not st.session_state.is_active_error_ethylene:
         # To get a target of 1/(2.5) spacing, calculate linewidth, which will be drawn on top of bars
         #linewidth_calc = (0.2*barwidth) * (0.8 / 1) * (mp.rcParams['figure.figsize'][0]/(x_axis_max - x_axis_min)) * 72 # convert barwidth fraction in x-data units into points
         # Fix linewidth to be uniform in all plots
-    linewidth_calc = 1.4769 
+    linewidth_calc = 1.4 # 1.4769 
 
     ###### CAPEX BAR CHART
     with middle_column.container(height = 300, border = False):  
