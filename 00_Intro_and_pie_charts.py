@@ -1194,7 +1194,6 @@ if not np.isnan(FE_product_checked):
                             counterclock = False,
                             # explode = 0.2*np.ones(len(df_opex.index),
                             )   
-            plt.setp(autopercents, color="white")
             axs.text(0, 0,  
             'Levelized cost: \n \${:.2f}/kg$_{{{}}}$'.format(df_opex_totals.loc[ 'Levelized cost', 'Cost ($/kg {})'.format(product_name)], product_name), # All capex except working capital, which is recovered during operation
             ha='center', va='center', 
@@ -1225,6 +1224,7 @@ if not np.isnan(FE_product_checked):
                             full_list_of_costs.index[i],
                             horizontalalignment=horizontalalignment, 
                             verticalalignment = verticalalignment)
+            plt.setp(autopercents, color="white")
             st.pyplot(levelized_pie_fig, transparent = True, use_container_width = True)   
 
     with right_column.container(height = 455, border = False): 
