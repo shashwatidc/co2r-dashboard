@@ -1107,7 +1107,7 @@ if not np.isnan(FE_product_checked):
                 delta_color = capex_delta_color, label_visibility='collapsed') 
         with _render_lock:
             capex_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
-            wedges, texts, autopercents = axs.pie(df_capex_BM.loc[:, 'Cost ($)'], 
+            __, __, autopercents = axs.pie(df_capex_BM.loc[:, 'Cost ($)'], 
                     labels = df_capex_BM.index, labeldistance = 1.1,
                     autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
                     pctdistance = 0.7,
@@ -1146,7 +1146,7 @@ if not np.isnan(FE_product_checked):
 
         with _render_lock:
             opex_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
-            wedges, texts, autopercents = axs.pie(df_opex.loc[:, 'Cost ($/kg {})'.format(product_name)], 
+            __, __, autopercents = axs.pie(df_opex.loc[:, 'Cost ($/kg {})'.format(product_name)], 
                     labels = df_opex.index, labeldistance = 1.1,
                     autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
                     pctdistance = 0.8,
@@ -1183,7 +1183,7 @@ if not np.isnan(FE_product_checked):
                             df_capex_BM.loc[:,'Cost ($)']/(365*capacity_factor*lifetime_years*product_rate_kg_day)], axis = 0)
 
         with _render_lock:
-            wedges, __, __ = axs.pie(full_list_of_costs, 
+            wedges, __, autopercents = axs.pie(full_list_of_costs, 
                             # labels = full_list_of_costs.index, 
                             # labeldistance = 1.1,
                             autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
@@ -1194,6 +1194,7 @@ if not np.isnan(FE_product_checked):
                             counterclock = False,
                             # explode = 0.2*np.ones(len(df_opex.index),
                             )   
+            plt.setp(autopercents, color="white")
             axs.text(0, 0,  
             'Levelized cost: \n \${:.2f}/kg$_{{{}}}$'.format(df_opex_totals.loc[ 'Levelized cost', 'Cost ($/kg {})'.format(product_name)], product_name), # All capex except working capital, which is recovered during operation
             ha='center', va='center', 
