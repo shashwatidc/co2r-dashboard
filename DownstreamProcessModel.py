@@ -214,7 +214,7 @@ def update_stream_table(product_name,
                                                            0]
     
     # Update anode outlet to drier inlet ## TODO: account for drying wet anode gas
-    df_streams.loc[ 'Anode outlet', 'Molar flow rate (mol/s)'] = df_streams.loc['Anode PSA inlet', 'Molar flow rate (mol/s)'] - df_streams.loc['O2 outlet', 'Molar flow rate (mol/s)'] + df_streams.loc['Anode inlet', 'Molar flow rate (mol/s)'] - df_streams.loc['Cathode gas outlet', 'Molar flow rate (mol/s)']*df_streams.loc['Cathode gas outlet', 'x_H2O'] - df_electrolyzer_streams_mol_s['H2 outlet']
+    df_streams.loc[ 'Anode outlet', 'Molar flow rate (mol/s)'] = df_streams.loc['Anode PSA inlet', 'Molar flow rate (mol/s)'] + df_streams.loc['Anode inlet', 'Molar flow rate (mol/s)'] - df_streams.loc['Cathode gas outlet', 'Molar flow rate (mol/s)']*df_streams.loc['Cathode gas outlet', 'x_H2O'] - df_electrolyzer_streams_mol_s['H2 outlet']
     df_streams.loc[ 'Anode outlet', ['x_{}'.format(product_name),
                                                        'x_H2',
                                                        'x_CO2',
