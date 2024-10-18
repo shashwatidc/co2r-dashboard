@@ -61,7 +61,7 @@ def blank_stream_table(product_name):
     df_streams.loc['Cathode gas outlet', 'Stream number'] = 3
     df_streams.loc['Anode inlet', 'Stream number'] = 4
     df_streams.loc['Anode outlet', 'Stream number'] = 5
-    df_streams.loc['Anolyte recycle', 'Stream number'] = 6
+    df_streams.loc['Anode water recycle', 'Stream number'] = 6
     df_streams.loc['Anode PSA inlet', 'Stream number'] = 7
     df_streams.loc['O2 outlet', 'Stream number'] = 8
     df_streams.loc['Anode CO2 recycle', 'Stream number'] = 9
@@ -233,8 +233,8 @@ def update_stream_table(product_name,
                                                       df_streams.loc['Anode outlet', 'x_MX']])
                                                                  
     # Update anode water recyle 
-    df_streams.loc[ 'Anolyte recycle', 'Molar flow rate (mol/s)'] = df_streams.loc['Anode outlet', 'Molar flow rate (mol/s)'] - df_electrolyzer_streams_mol_s['Anode gas outlet']
-    df_streams.loc[ 'Anolyte recycle', ['x_{}'.format(product_name),
+    df_streams.loc[ 'Anode water recycle', 'Molar flow rate (mol/s)'] = df_streams.loc['Anode outlet', 'Molar flow rate (mol/s)'] - df_electrolyzer_streams_mol_s['Anode gas outlet']
+    df_streams.loc[ 'Anode water recycle', ['x_{}'.format(product_name),
                                                        'x_H2',
                                                        'x_CO2',
                                                        'x_O2',
@@ -243,9 +243,9 @@ def update_stream_table(product_name,
                                                             0,
                                                             0,
                                                             0,
-                                                           df_streams.loc[ 'Anode inlet', 'Molar flow rate (mol/s)']*df_streams.loc['Anode inlet', 'x_MX']/df_streams.loc[ 'Anolyte recycle', 'Molar flow rate (mol/s)'],                                
+                                                           df_streams.loc[ 'Anode inlet', 'Molar flow rate (mol/s)']*df_streams.loc['Anode inlet', 'x_MX']/df_streams.loc[ 'Anode water recycle', 'Molar flow rate (mol/s)'],                                
                                                            ]
-    df_streams.loc['Anolyte recycle', 'x_H2O'] = 1 - df_streams.loc['Anolyte recycle', 'x_MX']
+    df_streams.loc['Anode water recycle', 'x_H2O'] = 1 - df_streams.loc['Anode water recycle', 'x_MX']
 
     # Update fresh water feed
     df_streams.loc[ 'Fresh water feed', 'Molar flow rate (mol/s)'] = df_electrolyzer_streams_mol_s['Water makeup']
@@ -373,7 +373,7 @@ def update_stream_table(product_name,
 
     # Update stream phases
     df_streams['Phase'] = 'Vapor'
-    df_streams.loc[['Anode inlet', 'Anode outlet', 'Anolyte recycle', 'Fresh water feed', 'Total DI feed', 'Cathode water recycle'], 'Phase'] = 'Liquid'
+    df_streams.loc[['Anode inlet', 'Anode outlet', 'Anode water recycle', 'Fresh water feed', 'Total DI feed', 'Cathode water recycle'], 'Phase'] = 'Liquid'
 
     # Update stream VFRs
     df_streams.loc[df_streams['Phase'] == 'Vapor', 'Pressure (Pa)'] = P
