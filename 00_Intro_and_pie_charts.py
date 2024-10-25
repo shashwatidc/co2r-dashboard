@@ -465,9 +465,9 @@ st.write("*Developed by [Shashwati da Cunha](https://shashwatidc.github.io/) in 
 st.write('''Generate the capital and operating cost for a CO₂ reduction process converting captured CO₂
          into either CO or ethylene. Modify the settings on the left to see how the results change. 
          This interactive tool is based on our paper,
-> Da Cunha, S.; Resasco, J. Insights from Techno-Economic Analysis Can Guide the Design of Low-Temperature CO₂ Electrolyzers towards Industrial Scaleup; preprint; ChemRxiv, 2024. DOI: [10.26434/chemrxiv-2024-g76xl](https://chemrxiv.org/engage/chemrxiv/article-details/668eaa4c01103d79c59ceaf6). 
+> Da Cunha, S.; Resasco, J. Insights from Techno-Economic Analysis Can Guide the Design of Low-Temperature CO₂ Electrolyzers towards Industrial Scaleup. ACS Energy Lett. 2024, 9, XXX, 5550–5561. DOI: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647). 
          ''')
-st.write("**Cite this work: [10.26434/chemrxiv-2024-g76xl](https://chemrxiv.org/engage/chemrxiv/article-details/668eaa4c01103d79c59ceaf6)**")
+st.write("**Cite this work: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647)**")
 st.write("Questions, collaborations, requests? Contact [shashwati.dacunha@austin.utexas.edu](mailto:shashwati.dacunha@austin.utexas.edu).")
 # st.write(
 #     '<img width=100 src="https://emojipedia-us.s3.amazonaws.com/source/skype/289/squid_1f991.png" style="margin-left: 5px; filter: hue-rotate(230deg) brightness(1.1);">',
