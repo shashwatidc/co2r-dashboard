@@ -599,7 +599,7 @@ crossover_ratio = crossover_neutral
 default_crossover_ratio = crossover_ratio
 FE_product_specified = df_products.loc[product_name, 'FECO2R at SPC = 0']  # 0.9 # 0.90 # %/100
 default_FE_product_specified = FE_product_specified
-j_total_mA_cm2 = float(df_products.loc[product_name, 'Optimal j @ 7.6 c/kWh, Hawks model']) # 300 # mA/cm2
+j_total_mA_cm2 = float(df_products.loc[product_name, 'Optimal j @ 8.2 c/kWh, Hawks model']) # 300 # mA/cm2
 default_j_total_mA_cm2 = j_total_mA_cm2
 cell_E_V = -3.0  # default cell voltage
 default_cell_E_V = cell_E_V
@@ -609,7 +609,7 @@ BV_eta_an_V = 0.25
 default_BV_eta_an_V = BV_eta_an_V
 FE_CO2R_0 = df_products.loc[product_name, 'FECO2R at SPC = 0']
 default_FE_CO2R_0  = FE_CO2R_0
-SPC = df_products.loc[product_name, 'Optimal SPC @ 7.6 c/kWh, Hawks model']  #0.3 # 0.5 # %/100
+SPC = df_products.loc[product_name, 'Optimal SPC @ 8.2 c/kWh, Hawks model']  #0.3 # 0.5 # %/100
 default_SPC = SPC
 cat_Tafel_slope = df_products.loc[product_name, 'Tafel slope (mV/dec)']
 default_cat_Tafel_slope = cat_Tafel_slope
