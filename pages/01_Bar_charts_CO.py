@@ -460,13 +460,18 @@ st.title("CO$_2$R Costing Dashboard: Bar charts for CO$_2$R to CO")
 st.write("*Developed by [Shashwati da Cunha](https://shashwatidc.github.io/) in the [Resasco Catalysis Lab](https://www.resascolab.com/)*")
 st.write('''Visualize how the capex and opex respond to a change in a single process parameter for CO₂R to CO.
          Pick a parameter and modify the settings on the left to see how the results change. 
-         This interactive tool is based on our paper,
-> Da Cunha, S.; Resasco, J. Insights from Techno-Economic Analysis Can Guide the Design of Low-Temperature CO₂ Electrolyzers towards Industrial Scaleup. ACS Energy Lett. 2024, 9, XXX, 5550–5561. DOI: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647). 
          ''')
-st.write(':red[**Known issues:** Currently, there is no warning if you enter a numeric value in any text box that is out of  \
+
+st.write('''**:primary[Update] 2025/01/14:** The CO₂R Dashboard has been updated! Capital costs are now adjusted to the approximate average CEPCI for 2024 (800). 
+         Industrial electricity prices are now the average for Jan - Jun 2024 ($0.082/kWh). The base case single-pass conversion and total current density have been adjusted to the optimal at these new costs.
+         The market price of ethylene is updated to the 2024 global average. Pure CO is a difficult chemical to price since it is rarely sold, usually used within a facility where it is generated.
+         The base price for CO ($0.6/kg in 2001) has also been updated with an arbitrary 1% inflation rate. Note that it may be more likely to track natural gas prices, which slightly dipped from 2001 to 2024 on the Henry Hub.   
+         ''')
+
+st.write('**:red[Known issues]:** Currently, there is no warning if you enter a numeric value in any text box that is out of  \
          physical range, e.g. capacity factor > 1, single-pass conversion > 1. The displayed results will be physically unreasonable. \
-         User is responsible for checking that their inputs are reasonable.]')
-st.write("**Cite this work: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647)**")
+         User is responsible for checking that their inputs are reasonable.')
+
 # st.write(
 #     '<img width=100 src="https://emojipedia-us.s3.amazonaws.com/source/skype/289/squid_1f991.png" style="margin-left: 5px; filter: hue-rotate(230deg) brightness(1.1);">',
 #     unsafe_allow_html=True,
@@ -481,12 +486,21 @@ st.write("**Cite this work: [10.1021/acsenergylett.4c02647](https://pubs.acs.org
 with st.expander("**Help**", expanded = False):
     st.write("""Select the variable which you want to see the costs respond to, and adjust the costing assumptions and model in the left sidebar.
         Select how many points you want to generate, the range between them, and whether they are linearly or log-spaced. The bar charts breaking down 
-        cost will update dynamically every time you change the model. This model and its assumptions are based on our [2024 paper](https://chemrxiv.org/engage/chemrxiv/article-details/668eaa4c01103d79c59ceaf6).
+        cost will update dynamically every time you change the model. This model and its assumptions are based on our [2024 paper](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647).
         Plot formatting options to change the range and number of ticks (axis labels) can be found in **Plot formatting** in the sidebar.
-        Please note that it can take some time to run the model for a large number of datapoints. If possible, start with a few points and add more once you have the settings you want. 
-        \n By default, the cell voltage will be modeled using Tafel equations, and the Faradaic efficiency based on the single-pass conversion and the maximum Faradaic efficiency.
+            Please note that it can take some time to run the model for a large number of datapoints. If possible, start with a few points and add more once you have the settings you want. 
+           \n By default, the cell voltage will be modeled using Tafel equations, and the Faradaic efficiency based on the single-pass conversion and the maximum Faradaic efficiency.
         Mouse over the :grey[**?**] next to each input to see the default values for each parameter. Refresh the page to reset all values to their defaults.      
+        This dashboard will not exactly match the paper, since costs have been updated since its publication. You can get close to reproducing it
+            by adjusting the electrolyzer capex to $5000/m<superscript>2</superscript>, electricity price to $0.076/kWh, single-pass conversion for CO
+            to 11.5%, total current density for CO to 472 mA/cm<superscript>2</superscript>, single-pass conversion for ethylene to 2.7%, 
+            and total current density for ethylene to 436 mA/cm<superscript>2</superscript>, CO market price to $0.6/kg, and ethylene market price to $0.96. 
+            However, the PSA capex will still differ from the original, so the resulting price will still be slightly higher. 
         """)
+
+st.write("**Cite this work**: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647)")
+st.write("**Questions, collaborations, requests?** Contact [shashwati.dacunha@austin.utexas.edu](mailto:shashwati.dacunha@austin.utexas.edu).")
+
 
 #__________________________________________________________________________________
 
@@ -1223,7 +1237,7 @@ with st.sidebar:
                             format = '%.1f',
                             help = '''Default value: \${}/kg
                             '''.format(default_H2_cost_USD_kgH2))
-        product_cost_USD_kgprod = st.slider(label = '{} cost (\$/kg {})'.format(product_name, product_name),
+        product_cost_USD_kgprod = st.slider(label = '{} market price (\$/kg {})'.format(product_name, product_name),
                             min_value = 0.0, 
                             max_value = 10.0, 
                             step = 0.1, value = product_cost_USD_kgprod,
