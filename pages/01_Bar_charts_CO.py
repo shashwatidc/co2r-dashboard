@@ -492,9 +492,9 @@ with st.expander("**Help**", expanded = False):
            \n By default, the cell voltage will be modeled using Tafel equations, and the Faradaic efficiency based on the single-pass conversion and the maximum Faradaic efficiency.
         Mouse over the :grey[**?**] next to each input to see the default values for each parameter. Refresh the page to reset all values to their defaults.      
         This dashboard will not exactly match the paper, since costs have been updated since its publication. You can get close to reproducing it
-            by adjusting the electrolyzer capex to $5000/m<superscript>2</superscript>, electricity price to $0.076/kWh, single-pass conversion for CO
+            by adjusting the electrolyzer capex to \$5000/m<superscript>2</superscript>, electricity price to \$0.076/kWh, single-pass conversion for CO
             to 11.5%, total current density for CO to 472 mA/cm<superscript>2</superscript>, single-pass conversion for ethylene to 2.7%, 
-            and total current density for ethylene to 436 mA/cm<superscript>2</superscript>, CO market price to $0.6/kg, and ethylene market price to $0.96. 
+            and total current density for ethylene to 436 mA/cm<superscript>2</superscript>, CO market price to \$0.6/kg, and ethylene market price to \$0.96. 
             However, the PSA capex will still differ from the original, so the resulting price will still be slightly higher. 
         """)
 
