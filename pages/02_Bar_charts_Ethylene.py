@@ -457,8 +457,8 @@ st.write('''Visualize how the capex and opex respond to a change in a single pro
          Pick a parameter and modify the settings on the left to see how the results change. 
          ''')
 
-st.write('''**Update (Jan 14, 2025):** The CO₂R Dashboard has been updated! Capital costs are now adjusted to the approximate average CEPCI for 2024 (800). 
-         Industrial electricity prices are now the average for Jan - Jun 2024 (\$0.082/kWh). The base case single-pass conversion and total current density have been adjusted to the optimal at these new costs.
+st.write('''**Update (March 12, 2025):** The CO₂R Dashboard has been updated! Capital costs are now adjusted to the approximate average CEPCI for 2024 (800). 
+         Industrial electricity prices are now the average for 2024 (\$0.082/kWh). The base case single-pass conversion and total current density have been adjusted to the optimal in the Hawks model at these new costs.
          The market price of ethylene is updated to the 2024 global average. Pure CO is a difficult chemical to price since it is rarely sold, usually used within a facility where it is generated.
          The base price for CO (\$0.6/kg in 2001) has also been updated with an arbitrary 1% inflation rate. Note that it may be more likely to track natural gas prices, which slightly dipped from 2001 to 2024 on the Henry Hub.   
          ''')
