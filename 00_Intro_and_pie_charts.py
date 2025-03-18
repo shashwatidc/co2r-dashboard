@@ -811,7 +811,7 @@ with st.sidebar:
                             min_value = 0.0001 / 1000, 
                             max_value = 1.5e6 / 1000, 
                             step = 10.0, value = product_rate_kg_day / 1000,
-                            format = '%i',
+                            format = '%.0f',
                             help = '''Daily production rate. This is fixed for the entire plant lifetime and sets the total CO₂R current required.
                               \n Default value: {} kg$ _{{{}}}$/day
                             '''.format(product_rate_kg_day, product_name))
@@ -827,7 +827,7 @@ with st.sidebar:
                             min_value = 0.0001, 
                             max_value = 100.0, 
                             step = 1.0, value = lifetime_years,
-                            format = '%i',
+                            format = '%.0f',
                             help = '''Plant lifetime in years. The process operates to produce {} kg/day of product for this many years.
                               \n Default value: {} years
                             '''.format(product_rate_kg_day, lifetime_years))
@@ -835,7 +835,7 @@ with st.sidebar:
                             min_value = 0.0001, 
                             max_value = 30.0, 
                             step = 1.0, value = stack_lifetime_years,
-                            format = '%i',
+                            format = '%.0f',
                             help = '''Stack replacement time in years. The entire electrolyzer must be replacemed at this interval.
                               \n Default value: {} years
                             '''.format(stack_lifetime_years))
