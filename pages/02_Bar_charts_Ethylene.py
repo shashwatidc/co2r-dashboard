@@ -775,11 +775,11 @@ with st.sidebar:
                     )
     try:
         st.write('Minimum value')
-        vbl_min = float(st.text_input(label = 'Minimum {} ({})'.format(vbl_name, vbl_unit),
+        vbl_min = float(st.text_input(label = 'Minimum {} ()'.format(vbl_name),
                     key = 'minimum_value_input_ethylene', # value = str(df_flags.loc[vbl_name, 'Range min']),  
                     label_visibility='collapsed'))
         st.write('Maximum value')
-        vbl_max = float(st.text_input(label = 'Maximum {} ({})'.format(vbl_name, vbl_unit),
+        vbl_max = float(st.text_input(label = 'Maximum {} ()'.format(vbl_name),
                     key = 'maximum_value_input_ethylene',#  value = str(df_flags.loc[vbl_name, 'Range max']),
                     label_visibility='collapsed'))
         
