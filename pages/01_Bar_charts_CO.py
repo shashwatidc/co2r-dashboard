@@ -585,6 +585,7 @@ product_name = 'CO' # default
 range_selection = 'Linear' # default
 override_vbl_selection = 'Total current density' # default
 vbl_name = 'Current density' # default
+vbl_unit = 'mA/cm$^2$' # default
 if 'minimum_value_input_CO' not in st.session_state:
     st.session_state.minimum_value_input_CO = str(0.001)
 if 'maximum_value_input_CO' not in st.session_state:
@@ -760,6 +761,7 @@ def y_axis_formatting(y_axis_min, y_axis_max, y_axis_num):
 def updated_radio_state(df_flags):
     vbl_row = options_list.index(st.session_state['overridden_vbl_radio_CO']) # convert input into integer
     vbl_name = df_flags.index[vbl_row] # set vbl_name from that row
+    vbl_unit = df_flags.loc[vbl_name, 'Unit']
     st.session_state.minimum_value_input_CO = str(df_flags.loc[vbl_name, 'Range min'])
     st.session_state.maximum_value_input_CO = str(df_flags.loc[vbl_name, 'Range max'])
 
@@ -779,11 +781,11 @@ with st.sidebar:
                       on_change= updated_radio_state, args = (df_flags, )
                     )
     try:
-        st.write('Minimum {}'.format(vbl_name))
+        st.write('Minimum {} ({})'.format(vbl_name, vbl_unit))
         vbl_min = float(st.text_input(label = 'Minimum value',
                     key = 'minimum_value_input_CO', # value = str(df_flags.loc[vbl_name, 'Range min']),  
                     label_visibility='collapsed'))
-        st.write('Maximum {}'.format(vbl_name))
+        st.write('Maximum {} ({})'.format(vbl_name, vbl_unit))
         vbl_max = float(st.text_input(label = 'Maximum value',
                     key = 'maximum_value_input_CO',#  value = str(df_flags.loc[vbl_name, 'Range max']),
                     label_visibility='collapsed'))
