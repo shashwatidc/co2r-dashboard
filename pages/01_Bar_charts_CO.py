@@ -790,7 +790,7 @@ with st.sidebar:
         
         st.write('Number of points (integer)')
         vbl_num = int(st.text_input(label = 'Number of points',
-                    value = 11, # TODO: fix this
+                    value = 11, 
                     label_visibility='collapsed'))
         st.session_state.is_active_error_CO = False
     except:

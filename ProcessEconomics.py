@@ -108,7 +108,7 @@ def capex(
     
     ## Bare module costs of onsite equipment (includes process equipment which is customized, like pressure vessels; and off-the-shelf process machinery, like pumps)
     dict_capex_BM = {
-        'Electrolyzer' : ['Electrolysis', '$5000/m2 - Linear scaling, Badgett Cortright J Cleaner Prod 2022', np.NaN],
+        'Electrolyzer' : ['Electrolysis', '$5174/m2 - Linear scaling, Badgett Cortright J Cleaner Prod 2022', np.NaN],
         #         'Deionization' : ['', '', 0] , # TODO: add deionization capex and opex
         'Balance of plant' : ['Pressure changes etc', '34% of electrolyzer bare module - Linear scaling, H2A model', np.NaN] ,
         'Cathode PSA - CO$_2$/products' : ['Separations', 'Scaling factor 0.7 to Shin Jiao Nat Sust 2021', np.NaN] ,
@@ -232,7 +232,7 @@ def sales(
 
     df_sales.index.name= 'Sales'    
 
-    # Fill in costs # TODO: fix this whole section to be more precise
+    # Fill in costs 
     df_sales.loc['{}'.format(product_name), 'Earnings ($/yr)'] = product_cost_USD_kgprod * df_streams.loc[ 'Product outlet', 'Mass flow rate (kg/day)'] * 365*capacity_factor
     df_sales.loc['H2','Earnings ($/yr)'] = H2_cost_USD_kgH2 * df_streams.loc[ 'H2 outlet', 'Mass flow rate (kg/day)'] * 365*capacity_factor
 
@@ -281,7 +281,7 @@ def feedstocks(
     df_feedstocks = df_feedstocks.astype({'Stage':'string', 'Description': 'string', 'Cost ($/yr)':'float64'})
     df_feedstocks.index.name= 'Feedstocks'
 
-    # Fill in costs # TODO: fix this whole section to be more precise
+    # Fill in costs 
     df_feedstocks.loc['Captured CO2', 'Cost ($/yr)'] = CO2_cost_USD_tCO2/1000*df_streams.loc['Fresh CO2 feed', 'Mass flow rate (kg/day)']*365*capacity_factor
     df_feedstocks.loc['Deionized water','Cost ($/yr)'] = water_cost_USD_kg*df_streams.loc['Fresh water feed', 'Mass flow rate (kg/day)']*365*capacity_factor #df_streams[]
 
@@ -743,7 +743,7 @@ def opex_sinnott(C_ISBL, # currently C_TBM
     df_opex.loc['Stack replacement', 'Description'] = 'See Stack replacement'
     
     df_opex.loc['Operating overhead', 'Cost ($/yr)'] = 0.65 * (df_opex.loc['Operating labor', 'Cost ($/yr)'] + df_opex.loc['Supervision', 'Cost ($/yr)']+ df_opex.loc['Maintenance', 'Cost ($/yr)'] + df_opex.loc['Direct salary overhead', 'Cost ($/yr)'])
-    df_opex.loc['Operating overhead', 'Description'] = '65% of operating labor + supervision + maintenance'
+    df_opex.loc['Operating overhead', 'Description'] = '65% of operating labor + supervision + labor overhead + maintenance'
     
     df_opex.loc['Property taxes and insurance', 'Cost ($/yr)'] = 0.02 * C_ISBL
     df_opex.loc['Property taxes and insurance', 'Description'] = '2% of ISBL plant cost'
