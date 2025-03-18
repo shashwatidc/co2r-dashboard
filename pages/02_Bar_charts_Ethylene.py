@@ -1048,7 +1048,7 @@ with st.sidebar:
                             min_value = 0.0001, 
                             max_value = 1500.0, 
                             step = 1.0, value = j_total_mA_cm2,
-                            format = '%i',
+                            format = '%.0f',
                             help = '''Total current density of the cell. This will determine the size and voltage of the cell.
                               \n Default total current density: {} mA/cm$^2$'''.format(default_j_total_mA_cm2),)
 
@@ -1142,7 +1142,7 @@ with st.sidebar:
                             min_value = 0.0001 / 1000, 
                             max_value = 1.5e6 / 1000, 
                             step = 10.0, value = product_rate_kg_day / 1000,
-                            format = '%i',
+                            format = '%.0f',
                             help = '''Daily production rate. This is fixed for the entire plant lifetime and sets the total CO$_2$R current required.
                               \n Default value: {} kg$ _{{{}}}$/day
                             '''.format(product_rate_kg_day, product_name))
@@ -1158,7 +1158,7 @@ with st.sidebar:
                             min_value = 0.0001, 
                             max_value = 100.0, 
                             step = 1.0, value = lifetime_years,
-                            format = '%i',
+                            format = '%.0f',
                             help = '''Plant lifetime in years. The process operates to produce {} kg/day of product for this many years.
                               \n Default value: {} years
                             '''.format(product_rate_kg_day, lifetime_years))
@@ -1166,7 +1166,7 @@ with st.sidebar:
                             min_value = 0.0001, 
                             max_value = 30.0, 
                             step = 1.0, value = stack_lifetime_years,
-                            format = '%i',
+                            format = '%.0f',
                             help = '''Stack replacement time in years. The entire electrolyzer must be replacemed at this interval.
                               \n Default value: {} years
                             '''.format(stack_lifetime_years))
@@ -1222,7 +1222,7 @@ with st.sidebar:
                             min_value = 0.0, 
                             max_value = 500.0, 
                             step = 1.0, value = CO2_cost_USD_tCO2,
-                            format = '%i',
+                            format = '%.0f',
                             help = '''Default value: \${}/t$_{{CO_2}}$
                             '''.format(default_CO2_cost_USD_tCO2))
         H2_cost_USD_tCO2 = st.slider(label = 'H$_2$ cost (\$/kg H$_2$)',
@@ -1250,14 +1250,14 @@ with st.sidebar:
                             min_value = 0.0, 
                             max_value = 15000.0, 
                             step = 100.0, value = electrolyzer_capex_USD_m2,
-                            format = '%i',
+                            format = '%.0f',
                             help = '''Default value: \${}/m$^2$
                             '''.format(default_electrolyzer_capex_USD_m2))
         battery_capex_USD_kWh = st.slider(label = 'Battery capital cost (\$/kWh)' , 
                             min_value = 0.0, 
                             max_value = 500.0, 
                             step = 1.0, value = battery_capex_USD_kWh,
-                            format = '%i', disabled = not is_battery,
+                            format = '%.0f', disabled = not is_battery,
                             help = '''Default value: \${}/kWh, based on 4-hour storage.
                             '''.format(default_battery_capex_USD_kWh))
         
@@ -1271,7 +1271,7 @@ with st.sidebar:
                             min_value = 0.0, 
                             max_value = 100.0, 
                             step = 1.0, value = 0.0,
-                            format = '%i', disabled = not is_additional_capex,
+                            format = '%.0f', disabled = not is_additional_capex,
                             help = '''Optional additional capex. Default value: \${} million.
                             '''.format(0)) *1e6
     else:
