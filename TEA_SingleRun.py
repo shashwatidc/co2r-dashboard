@@ -236,7 +236,7 @@ def single_run(product_name,
                     capacity_factor = capacity_factor)
 
     ## Generate opex - SINNOTT TEXTBOOK
-    df_opex, df_opex_totals = opex_sinnott(C_ISBL = df_capex_totals.loc['Total bare-module investment', 'Cost ($)'], # currently C_TDC
+    df_opex, df_opex_totals = opex_sinnott(C_ISBL = df_capex_totals.loc['Total bare-module investment', 'Cost ($)'], # currently C_TBM
              df_feedstocks = df_feedstocks,
              df_utilities = df_utilities,
              df_stack_replacement = df_stack_replacement,

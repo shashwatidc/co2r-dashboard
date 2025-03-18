@@ -321,6 +321,9 @@ def utilities(df_energy,
     df_utilities.loc[:, 'Cost ($/yr)']  = df_utilities.loc[:,'Cost ($/kg {})'.format(product_name) ] * product_rate_kg_day * 365 * capacity_factor
     df_utilities.loc['Total', 'Energy (kJ/kg {})'.format(product_name)] = df_utilities.loc[:, 'Energy (kJ/kg {})'.format(product_name)].sum(axis=0)
    
+      
+    df_utilities.index.name= 'Utilities'
+
     return df_utilities
 
 # %% [markdown]
@@ -685,7 +688,7 @@ def opex_seider(df_feedstocks,
 
 # %%
 @st.cache_data(ttl = "1h")
-def opex_sinnott(C_ISBL, # currently C_TDC
+def opex_sinnott(C_ISBL, # currently C_TBM
                  df_feedstocks,
                  df_utilities,
                  df_sales,
@@ -724,8 +727,8 @@ def opex_sinnott(C_ISBL, # currently C_TDC
     df_opex.loc['Utilities', 'Cost ($/yr)'] =  df_utilities.loc['Total', 'Cost ($/yr)']
     df_opex.loc['Utilities', 'Description'] =  'See Utilities - used Seider book prices'
     
-    df_opex.loc['Operating labor', 'Cost ($/yr)'] = 5* 60000
-    df_opex.loc['Operating labor', 'Description'] = '$60000 per shift per year - standalone continuous fluids process'
+    df_opex.loc['Operating labor', 'Cost ($/yr)'] = 4 * 80000
+    df_opex.loc['Operating labor', 'Description'] = '$80000 per shift per year - Fluids processing, 3 sections + 1 controls'
     
     df_opex.loc['Supervision', 'Cost ($/yr)'] =  0.25 * df_opex.loc['Operating labor', 'Cost ($/yr)']
     df_opex.loc['Supervision', 'Description'] = '25% of operating labor'
