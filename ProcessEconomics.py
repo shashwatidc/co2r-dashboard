@@ -733,13 +733,13 @@ def opex_sinnott(C_ISBL, # currently C_TDC
     df_opex.loc['Direct salary overhead', 'Cost ($/yr)'] =  0.5 * (df_opex.loc['Operating labor', 'Cost ($/yr)'] + df_opex.loc['Supervision', 'Cost ($/yr)'])
     df_opex.loc['Direct salary overhead', 'Description'] =  '50% of operating labor + supervision'
     
-    df_opex.loc['Maintenance', 'Cost ($/yr)'] = 0.04 * (C_ISBL - 1.18 * df_capex_BM.loc['Electrolyzer', 'Cost ($)'])
+    df_opex.loc['Maintenance', 'Cost ($/yr)'] = 0.04 * (C_ISBL - df_capex_BM.loc['Electrolyzer', 'Cost ($)'])
     df_opex.loc['Maintenance', 'Description'] =  '4% of ISBL plant cost'
     
     df_opex.loc['Stack replacement', 'Cost ($/yr)'] = df_stack_replacement.loc['Total', 'Cost ($/yr)']
     df_opex.loc['Stack replacement', 'Description'] = 'See Stack replacement'
     
-    df_opex.loc['Operating overhead', 'Cost ($/yr)'] = 0.65 * (df_opex.loc['Operating labor', 'Cost ($/yr)'] + df_opex.loc['Supervision', 'Cost ($/yr)']+ df_opex.loc['Maintenance', 'Cost ($/yr)'])
+    df_opex.loc['Operating overhead', 'Cost ($/yr)'] = 0.65 * (df_opex.loc['Operating labor', 'Cost ($/yr)'] + df_opex.loc['Supervision', 'Cost ($/yr)']+ df_opex.loc['Maintenance', 'Cost ($/yr)'] + df_opex.loc['Direct salary overhead', 'Cost ($/yr)'])
     df_opex.loc['Operating overhead', 'Description'] = '65% of operating labor + supervision + maintenance'
     
     df_opex.loc['Property taxes and insurance', 'Cost ($/yr)'] = 0.02 * C_ISBL
