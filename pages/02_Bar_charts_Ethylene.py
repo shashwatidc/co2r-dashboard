@@ -756,6 +756,7 @@ def updated_radio_state(df_flags):
     vbl_name = df_flags.index[vbl_row] # set vbl_name from that row
     st.session_state.minimum_value_input_ethylene = str(df_flags.loc[vbl_name, 'Range min'])
     st.session_state.maximum_value_input_ethylene = str(df_flags.loc[vbl_name, 'Range max'])
+    vbl_unit = str(df_flags.loc[vbl_name, 'Unit'])
 
 df_flags = flags(product_name)
 
@@ -774,11 +775,11 @@ with st.sidebar:
                     )
     try:
         st.write('Minimum value')
-        vbl_min = float(st.text_input(label = 'Minimum value',
+        vbl_min = float(st.text_input(label = 'Minimum {} ({})'.format(vbl_name, vbl_unit),
                     key = 'minimum_value_input_ethylene', # value = str(df_flags.loc[vbl_name, 'Range min']),  
                     label_visibility='collapsed'))
         st.write('Maximum value')
-        vbl_max = float(st.text_input(label = 'Maximum value',
+        vbl_max = float(st.text_input(label = 'Maximum {} ({})'.format(vbl_name, vbl_unit),
                     key = 'maximum_value_input_ethylene',#  value = str(df_flags.loc[vbl_name, 'Range max']),
                     label_visibility='collapsed'))
         
