@@ -639,7 +639,7 @@ options_list  = ['Cell voltage (V)',
                 'CO$_2$ cost ($/t)',
                 'H$_2$ cost ($/kg)',
                 'Water cost ($/kg)',
-                'Electrolyzer capex ($/m$^2$)',
+                'Electrolyzer capex (\$/m$^2$)',
                 # 'Renewables capacity factor'
                 ] # Order must exactly match df_flags
 
