@@ -628,26 +628,26 @@ additional_capex_USD = 0.0
 additional_opex_USD_kg = 0.0
 
 ##### CHOICE OF x-AXIS VARIABLE
-options_list  = ['Cell voltage', 
-                                    'Cathodic overpotential',
-                                    'Anodic overpotential',
-                                    'Ohmic resistance',
-                                    'Total current density',
+options_list  = ['Cell voltage (V)', 
+                                    'Cathodic overpotential (V)',
+                                    'Anodic overpotential (V)',
+                                    'Ohmic resistance ($\Omega$)',
+                                    'Total current density (mA/cm$^2$)',
                                     '$FE_{CO_2R, \: 0}$',
                                     'Single-pass conversion',
                                     'Crossover ratio',
-                                    'Production rate',
+                                    'Production rate (kg/day)',
                                     'Capacity factor',
-                                    'Lifetime',
-                                    'Stack lifetime',
+                                    'Lifetime (yrs)',
+                                    'Stack lifetime (yrs)',
                                     'Separation efficiency',
-                                    'Electricity cost',
-                                    'CO$_2$ cost',
-                                    'H$_2$ cost',
-                                    'Water cost',
-                                    'Electrolyzer capex',
+                                    'Electricity cost ($/kWh)',
+                                    'CO$_2$ cost ($/t)',
+                                    'H$_2$ cost ($/kg)',
+                                    'Water cost ($/kg)',
+                                    'Electrolyzer capex ($/m$^2$)',
                                     # 'Renewables capacity factor'
-                                    ]
+                                    ] # Order must exactly match df_flags
 
 middle_column, right_column = st.columns(2, gap = 'large')
 st.sidebar.header('x-axis variable' )
@@ -681,7 +681,7 @@ def flags(product_name):
         'override_H2_cost': ['H$_2$ cost'  , '\$/kg H$_2$', 'H2_cost_USD_kgH2',                   H2_cost_USD_kgH2, 0, 10],
         'override_water_cost': ['Water cost' , '\$/kg', 'water_cost_USD_kg',                      water_cost_USD_kg, 0, 0.30],
         'override_electrolyzer_capex': ['Electrolyzer capital cost' , '\$/m$^2$', 'electrolyzer_capex_USD_m2', electrolyzer_capex_USD_m2, 3000, 10000],
-        'override_carbon_intensity': ['Grid CO$_2$ intensity', 'kg CO$_2$/kWh', 'electricity_emissions_kgCO2_kWh',electricity_emissions_kgCO2_kWh, 0, 0.5],
+        # 'override_carbon_intensity': ['Grid CO$_2$ intensity', 'kg CO$_2$/kWh', 'electricity_emissions_kgCO2_kWh',electricity_emissions_kgCO2_kWh, 0, 0.5],
         
         # 'override_battery_capacity': ['Renewables capacity factor' , '', 'avbl_renewables',        avbl_renewables, 1e-4, 1 ],
         }
@@ -781,11 +781,11 @@ with st.sidebar:
                       on_change= updated_radio_state, args = (df_flags, )
                     )
     try:
-        st.write('Minimum {} ({})'.format(vbl_name, vbl_unit))
+        st.write('Minimum value')
         vbl_min = float(st.text_input(label = 'Minimum value',
                     key = 'minimum_value_input_CO', # value = str(df_flags.loc[vbl_name, 'Range min']),  
                     label_visibility='collapsed'))
-        st.write('Maximum {} ({})'.format(vbl_name, vbl_unit))
+        st.write('Maximum value')
         vbl_max = float(st.text_input(label = 'Maximum value',
                     key = 'maximum_value_input_CO',#  value = str(df_flags.loc[vbl_name, 'Range max']),
                     label_visibility='collapsed'))
