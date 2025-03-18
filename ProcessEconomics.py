@@ -751,8 +751,8 @@ def opex_sinnott(C_ISBL, # currently C_TBM
     df_opex.loc['Environmental charges', 'Cost ($/yr)'] = 0.01 * C_ISBL
     df_opex.loc['Environmental charges', 'Description'] = '1% of ISBL plant cost'
     
-    df_opex.loc['Land rent', 'Cost ($/yr)'] = 0.02 * (1.4 * C_ISBL)
-    df_opex.loc['Land rent', 'Description'] = '2% of ISBL+OSBL, here 1.4 * ISBL'
+    df_opex.loc['Land rent', 'Cost ($/yr)'] = 0.02 *  C_ISBL
+    df_opex.loc['Land rent', 'Description'] = '2% of ISBL+OSBL, here ISBL only'
     
     df_opex.loc['General expenses', 'Cost ($/yr)'] = df_general.loc['Total', 'Cost ($/yr)']
     df_opex.loc['General expenses', 'Description'] = 'See General Expenses - used Seider book'
