@@ -503,7 +503,7 @@ with st.expander("**Help**", expanded = False):
          """)
 
 st.write("**Cite this work**: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647)")
-st.write("**Questions, collaborations, requests?** Contact [shashwati.dacunha@austin.utexas.edu](mailto:shashwati.dacunha@austin.utexas.edu).")
+st.write("**Questions, collaborations, requests?** Contact [shashwati.dc@utexas.edu](mailto:shashwati.dc@utexas.edu).")
 
 #__________________________________________________________________________________
 
