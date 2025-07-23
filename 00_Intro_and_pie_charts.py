@@ -8,6 +8,10 @@
 import streamlit as st
 # from streamlit_super_slider import st_slider as superslider
 
+################################################################################
+###########################    PAGE NAVIGATION   ###############################
+################################################################################
+
 ### This page makes the page navigation outline
 ### IMPORTANT: this file CANNOT be renamed!
 
@@ -36,15 +40,15 @@ page_03 = st.Page(
     url_path = 'nonaqueous-CO')
 page_04 = st.Page(
     "pages/04_OA_Nonaq.py", 
-    title = "Oxalic acid, non-aqueousd", 
+    title = "Oxalic acid, non-aqueous", 
     icon = None, # ":material/calculate:", 
     default=False,
     url_path = 'nonaqueous-OA')
 
 pg = st.navigation(
         pages = {
-            "Aqueous CO2R, zero-gap MEA": [page_00, page_01, page_02],
-            "Non-aqueous CO2R, flow cell": [page_03, page_04],
+            "Aqueous CO₂R, zero-gap MEA": [page_00, page_01, page_02],
+            "Non-aqueous CO₂R, flow cell": [page_03, page_04],
         },
         position = 'top', # 'sidebar'
         # expanded = True,

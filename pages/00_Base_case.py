@@ -25,6 +25,10 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 import threading
 
+#TODO
+import base64
+from io import StringIO
+
 # import csv
 
 from datetime import datetime
@@ -464,9 +468,11 @@ st.title("CO₂R Costing Dashboard: Home")
 st.write("*Developed by [Shashwati da Cunha](https://shashwatidc.github.io/) in the [Resasco Catalysis Lab](https://www.resascolab.com/)*")
 st.write('''Generate the capital and operating cost for a CO₂ reduction process converting captured CO₂
          into CO or ethylene in a low-temperature membrane electrode assembly (MEA) at neutral pH. Navigate using the sidebar to also view 
-         the costs of non-aqueous CO₂R to CO or oxalic acid in a flow cell, or visualize the sensitivity of costs. Modify the settings on 
-         the left to see how the results change. This interactive tool is based on our papers,
-> Da Cunha, S.; Resasco, J. Insights from Techno-Economic Analysis Can Guide the Design of Low-Temperature CO₂ Electrolyzers towards Industrial Scaleup. ACS Energy Lett. 2024, 9, 11, 5550–5561. DOI: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647). 
+         the costs of non-aqueous CO₂R to CO or oxalic acid in a flow cell, or visualize the sensitivity of costs. Modify the settings in 
+         the left sidebar to see how the results change. Click here to see the electrolyzer and process design, as well as stream tables and results. 
+         This interactive tool is based on our papers,
+> Da Cunha, S.; Resasco, J. Insights from Techno-Economic Analysis Can Guide the Design of Low-Temperature CO₂ Electrolyzers towards Industrial Scaleup. ACS Energy Lett. 2024, 9, 11, 5550–5561. DOI: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647).
+          
 > Da Cunha, S.; Resasco, J. Techno-Economic Assessment of Non-Aqueous CO2 Reduction. ChemRxiv, 2025. DOI:[10.26434/chemrxiv-2025-k071x](https://doi.org/10.26434/chemrxiv-2025-k071x).
          ''')
 
@@ -1358,7 +1364,7 @@ if not np.isnan(FE_product_checked):
 
     ############################### RAW RESULTS #####################################
 
-    st.header('Raw model results')
+    st.markdown('[Raw model results](#results)')
     st.subheader('Capex')                                                                                  
     df_capex_BM
     df_capex_totals
@@ -1394,5 +1400,46 @@ else:
     
         st.error(':red[Model is physically unviable. Please check $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio.]',
                  icon = ":material/error:")
+
+st.markdown("[Process flow diagram](#pfd)")
+
+# TODO
+def svg_write(fig, center=True):
+    """
+    Renders a matplotlib figure object to SVG.
+    Disable center to left-margin align like other objects.
+    """
+    # Save to stringIO instead of file
+    imgdata = StringIO()
+    fig.savefig(imgdata, format="svg")
+
+    # Retrieve saved string
+    imgdata.seek(0)
+    svg_string = imgdata.getvalue()
+
+    # Encode as base 64
+    b64 = base64.b64encode(svg_string.encode("utf-8")).decode("utf-8")
+
+    # Add some CSS on top
+    css_justify = "center" if center else "left"
+    css = '<p style="text-align:center; display: flex; justify-content: {};">'.format(css_justify)
+    html = r'{}<img src="data:image/svg+xml;base64,{}"/>'.format(
+        css, b64
+    )
+
+    # Write the HTML
+    st.write(html, unsafe_allow_html=True)
+
+def render_svg(svg):
+    """Renders the given svg string."""
+    b64 = base64.b64encode(svg.encode('utf-8')).decode("utf-8")
+    html = r'<img src="data:image/svg+xml;base64,%s"/>' % b64
+    st.write(html, unsafe_allow_html=True)
+
+PFD_svg = open("figures/E:\OneDrive - The University of Texas at Austin\RCL Code\TEA\Streamlit\figures\2a 20250317 PFD CO flow diagram - no boxes.svg", 
+               'r', 
+               encoding='utf-8')
+source_code = PFD_svg.read() 
+render_svg(source_code)
 
 st.write('Copyright © {} Shashwati C da Cunha. All rights reserved.'.format(datetime.now().date().strftime("%Y")))
