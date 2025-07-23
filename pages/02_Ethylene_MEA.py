@@ -1132,7 +1132,14 @@ with st.sidebar:
             st.session_state.is_active_error_ethylene = False
         else:
             st.session_state.is_active_error_ethylene = True
-            st.header(':red[Model is physically unviable. Please check $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio.]')    
+            st.error('''Model is physically unviable. \n Please check the Reactor Model section under Electrolyzer Operation 
+                and verify the model for selectivity versus single-pass conversion, as well as the assumptions made for 
+                $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio. These three assumptions 
+                together violate mass balance. If the electrolyzer is following the Hawks model, this could be because the desired single-pass
+                conversion is too high to be achieved with the given $FE_{CO2R, 0}$ because of plug flow and crossover. 
+                To manually override this error, choose to manually specify $FE$ and single-pass conversion.
+                If you are still seeing an error, it may be because the crossover is too high and limits the possible single-pass conversion.''',
+                icon = ":material/error:")
         st.latex(r'''
                  \footnotesize \implies  FE_{{{}}} = {:.2f}
                  '''.format(product_name, FE_product_checked))

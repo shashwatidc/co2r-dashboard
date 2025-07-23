@@ -304,12 +304,10 @@ def render_svg(svg):
     html = r'<img src="data:image/svg+xml;base64,%s"/>' % b64
     st.write(html, unsafe_allow_html=True)
 
-@st.cache_data(ttl = "1h")
 @st.dialog("Error")
 def error_dialog(): # (FE_product_checked, SPC, crossover_ratio):
     st.write('''The assumptions for the selectivity, single-pass conversion, and crossover ratio
                 together violate mass balance.'''.format())
-
 
 _render_lock = threading.RLock()
 
