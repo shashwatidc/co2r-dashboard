@@ -304,8 +304,9 @@ def render_svg(svg):
     html = r'<img src="data:image/svg+xml;base64,%s"/>' % b64
     st.write(html, unsafe_allow_html=True)
 
-@st.dialog("Error")
-def error_dialog(): # (FE_product_checked, SPC, crossover_ratio):
+@st.dialog(title = "Error",
+           width = 'large')
+def error_dialog(FE_product_checked, SPC, crossover_ratio):
     st.write('''The assumptions for the selectivity, single-pass conversion, and crossover ratio
                 together violate mass balance.'''.format())
 
@@ -1411,7 +1412,7 @@ if not np.isnan(FE_product_checked):
     
 else:
     with middle_column:
-        error_dialog()
+        error_dialog(FE_product_checked, SPC, crossover_ratio)
         # st.header(':red[Model is physically unviable. Please check $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio.]')
         
         st.error('''Model is physically unviable. \n Please check the Reactor Model section under Electrolyzer Operation 
