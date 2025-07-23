@@ -9,19 +9,34 @@ import streamlit as st
 # from streamlit_super_slider import st_slider as superslider
 
 page_00 = st.Page(
-    "pages/00_Intro_and_pie_charts.py", title="Base case techno-economics", icon=":material/dashboard:", default=True
+    "pages/00_Intro_and_pie_charts.py", 
+    title="Base case techno-economics", 
+    icon=":material/home:", 
+    default=True
 )
 page_01 = st.Page(
-    "pages/01_Sensitivity_-_MEA_CO.py", title="Sensitivity - MEA to CO", icon=":material/dashboard:", default=True
+    "pages/01_Sensitivity_-_MEA_CO.py", 
+    title="Sensitivity - MEA to CO", 
+    icon=":material/analytics:",
+    default=False
 )
 page_02 = st.Page(
-    "pages/02_Sensitivity_-_MEA_Ethylene.py", title="Sensitivity - MEA to ethylene", icon=":material/dashboard:", default=True
+    "pages/02_Sensitivity_-_MEA_Ethylene.py", 
+    title="Sensitivity - MEA to ethylene", 
+    icon=":material/analytics:", 
+    default=False
 )
 page_03 = st.Page(
-    "pages/03_Non-aqueous_CO2R_to_CO.py", title="Non-aqueous CO<subscript>2</subscript>R to CO", icon=":material/dashboard:", default=True
+    "pages/03_Non-aqueous_CO2R_to_CO.py", 
+    title="Non-aqueous CO<subscript>2</subscript>R to CO", 
+    icon=":material/calculate:", 
+    default=False
 )
 page_04 = st.Page(
-    "pages/04_Non-aqueous_CO2R_to_oxalic_acid.py", title="Non-aqueous CO<subscript>2</subscript>R to oxalic acid", icon=":material/dashboard:", default=True
+    "pages/04_Non-aqueous_CO2R_to_oxalic_acid.py", 
+    title="Non-aqueous CO<subscript>2</subscript>R to oxalic acid", 
+    icon=":material/calculate:", 
+    default=False
 )
 
 pg = st.navigation(
