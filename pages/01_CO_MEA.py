@@ -35,6 +35,9 @@ from datetime import datetime
 # from os.path import exists
 # import os
 
+import base64
+from io import StringIO
+
 # import openpyxl
 # from openpyxl.worksheet.dimensions import ColumnDimension, DimensionHolder
 # import openpyxl.utils.cell
@@ -293,6 +296,19 @@ def cached_single_run(product_name,
 #     energy_default = df_energy_default.loc['Total', 'Energy (kJ/kg {})'.format(product_name)]
 #     emissions_default = sum(df_energy_default.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)])
 #     return capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default
+
+@st.cache_data(ttl = "1h")
+def render_svg(svg):
+    """Renders the given svg string."""
+    b64 = base64.b64encode(svg.encode('utf-8')).decode("utf-8")
+    html = r'<img src="data:image/svg+xml;base64,%s"/>' % b64
+    st.write(html, unsafe_allow_html=True)
+
+@st.dialog(title = "Error",
+           width = 'large')
+def error_dialog(FE_product_checked, SPC, crossover_ratio):
+    st.write('''The assumptions for the selectivity, single-pass conversion, and crossover ratio
+                together violate mass balance.'''.format())
 
 _render_lock = threading.RLock()
 
@@ -1138,13 +1154,16 @@ with st.sidebar:
             st.session_state.is_active_error_CO = False
         else:
             st.session_state.is_active_error_CO = True
+            error_dialog(FE_product_checked, SPC, crossover_ratio)
+            # st.header(':red[Model is physically unviable. Please check $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio.]')
+            
             st.error('''Model is physically unviable. \n Please check the Reactor Model section under Electrolyzer Operation 
-                and verify the model for selectivity versus single-pass conversion, as well as the assumptions made for 
-                $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio. These three assumptions 
+                    and verify the model for selectivity versus single-pass conversion, as well as the assumptions made for 
+                    $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio. These three assumptions 
                 together violate mass balance. If the electrolyzer is following the Hawks model, this could be because the desired single-pass
-                conversion is too high to be achieved with the given $FE_{CO2R, 0}$ because of plug flow and crossover. 
-                To manually override this error, choose to manually specify $FE$ and single-pass conversion.
-                If you are still seeing an error, it may be because the crossover is too high and limits the possible single-pass conversion.''',
+                    conversion is too high to be achieved with the given $FE_{CO2R, 0}$ because of plug flow and crossover. 
+                    To manually override this error, choose to manually specify $FE$ and single-pass conversion.
+                    If you are still seeing an error, it may be because the crossover is too high and limits the possible single-pass conversion.''',
                     icon = ":material/error:")
         
         st.latex(r'''
@@ -2025,5 +2044,27 @@ if not st.session_state.is_active_error_CO:
     df_constants
     df_products
     df_utility_imports
+
+# ________________________________________________________________________________
+
+##################################### DIAGRAMS ###################################
+
+st.divider()
+
+st.subheader("Process flow diagram")
+
+PFD_svg = open("figures/2a 20250317 PFD CO flow diagram - no boxes.svg", 
+               'r', 
+               encoding='utf-8')
+source_code = PFD_svg.read() 
+render_svg(source_code)
+
+st.subheader('MEA design schematic')
+electrolyzer_svg = open("figures/1a 20240708 Schematic - labeled.svg", 
+               'r', 
+               encoding='utf-8')
+source_code = electrolyzer_svg.read() 
+
+render_svg(source_code)
 
 st.write('Copyright © {} Shashwati C da Cunha. All rights reserved.'.format(datetime.now().date().strftime("%Y")))

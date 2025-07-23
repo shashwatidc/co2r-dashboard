@@ -25,9 +25,6 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 import threading
 
-import base64
-from io import StringIO
-
 # import csv
 
 from datetime import datetime
@@ -38,6 +35,8 @@ from datetime import datetime
 # from os.path import exists
 # import os
 
+import base64
+from io import StringIO
 # from io import BytesIO
 
 # import openpyxl
@@ -1053,7 +1052,6 @@ else:
 
 # ### Generate physical and costing model
 if not np.isnan(FE_product_checked): 
-    st.write("HERE")
     df_capex_BM, df_capex_totals, df_costing_assumptions, df_depreciation, df_electrolyzer_assumptions, df_electrolyzer_streams_mol_s,\
             df_energy, df_feedstocks, df_general, df_maintenance, df_operations, df_opex, df_opex_totals, df_outlet_assumptions,\
             df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities = cached_single_run(product_name = product_name, 
@@ -1411,18 +1409,17 @@ if not np.isnan(FE_product_checked):
     df_utility_imports
     
 else:
-    with middle_column:
-        error_dialog(FE_product_checked, SPC, crossover_ratio)
-        # st.header(':red[Model is physically unviable. Please check $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio.]')
-        
-        st.error('''Model is physically unviable. \n Please check the Reactor Model section under Electrolyzer Operation 
-             and verify the model for selectivity versus single-pass conversion, as well as the assumptions made for 
-             $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio. These three assumptions 
-            together violate mass balance. If the electrolyzer is following the Hawks model, this could be because the desired single-pass
-             conversion is too high to be achieved with the given $FE_{CO2R, 0}$ because of plug flow and crossover. 
-             To manually override this error, choose to manually specify $FE$ and single-pass conversion.
-             If you are still seeing an error, it may be because the crossover is too high and limits the possible single-pass conversion.''',
-                icon = ":material/error:")
+    error_dialog(FE_product_checked, SPC, crossover_ratio)
+    # st.header(':red[Model is physically unviable. Please check $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio.]')
+    
+    st.error('''Model is physically unviable. \n Please check the Reactor Model section under Electrolyzer Operation 
+            and verify the model for selectivity versus single-pass conversion, as well as the assumptions made for 
+            $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio. These three assumptions 
+        together violate mass balance. If the electrolyzer is following the Hawks model, this could be because the desired single-pass
+            conversion is too high to be achieved with the given $FE_{CO2R, 0}$ because of plug flow and crossover. 
+            To manually override this error, choose to manually specify $FE$ and single-pass conversion.
+            If you are still seeing an error, it may be because the crossover is too high and limits the possible single-pass conversion.''',
+            icon = ":material/error:")
 
 # ________________________________________________________________________________
 
@@ -1430,7 +1427,7 @@ else:
 
 st.divider()
 
-st.header("Process flow diagram")
+st.subheader("Process flow diagram")
 
 PFD_svg = open("figures/2a 20250317 PFD CO flow diagram - no boxes.svg", 
                'r', 
@@ -1438,7 +1435,7 @@ PFD_svg = open("figures/2a 20250317 PFD CO flow diagram - no boxes.svg",
 source_code = PFD_svg.read() 
 render_svg(source_code)
 
-st.header('MEA design schematic')
+st.subheader('MEA design schematic')
 electrolyzer_svg = open("figures/1a 20240708 Schematic - labeled.svg", 
                'r', 
                encoding='utf-8')
