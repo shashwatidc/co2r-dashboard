@@ -2045,13 +2045,16 @@ st.divider()
 
 st.subheader("Process flow diagram")
 
-PFD_svg = open("figures/2a 20250317 PFD CO flow diagram - no boxes.svg", 
+PFD_svg = open("figures/2c 20250317 Non-aq oxalic acid flow diagram.svg", 
                'r', 
                encoding='utf-8')
 source_code = PFD_svg.read() 
 render_svg(source_code)
 
+st.write('\n \n \n')
+
 st.subheader('MEA design schematic')
+st.write('\n')
 electrolyzer_svg = open("figures/1a 20240708 Schematic - labeled.svg", 
                'r', 
                encoding='utf-8')
@@ -2059,4 +2062,4 @@ source_code = electrolyzer_svg.read()
 
 render_svg(source_code)
 
-st.write('Copyright © {} Shashwati C da Cunha. All rights reserved.'.format(datetime.now().date().strftime("%Y")))
+st.write('\n \n \n Copyright © {} Shashwati C da Cunha. All rights reserved.'.format(datetime.now().date().strftime("%Y")))

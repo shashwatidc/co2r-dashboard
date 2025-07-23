@@ -50,7 +50,7 @@ pg = st.navigation(
             "Aqueous CO₂R, zero-gap MEA": [page_00, page_01, page_02],
             "Non-aqueous CO₂R, flow cell": [page_03, page_04],
         },
-        position = 'top', # 'sidebar'
+        position = 'sidebar', # 'top' 'sidebar'
         # expanded = True,
     )
 
