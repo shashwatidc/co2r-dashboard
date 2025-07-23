@@ -27,13 +27,13 @@ page_02 = st.Page(
     url_path = 'MEA-ethylene')
 page_03 = st.Page(
     "pages/03_Non-aqueous_CO2R_to_CO.py", 
-    title = "Non-aqueous CO<subscript>2</subscript>R to CO", 
+    title = "Non-aqueous CO$_2$R to CO", 
     icon = None, # ":material/calculate:",
     default = False,
     url_path = 'nonaqeuous-CO')
 page_04 = st.Page(
     "pages/04_Non-aqueous_CO2R_to_oxalic_acid.py", 
-    title = "Non-aqueous CO<subscript>2</subscript>R to oxalic acid", 
+    title = "Non-aqueous CO$_2$R to oxalic acid", 
     icon = None, # ":material/calculate:", 
     default=False,
     url_path = 'nonaqueous-OA')
@@ -44,7 +44,7 @@ pg = st.navigation(
             "Non-aqueous": [page_03, page_04],
         },
         position = 'top', # 'sidebar'
-        expanded = True,
+        # expanded = True,
     )
 
 pg.run()
