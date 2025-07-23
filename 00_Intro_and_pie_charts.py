@@ -18,7 +18,7 @@ import streamlit as st
 page_00 = st.Page(
     "pages/00_Base_case.py", 
     title = "Base case", 
-    icon = ":material/home:", 
+    icon = None, # ":material/home:", 
     default = True,)
 page_01 = st.Page(
     "pages/01_CO_MEA.py", 

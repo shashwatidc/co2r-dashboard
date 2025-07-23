@@ -469,7 +469,7 @@ st.write("*Developed by [Shashwati da Cunha](https://shashwatidc.github.io/) in 
 st.write('''Generate the capital and operating cost for a CO₂ reduction process converting captured CO₂
          into CO or ethylene in a low-temperature membrane electrode assembly (MEA) at neutral pH. Navigate using the sidebar to also view 
          the costs of non-aqueous CO₂R to CO or oxalic acid in a flow cell, or visualize the sensitivity of costs. Modify the settings in 
-         the left sidebar to see how the results change. Click here to see the electrolyzer and process design, as well as stream tables and results. 
+         the left sidebar to see how the results change. Click [here](#process-flow-diagram) to see the electrolyzer and process design, as well as stream tables and results. 
          This interactive tool is based on our papers,
 > Da Cunha, S.; Resasco, J. Insights from Techno-Economic Analysis Can Guide the Design of Low-Temperature CO₂ Electrolyzers towards Industrial Scaleup. ACS Energy Lett. 2024, 9, 11, 5550–5561. DOI: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647).
           
@@ -1364,7 +1364,7 @@ if not np.isnan(FE_product_checked):
 
     ############################### RAW RESULTS #####################################
 
-    st.markdown('[Raw model results](#results)')
+    st.header('Raw model results')
     st.subheader('Capex')                                                                                  
     df_capex_BM
     df_capex_totals
@@ -1401,7 +1401,11 @@ else:
         st.error(':red[Model is physically unviable. Please check $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio.]',
                  icon = ":material/error:")
 
-st.markdown("[Process flow diagram](#pfd)")
+# ________________________________________________________________________________
+
+##################################### DIAGRAMS ###################################
+
+st.header("Process flow diagram")
 
 # TODO
 def svg_write(fig, center=True):
@@ -1436,7 +1440,7 @@ def render_svg(svg):
     html = r'<img src="data:image/svg+xml;base64,%s"/>' % b64
     st.write(html, unsafe_allow_html=True)
 
-PFD_svg = open("figures/E:\OneDrive - The University of Texas at Austin\RCL Code\TEA\Streamlit\figures\2a 20250317 PFD CO flow diagram - no boxes.svg", 
+PFD_svg = open("figures/2a 20250317 PFD CO flow diagram - no boxes.svg", 
                'r', 
                encoding='utf-8')
 source_code = PFD_svg.read() 
