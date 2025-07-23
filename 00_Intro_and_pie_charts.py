@@ -10,40 +10,41 @@ import streamlit as st
 
 page_00 = st.Page(
     "pages/00_Intro_and_pie_charts.py", 
-    title="Base case techno-economics", 
-    icon=":material/home:", 
-    default=True
-)
+    title = "Base case techno-economics", 
+    icon = ":material/home:", 
+    default = True,)
 page_01 = st.Page(
     "pages/01_Sensitivity_-_MEA_CO.py", 
-    title="Sensitivity - MEA to CO", 
-    icon=":material/analytics:",
-    default=False
-)
+    title = "Sensitivity - MEA to CO", 
+    icon = None, # ":material/analytics:",
+    default = False,
+    url_path = 'MEA-CO')
 page_02 = st.Page(
     "pages/02_Sensitivity_-_MEA_Ethylene.py", 
-    title="Sensitivity - MEA to ethylene", 
-    icon=":material/analytics:", 
-    default=False
-)
+    title = "Sensitivity - MEA to ethylene", 
+    icon = None, # ":material/analytics:", 
+    default = False,
+    url_path = 'MEA-ethylene')
 page_03 = st.Page(
     "pages/03_Non-aqueous_CO2R_to_CO.py", 
-    title="Non-aqueous CO<subscript>2</subscript>R to CO", 
-    icon=":material/calculate:", 
-    default=False
-)
+    title = "Non-aqueous CO<subscript>2</subscript>R to CO", 
+    icon = None, # ":material/calculate:",
+    default = False,
+    url_path = 'nonaqeuous-CO')
 page_04 = st.Page(
     "pages/04_Non-aqueous_CO2R_to_oxalic_acid.py", 
-    title="Non-aqueous CO<subscript>2</subscript>R to oxalic acid", 
-    icon=":material/calculate:", 
-    default=False
-)
+    title = "Non-aqueous CO<subscript>2</subscript>R to oxalic acid", 
+    icon = None, # ":material/calculate:", 
+    default=False,
+    url_path = 'nonaqueous-OA')
 
 pg = st.navigation(
-        {
+        pages = {
             "Aqueous MEA": [page_00, page_01, page_02],
             "Non-aqueous": [page_03, page_04],
-        }
+        },
+        position = 'top', # 'sidebar'
+        expanded = True,
     )
 
 pg.run()
