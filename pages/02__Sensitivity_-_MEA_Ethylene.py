@@ -91,11 +91,11 @@ def cached_single_run(product_name,
         capacity_factor,
         battery_capex_USD_kWh,               
         battery_capacity,
-        model_FE,
-        is_additional_opex,
         is_additional_capex,
-        additional_opex_USD_kg,
+        is_additional_opex,
         additional_capex_USD,
+        additional_opex_USD_kg,
+        model_FE,
         overridden_vbl,
         overridden_value,
         overridden_unit,
@@ -150,8 +150,8 @@ def cached_single_run(product_name,
         battery_capex_USD_kWh = battery_capex_USD_kWh,               
         battery_capacity = battery_capacity,
         model_FE = model_FE,
-        is_additional_opex= is_additional_opex,
-        is_additional_capex= is_additional_capex,
+        is_additional_capex=is_additional_capex,
+        is_additional_opex=is_additional_opex,
         additional_opex_USD_kg = additional_opex_USD_kg,
         additional_capex_USD = additional_capex_USD,
         overridden_vbl = overridden_vbl,
@@ -205,13 +205,11 @@ def cached_single_run(product_name,
 #         electrolyzer_capex_USD_m2,       
 #         lifetime_years,
 #         stack_lifetime_years,
+#         is_additional_capex, is_additional_opex,
+#         additional_capex_USD, additional_opex_USD_kg,
 #         capacity_factor,
 #         battery_capex_USD_kWh,               
 #         battery_capacity,
-#         additional_capex_USD,
-#         additional_opex_USD_kg,
-#         is_additional_capex,
-#         is_additional_opex,
 #         model_FE,
 #         overridden_vbl,
 #         overridden_value,
@@ -264,13 +262,11 @@ def cached_single_run(product_name,
 #         lifetime_years,
 #         stack_lifetime_years,
 #         capacity_factor,
+#         is_additional_capex, is_additional_opex,
+#         additional_capex_USD, additional_opex_USD_kg,
 #         battery_capex_USD_kWh,               
 #         battery_capacity,
 #         model_FE,
-#         is_additional_opex,
-#         is_additional_capex,
-#         additional_capex_USD,
-#         additional_opex_USD_kg,
 #         overridden_vbl,
 #         overridden_value,
 #         overridden_unit,
@@ -301,7 +297,7 @@ _render_lock = threading.RLock()
 ###################################################################################
 
 # Streamlit page formatting
-st.set_page_config(page_title = 'CO2R Costing Dashboard - CO bar charts', 
+st.set_page_config(page_title = 'CO2R Costing Dashboard - Ethylene bar charts', 
                    page_icon = ":test_tube:",
                    initial_sidebar_state= 'expanded',
                    layout="wide")
@@ -434,7 +430,6 @@ diverging = LinearSegmentedColormap.from_list('diverging_cmap', colors) # create
 colors = ['#a60027', '#ffefdc', '#012469'  ] #  
 RdBu = LinearSegmentedColormap.from_list('diverging_cmap', colors)
 
-
 # st.markdown(
 #     """
 #     <style>
@@ -456,19 +451,21 @@ RdBu = LinearSegmentedColormap.from_list('diverging_cmap', colors)
 # from matplotlib.backends.backend_agg import RendererAgg
 # _lock = RendererAgg.lock # Lock figures so that concurrent users/threads can coexist independently
 
-st.title("CO$_2$R Costing Dashboard: Bar charts for CO$_2$R to CO")
+st.title("CO$_2$R Costing Dashboard: Bar charts for sensitivity of CO$_2$R costs to ethylene")
 st.write("*Developed by [Shashwati da Cunha](https://shashwatidc.github.io/) in the [Resasco Catalysis Lab](https://www.resascolab.com/)*")
-st.write('''Visualize how the capex and opex respond to a change in a single process parameter for CO₂R to CO.
+st.write('''Visualize how the capex and opex respond to a change in a single process parameter for CO₂R to ethylene.
          Pick a parameter and modify the settings on the left to see how the results change. 
          ''')
 
-st.write('''**Update (March 12, 2025):** The CO₂R Dashboard has been updated! Capital costs are now adjusted to the approximate average CEPCI for 2024 (800). 
+with st.expander("**Update history**", expanded = False):
+    st.write('''**March 12, 2025:** The CO₂R Dashboard has been updated! Capital costs are now adjusted to the approximate average CEPCI for 2024 (800). 
          Industrial electricity prices are now the average for 2024 (\$0.082/kWh). The base case single-pass conversion and total current density have been adjusted to the optimal in the Hawks model at these new costs.
          The market price of ethylene is updated to the 2024 global average. Pure CO is a difficult chemical to price since it is rarely sold, usually used within a facility where it is generated.
          The base price for CO (\$0.6/kg in 2001) has also been updated with an arbitrary 1% inflation rate. Note that it may be more likely to track natural gas prices, which slightly dipped from 2001 to 2024 on the Henry Hub.   
          ''')
 
-st.write('**:red[Known issues]:** Currently, there is no warning if you enter a numeric value in any text box that is out of  \
+with st.expander("**:red[Known issues]:**", expanded = False):
+    st.write('Currently, there is no warning if you enter a numeric value in any text box that is out of  \
          physical range, e.g. capacity factor > 1, single-pass conversion > 1. The displayed results will be physically unreasonable. \
          User is responsible for checking that their inputs are reasonable.')
 
@@ -499,8 +496,7 @@ with st.expander("**Help**", expanded = False):
         """)
 
 st.write("**Cite this work**: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647)")
-st.write("**Questions, collaborations, requests?** Contact [shashwati.dc@utexas.edu](mailto:shashwati.dc@utexas.edu).")
-
+st.write("**Questions, collaborations, requests?** Contact [shashwatidc@utexas.edu](mailto:shashwatidc@utexas.edu).")
 
 #__________________________________________________________________________________
 
@@ -580,16 +576,16 @@ model_FE = 'Kas'
 is_battery = False
 is_additional_capex = False
 is_additional_opex = False
-st.session_state.is_active_error_CO = False
-product_name = 'CO' # default
+st.session_state.is_active_error_ethylene = False
+product_name = 'Ethylene' # default
 range_selection = 'Linear' # default
 override_vbl_selection = 'Total current density' # default
 vbl_name = 'Current density' # default
 vbl_unit = 'mA/cm$^2$' # default
-if 'minimum_value_input_CO' not in st.session_state:
-    st.session_state.minimum_value_input_CO = str(0.001)
-if 'maximum_value_input_CO' not in st.session_state:
-    st.session_state.maximum_value_input_CO = str(1500)
+if 'minimum_value_input_ethylene' not in st.session_state:
+    st.session_state.minimum_value_input_ethylene = str(0.001)
+if 'maximum_value_input_ethylene' not in st.session_state:
+    st.session_state.maximum_value_input_ethylene = str(1500)
 
 ########## OTHER FIXED VALUES
 # PRODUCT COSTS
@@ -629,25 +625,25 @@ additional_opex_USD_kg = 0.0
 
 ##### CHOICE OF x-AXIS VARIABLE
 options_list  = ['Cell voltage (V)', 
-                                    'Cathodic overpotential (V)',
-                                    'Anodic overpotential (V)',
-                                    'Ohmic resistance ($\Omega$)',
-                                    'Total current density (mA/cm$^2$)',
-                                    '$FE_{CO_2R, \: 0}$',
-                                    'Single-pass conversion',
-                                    'Crossover ratio',
-                                    'Production rate (kg/day)',
-                                    'Capacity factor',
-                                    'Lifetime (yrs)',
-                                    'Stack lifetime (yrs)',
-                                    'Separation efficiency',
-                                    'Electricity cost ($/kWh)',
-                                    'CO$_2$ cost ($/t)',
-                                    'H$_2$ cost ($/kg)',
-                                    'Water cost ($/kg)',
-                                    'Electrolyzer capex (\$/m$^2$)',
-                                    # 'Renewables capacity factor'
-                                    ] # Order must exactly match df_flags
+                'Cathodic overpotential (V)',
+                'Anodic overpotential (V)',
+                'Membrane resistance ($\Omega$.cm$^2$)',
+                'Total current density (mA/cm$^2$)',
+                '$FE_{CO_2R, \: 0}$',
+                'Single-pass conversion',
+                'Crossover ratio (mol CO$_2$ per mol e$^-$)',
+                'Production rate (kg/day)',
+                'Capacity factor',
+                'Lifetime (yrs)',
+                'Stack lifetime (yrs)',
+                'Separation efficiency',
+                'Electricity cost ($/kWh)',
+                'CO$_2$ cost ($/t)',
+                'H$_2$ cost ($/kg)',
+                'Water cost ($/kg)',
+                'Electrolyzer capex (\$/m$^2$)',
+                # 'Renewables capacity factor'
+                ] # Order must exactly match df_flags
 
 middle_column, right_column = st.columns(2, gap = 'large')
 st.sidebar.header('x-axis variable' )
@@ -759,18 +755,18 @@ def y_axis_formatting(y_axis_min, y_axis_max, y_axis_num):
     return(y_axis_major_ticks)
 
 def updated_radio_state(df_flags):
-    vbl_row = options_list.index(st.session_state['overridden_vbl_radio_CO']) # convert input into integer
+    vbl_row = options_list.index(st.session_state['overridden_vbl_radio_ethylene']) # convert input into integer
     vbl_name = df_flags.index[vbl_row] # set vbl_name from that row
     vbl_unit = df_flags.loc[vbl_name, 'Unit']
-    st.session_state.minimum_value_input_CO = str(df_flags.loc[vbl_name, 'Range min'])
-    st.session_state.maximum_value_input_CO = str(df_flags.loc[vbl_name, 'Range max'])
+    st.session_state.minimum_value_input_ethylene = str(df_flags.loc[vbl_name, 'Range min'])
+    st.session_state.maximum_value_input_ethylene = str(df_flags.loc[vbl_name, 'Range max'])
 
 df_flags = flags(product_name)
 
 with st.sidebar:
-    ## Initialize overridden_vbl_radio_CO widget
+    ## Initialize overridden_vbl_radio_ethylene widget
 
-    override_vbl_selection = st.radio(label = 'Select variable to see cost sensitivity ', key='overridden_vbl_radio_CO',
+    override_vbl_selection = st.radio(label = 'Select variable to see cost sensitivity ', key='overridden_vbl_radio_ethylene',
                           options= options_list, 
                     index = 4, # default option
                     label_visibility='visible',
@@ -783,22 +779,22 @@ with st.sidebar:
     try:
         st.write('Minimum value')
         vbl_min = float(st.text_input(label = 'Minimum value',
-                    key = 'minimum_value_input_CO', # value = str(df_flags.loc[vbl_name, 'Range min']),  
+                    key = 'minimum_value_input_ethylene', # value = str(df_flags.loc[vbl_name, 'Range min']),  
                     label_visibility='collapsed'))
         st.write('Maximum value')
         vbl_max = float(st.text_input(label = 'Maximum value',
-                    key = 'maximum_value_input_CO',#  value = str(df_flags.loc[vbl_name, 'Range max']),
+                    key = 'maximum_value_input_ethylene',#  value = str(df_flags.loc[vbl_name, 'Range max']),
                     label_visibility='collapsed'))
         
         st.write('Number of points (integer)')
         vbl_num = int(st.text_input(label = 'Number of points',
                     value = 11, 
                     label_visibility='collapsed'))
-        st.session_state.is_active_error_CO = False
+        st.session_state.is_active_error_ethylene = False
     except:
         st.error('One of your x-variable values is invalid. Please check that they are all numbers and \
                   that the number of points is an integer.')
-        st.session_state.is_active_error_CO = True
+        st.session_state.is_active_error_ethylene = True
         st.header('*:red[There is an error in the model inputs.]*')
 
     st.write('Spacing for points')
@@ -843,11 +839,11 @@ with st.sidebar:
             x_axis_min = float(x_axis_min)
             x_axis_max = float(x_axis_max)
             x_axis_num = int(x_axis_num)
-            st.session_state.is_active_error_CO = False
+            st.session_state.is_active_error_ethylene = False
         except:
             st.error('One of your x-axis values is invalid. Please check that they are all numbers and \
                     that the number of x-ticks is an integer.')
-            st.session_state.is_active_error_CO = True
+            st.session_state.is_active_error_ethylene = True
             st.header('*:red[There is an error in the model inputs.]*')
 
     with st.expander('**y-axes formatting**', expanded = False):
@@ -858,7 +854,7 @@ with st.sidebar:
                             value = 0, label_visibility='collapsed',)
         st.write('Capex y-axis maximum (millions)')
         y_axis_max_capex = st.text_input(label = 'capex y-axis maximum',
-                            value = 100, label_visibility='collapsed')
+                            value = 300, label_visibility='collapsed')
         st.write('Number of capex y-ticks, including endpoints (integer)')
         y_axis_num_capex = st.text_input(label = 'capex y-axis ticks',
                             value = 6, label_visibility='collapsed')
@@ -866,11 +862,11 @@ with st.sidebar:
             y_axis_min_capex = float(y_axis_min_capex)
             y_axis_max_capex = float(y_axis_max_capex)
             y_axis_num_capex = int(y_axis_num_capex)
-            st.session_state.is_active_error_CO = False
+            st.session_state.is_active_error_ethylene = False
         except:
             st.error('One of your capex y-axis values is invalid. Please check that they are all numbers and \
                     that the number of y-ticks is an integer.')
-            st.session_state.is_active_error_CO = True
+            st.session_state.is_active_error_ethylene = True
             st.header('*:red[There is an error in the model inputs..]*')
 
         st.divider()
@@ -888,11 +884,11 @@ with st.sidebar:
             y_axis_min_opex = float(y_axis_min_opex)
             y_axis_max_opex = float(y_axis_max_opex)
             y_axis_num_opex = int(y_axis_num_opex)
-            st.session_state.is_active_error_CO = False
+            st.session_state.is_active_error_ethylene = False
         except:
             st.error('One of your opex y-axis values is invalid. Please check that they are all numbers and \
                     that the number of y-ticks is an integer.')
-            st.session_state.is_active_error_CO = True
+            st.session_state.is_active_error_ethylene = True
             st.header('*:red[There is an error in the model inputs..]*')
     
         st.divider()
@@ -910,11 +906,11 @@ with st.sidebar:
             y_axis_min_levelized = float(y_axis_min_levelized)
             y_axis_max_levelized = float(y_axis_max_levelized)
             y_axis_num_levelized = int(y_axis_num_levelized)
-            st.session_state.is_active_error_CO = False
+            st.session_state.is_active_error_ethylene = False
         except:
             st.error('One of your levelized cost y-axis values is invalid. Please check that they are all numbers and \
                     that the number of y-ticks is an integer.')
-            st.session_state.is_active_error_CO = True
+            st.session_state.is_active_error_ethylene = True
             st.header('*:red[There is an error in the model inputs..]*')
 
         st.write('**Cell potential**')
@@ -923,19 +919,19 @@ with st.sidebar:
                             value = 0, label_visibility='collapsed',)
         st.write('Cell potential y-axis maximum')
         y_axis_max_potential = st.text_input(label = 'E y-axis maximum',
-                            value = 4, label_visibility='collapsed')
+                            value = 5, label_visibility='collapsed')
         st.write('Number of potential y-ticks, including endpoints (integer)')
         y_axis_num_potential = st.text_input(label = 'E y-axis ticks',
-                            value = 5, label_visibility='collapsed')
+                            value = 6, label_visibility='collapsed')
         try:
             y_axis_min_potential = float(y_axis_min_potential)
             y_axis_max_potential = float(y_axis_max_potential)
             y_axis_num_potential = int(y_axis_num_potential)
-            st.session_state.is_active_error_CO = False
+            st.session_state.is_active_error_ethylene = False
         except:
             st.error('One of your opex y-axis values is invalid. Please check that they are all numbers and \
                     that the number of y-ticks is an integer.')
-            st.session_state.is_active_error_CO = True
+            st.session_state.is_active_error_ethylene = True
             st.header('*:red[There is an error in the model inputs..]*')
 
         st.divider()
@@ -945,19 +941,19 @@ with st.sidebar:
                             value = 0, label_visibility='collapsed',)
         st.write('Energy y-axis maximum')
         y_axis_max_energy = st.text_input(label = 'energy y-axis maximum',
-                            value = 1200, label_visibility='collapsed')
+                            value = 15000, label_visibility='collapsed')
         st.write('Number of energy y-ticks, including endpoints (integer)')
         y_axis_num_energy = st.text_input(label = 'energy y-axis ticks',
-                            value = 7, label_visibility='collapsed')
+                            value = 4, label_visibility='collapsed')
         try:
             y_axis_min_energy = float(y_axis_min_energy)
             y_axis_max_energy = float(y_axis_max_energy)
             y_axis_num_energy = int(y_axis_num_energy)
-            st.session_state.is_active_error_CO = False
+            st.session_state.is_active_error_ethylene = False
         except:
             st.error('One of your energy y-axis values is invalid. Please check that they are all numbers and \
                     that the number of y-ticks is an integer.')
-            st.session_state.is_active_error_CO = True
+            st.session_state.is_active_error_ethylene = True
             st.header('*:red[There is an error in the model inputs..]*')
     
         st.divider()
@@ -967,19 +963,19 @@ with st.sidebar:
                             value = 0, label_visibility='collapsed',)
         st.write('Emissions y-axis maximum')
         y_axis_max_emissions = st.text_input(label = 'emissions y-axis maximum',
-                            value = 5, label_visibility='collapsed')
+                            value = 50, label_visibility='collapsed')
         st.write('Number of emissions y-ticks, including endpoints (integer)')
         y_axis_num_emissions = st.text_input(label = 'emissions y-axis ticks',
-                            value = 5, label_visibility='collapsed')
+                            value = 6, label_visibility='collapsed')
         try:
             y_axis_min_emissions = float(y_axis_min_emissions)
             y_axis_max_emissions = float(y_axis_max_emissions)
             y_axis_num_emissions = int(y_axis_num_emissions)
-            st.session_state.is_active_error_CO = False
+            st.session_state.is_active_error_ethylene = False
         except:
             st.error('One of your emissions y-axis values is invalid. Please check that they are all numbers and \
                     that the number of y-ticks is an integer.')
-            st.session_state.is_active_error_CO = True
+            st.session_state.is_active_error_ethylene = True
             st.header('*:red[There is an error in the model inputs..]*')
 
 
@@ -1088,8 +1084,8 @@ with st.sidebar:
                     max_value = 1.0,
                     step = 0.01, value = FE_CO2R_0,
                     help = 'Faradaic efficiency, independent of any other variables. \
-                          This is not a recommended or default option, since it neglects electrolyzer geometry. \
-                            Therefore, it artificialy lowers costs.')
+                        This is not a recommended or default option, since it neglects electrolyzer geometry.\
+                        Therefore, it artificially lowers costs.')
 
         FE_CO2R_0 = st.slider(label = '$ FE_{CO_2R, \: 0}$, maximum Faradaic efficiency',
                             min_value = 0.0001, 
@@ -1101,12 +1097,12 @@ with st.sidebar:
                             lim_{{X_{{CO_2}} → 0}} FE_{{CO_2R}}
                             $$$
                             ''' +   '\n  Default $ FE_{{CO_2R, \: 0}}$: {}'.format(default_FE_CO2R_0),
-                            disabled=answer == option_3)
+                            disabled = answer == option_3)
         SPC = st.slider(label = 'Single-pass conversion',
                             min_value = 0.0001, 
                             max_value = 1.0, 
                             step = 0.01, value = SPC,
-                            format = '%.2f')
+                            format = '%.2f')        
         crossover_ratio = st.slider(label = 'Crossover ratio (mol CO$_2$/mol e$^-$)',
                             min_value = 0.0001, 
                             max_value = 1.0, 
@@ -1121,7 +1117,7 @@ with st.sidebar:
                             \\\   CO_{{2}} + 2OH^{{-}} → HCO_{{3}}^{{-}} + OH^- ⇌ CO_{{3}}^{{2-}} + H_2O 
                             $$$
                             """,
-                            format = '%.2f')        
+                            format = '%.2f')
         FE_product_checked, __ = SPC_check(FE_product_specified=FE_product_specified, 
                 exponent= exponent,
                 scaling = scaling,
@@ -1133,11 +1129,10 @@ with st.sidebar:
                 df_products=df_products,
                 crossover_ratio=crossover_ratio)
         if not np.isnan(FE_product_checked): 
-            st.session_state.is_active_error_CO = False
+            st.session_state.is_active_error_ethylene = False
         else:
-            st.session_state.is_active_error_CO = True
+            st.session_state.is_active_error_ethylene = True
             st.header(':red[Model is physically unviable. Please check $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio.]')    
-        
         st.latex(r'''
                  \footnotesize \implies  FE_{{{}}} = {:.2f}
                  '''.format(product_name, FE_product_checked))
@@ -1170,7 +1165,7 @@ with st.sidebar:
                               \n Default value: {} years
                             '''.format(product_rate_kg_day, lifetime_years))
         stack_lifetime_years = st.slider(label = 'Stack lifetime (years)',
-                            min_value = 0.0001,
+                            min_value = 0.0001, 
                             max_value = 30.0, 
                             step = 1.0, value = stack_lifetime_years,
                             format = '%.0f',
@@ -1280,11 +1275,11 @@ with st.sidebar:
                             step = 1.0, value = 0.0,
                             format = '%.0f', disabled = not is_additional_capex,
                             help = '''Optional additional capex. Default value: \${} million.
-                            '''.format(0))*1e6
+                            '''.format(0)) *1e6
     else:
         is_additional_capex = False
-        additional_capex_USD = 0 
-
+        additional_capex_USD = 0
+        
     answer = st.toggle('Add custom opex', value = False,
                          help = 'Optional operating cost')
     if answer:            
@@ -1299,11 +1294,11 @@ with st.sidebar:
                             $$$
                             \\\ \\frac{{\$ opex}}{{year}} = \\frac{{\$ opex}}{{day}} \cdot CF \cdot 365 \cdot plant lifetime
                             $$$
-                            ''')
+                            ''')    
     else:
         is_additional_opex = False
         additional_opex_USD_kg = 0 
-
+        
 with st.sidebar:
     st.subheader('Emissions assessment')
     electricity_emissions_kgCO2_kWh = st.slider(label = 'Grid CO$_2$ intensity (kg$_{CO_2}$/kWh)',
@@ -1326,11 +1321,8 @@ with st.sidebar:
 #                         FE_product_specified = default_FE_product_specified, 
 #                         j_total_mA_cm2 = default_j_total_mA_cm2,SPC = default_SPC, 
 #                         crossover_ratio = default_crossover_ratio, model_FE = 'Hawks',  
-#                         is_additional_opex = False, is_additional_capex = False,
-#                         additional_opex_USD_kg = 0,
-#                         additional_capex_USD = 0,
 #                         overridden_vbl = '', overridden_value = np.NaN, overridden_unit = '', 
-#                         override_optimization =  False, P = default_P, T_streams = default_T_streams, 
+#                         override_optimization =  override_optimization, P = default_P, T_streams = default_T_streams, 
 #                         R_ohmcm2 = default_R_ohmcm2, an_E_eqm = default_an_E_eqm, MW_CO2 = MW_CO2, 
 #                         MW_H2O = MW_H2O, MW_O2 = MW_O2,  MW_MX = MW_K2CO3,
 #                         cathode_outlet_humidity = default_cathode_outlet_humidity,
@@ -1347,7 +1339,9 @@ with st.sidebar:
 #                         heat_cost_USD_kWh = default_heat_cost_USD_kWh,product_cost_USD_kgprod = default_product_cost_USD_kgprod,
 #                         H2_cost_USD_kgH2 = default_H2_cost_USD_kgH2,water_cost_USD_kg = default_water_cost_USD_kg,
 #                         CO2_cost_USD_tCO2 = default_CO2_cost_USD_tCO2,lifetime_years = default_lifetime_years,
-#                         stack_lifetime_years = default_stack_lifetime_years,
+#                         stack_lifetime_years = stack_lifetime_years,
+#                         is_additional_capex = False, is_additional_opex = False,
+#                         additional_capex_USD = 0, additional_opex_USD_kg = 0,
 #                         electrolyzer_capex_USD_m2 = default_electrolyzer_capex_USD_m2,
 #                         capacity_factor = default_capacity_factor,battery_capex_USD_kWh = default_battery_capex_USD_kWh,               
 #                         battery_capacity = default_battery_capacity, exponent=default_exponent, scaling=default_scaling,
@@ -1359,7 +1353,7 @@ with st.sidebar:
     
 ##########################  GENERATE MODEL OVER RANGE  ##########################
 with middle_column:
-    if not st.session_state.is_active_error_CO:
+    if not st.session_state.is_active_error_ethylene:
         progress_bar = st.progress(0, text= "Running model over range. Please wait.")
 
         ### Generate modeling results for variable range 
@@ -1499,7 +1493,7 @@ with middle_column:
                                         df_costing_assumptions['Cost']], axis = 1) # Store costing assumptions for plotting
             df_sales_vs_vbl = pd.concat([df_sales_vs_vbl, 
                                     df_sales['Earnings ($/yr)']], axis = 1) # Store costing assumptions for plotting
-            
+  
             ### Adjust FE_product, SPC, capacity_factor and variable back to their original values in globals()
             if vbl_name != 'Cell voltage' and vbl_name != 'Cathodic overpotential' and vbl_name != 'Anodic overpotential':
                 globals()[df_flags.loc[vbl_name,'Python variable']] = value_original
@@ -1512,8 +1506,7 @@ with middle_column:
 
         for df in [df_energy_vs_vbl, df_potentials_vs_vbl,  df_emissions_vs_vbl,
                         df_electrolyzer_assumptions_vs_vbl, df_outlet_assumptions_vs_vbl, df_costing_assumptions_vs_vbl, 
-                        df_capex_BM_vs_vbl, df_capex_totals_vs_vbl, df_opex_vs_vbl, df_opex_totals_vs_vbl, 
-                        df_sales_vs_vbl
+                        df_capex_BM_vs_vbl, df_capex_totals_vs_vbl, df_opex_vs_vbl, df_opex_totals_vs_vbl, df_sales_vs_vbl,
                         ]:
             df.columns = vbl_range_text # rename columns
 
@@ -1566,10 +1559,10 @@ with middle_column:
         df_emissions_vs_vbl_2.insert(0, 'Units', 'kg CO2/kg {}'.format(product_name))
 
         if df_capex_BM_vs_vbl.isnull().values.all():
-            st.session_state.is_active_error_CO = True
+            st.session_state.is_active_error_ethylene = True
             st.header('*:red[There is an error in the model inputs. Please check the sidebar for error messages.]*')
         else:
-            st.session_state.is_active_error_CO = False
+            st.session_state.is_active_error_ethylene = False
 
     else:
         st.header('*:red There is an error in the model inputs. Please check the sidebar for error messages.*')
@@ -1578,7 +1571,7 @@ with middle_column:
 
 ############################### FIGURE OUTPUTS #####################################
 
-if not st.session_state.is_active_error_CO:
+if not st.session_state.is_active_error_ethylene:
     ###### BAR CHART FORMATTING
     flag = {True: 1,
             False: 0}
@@ -1594,7 +1587,7 @@ if not st.session_state.is_active_error_CO:
     opex_colors = [diverging(i) for i in np.linspace(0, 0.85, len(df_opex_vs_vbl.index) - flag[is_additional_opex]) ]
     if is_additional_opex:
         opex_colors.append((0.85, 0.85, 0.85, 1)) # add in battery 
-    #PuOr okay but low contrast at ends
+
     # Emissions colors
     emissions_colors = [RdYlBu(i) for i in np.linspace(0, 1, sum(~df_emissions_vs_vbl.T.isnull().all()) - 1 )  ] # len(df_energy_vs_vbl.index) - 2)] # last rows are totals
 
@@ -1604,6 +1597,7 @@ if not st.session_state.is_active_error_CO:
     # Energy colors
     energy_colors = emissions_colors # [RdYlBu(i) for i in np.linspace(0, 1, sum(~df_energy_vs_vbl.iloc[:-3].T.isnull().all())  )  ] # len(df_energy_vs_vbl.index) - 2)] # last rows are totals
 
+    
     x_axis_major_ticks = x_axis_formatting(x_axis_min, x_axis_max, x_axis_num)
 
     if vbl_unit == '':
@@ -1640,7 +1634,7 @@ if not st.session_state.is_active_error_CO:
             axs.set_ylim([y_axis_min_capex,y_axis_max_capex])
 
             ## Plot series
-            if df_flags.loc['Capacity factor', 'T/F?']:
+            if df_flags.loc['Capacity factor', 'T/F?'] :
                 axs.plot([0.23625,0.23625], [y_axis_min_capex, y_axis_max_capex], alpha = 1,
                     c = theme_colors[6]) # Plot line for cost 
                 axs.text(0.23625, y_axis_min_capex + (y_axis_max_capex - y_axis_min_capex)*0.025, 'Solar capacity', ha='right', va='bottom', #  (5.67 h/day)
@@ -1678,7 +1672,7 @@ if not st.session_state.is_active_error_CO:
             y_axis_major_ticks = y_axis_formatting(y_axis_min_opex, y_axis_max_opex, y_axis_num_opex)
 
             ## Axis labels
-            axs.set_ylabel('Operating cost (\$/kg$_{{{}}}$)'.format(product_name))
+            axs.set_ylabel('Operating cost \n (\$/kg$_{{{}}}$)'.format(product_name))
             axs.set_xlabel(x_axis_label)
 
             ## Draw axis ticks
@@ -1729,7 +1723,7 @@ if not st.session_state.is_active_error_CO:
             y_axis_major_ticks = y_axis_formatting(y_axis_min_levelized, y_axis_max_levelized, y_axis_num_levelized)
 
             ## Axis labels
-            axs.set_ylabel('Levelized cost (\$/kg$_{{{}}}$)'.format(product_name))
+            axs.set_ylabel('Levelized cost \n (\$/kg$_{{{}}}$)'.format(product_name))
             axs.set_xlabel(x_axis_label)
             
             ## Draw axis ticks
@@ -1878,7 +1872,7 @@ if not st.session_state.is_active_error_CO:
 
     ###### ENERGY BAR CHART 
     with middle_column.container(height = 300, border = False): 
-        if not vbl_name == 'Cell voltage':
+        if not vbl_name == 'Cell voltage':   
             with _render_lock:
                 energy_bar_fig, axs = plt.subplots() # Set up plot
                 #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
@@ -1928,7 +1922,7 @@ if not st.session_state.is_active_error_CO:
                 y_axis_major_ticks = y_axis_formatting(y_axis_min_emissions, y_axis_max_emissions, y_axis_num_emissions)
 
                 ## Axis labels
-                axs.set_ylabel('Emissions (kg$_{{CO_2}}$/kg$_{{{}}}$)'.format(product_name))
+                axs.set_ylabel('Emissions \n (kg$_{{CO_2}}$/kg$_{{{}}}$)'.format(product_name))
                 axs.set_xlabel(x_axis_label)
 
                 ## Draw axis ticks
@@ -2001,7 +1995,7 @@ if not st.session_state.is_active_error_CO:
     
     st.subheader('Sales')
     df_sales_vs_vbl_2
-
+    
     st.subheader('Electrolyzer model')
     df_potentials_vs_vbl_2    
 

@@ -451,19 +451,21 @@ RdBu = LinearSegmentedColormap.from_list('diverging_cmap', colors)
 # from matplotlib.backends.backend_agg import RendererAgg
 # _lock = RendererAgg.lock # Lock figures so that concurrent users/threads can coexist independently
 
-st.title("CO$_2$R Costing Dashboard: Bar charts for CO$_2$R to Ethylene")
+st.title("CO$_2$R Costing Dashboard: Bar charts for sensitivity of CO$_2$R costs to ethylene")
 st.write("*Developed by [Shashwati da Cunha](https://shashwatidc.github.io/) in the [Resasco Catalysis Lab](https://www.resascolab.com/)*")
 st.write('''Visualize how the capex and opex respond to a change in a single process parameter for CO₂R to ethylene.
          Pick a parameter and modify the settings on the left to see how the results change. 
          ''')
 
-st.write('''**Update (March 12, 2025):** The CO₂R Dashboard has been updated! Capital costs are now adjusted to the approximate average CEPCI for 2024 (800). 
+with st.expander("**Update history**", expanded = False):
+    st.write('''**March 12, 2025:** The CO₂R Dashboard has been updated! Capital costs are now adjusted to the approximate average CEPCI for 2024 (800). 
          Industrial electricity prices are now the average for 2024 (\$0.082/kWh). The base case single-pass conversion and total current density have been adjusted to the optimal in the Hawks model at these new costs.
          The market price of ethylene is updated to the 2024 global average. Pure CO is a difficult chemical to price since it is rarely sold, usually used within a facility where it is generated.
          The base price for CO (\$0.6/kg in 2001) has also been updated with an arbitrary 1% inflation rate. Note that it may be more likely to track natural gas prices, which slightly dipped from 2001 to 2024 on the Henry Hub.   
          ''')
 
-st.write('**:red[Known issues]:** Currently, there is no warning if you enter a numeric value in any text box that is out of  \
+with st.expander("**:red[Known issues]:**", expanded = False):
+    st.write('Currently, there is no warning if you enter a numeric value in any text box that is out of  \
          physical range, e.g. capacity factor > 1, single-pass conversion > 1. The displayed results will be physically unreasonable. \
          User is responsible for checking that their inputs are reasonable.')
 
@@ -494,7 +496,7 @@ with st.expander("**Help**", expanded = False):
         """)
 
 st.write("**Cite this work**: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647)")
-st.write("**Questions, collaborations, requests?** Contact [shashwati.dc@utexas.edu](mailto:shashwati.dc@utexas.edu).")
+st.write("**Questions, collaborations, requests?** Contact [shashwatidc@utexas.edu](mailto:shashwatidc@utexas.edu).")
 
 #__________________________________________________________________________________
 
