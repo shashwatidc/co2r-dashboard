@@ -474,7 +474,7 @@ with st.expander("**Update history**", expanded = False):
             The market price of ethylene is updated to the 2024 global average. Pure CO is a difficult chemical to price since it is rarely sold, usually used within a facility where it is generated.
             The base price for CO (\$0.6/kg in 2001) has also been updated with an arbitrary 1% inflation rate. Note that it may be more likely to track natural gas prices, which slightly dipped from 2001 to 2024 on the Henry Hub.   
             ''')
-with st.expander("**:red[Known issues]:**", expanded = False):
+with st.expander("**:red[Known issues]**", expanded = False):
     st.write(' Currently, there is no warning if you enter a numeric value in any text box that is out of  \
             physical range, e.g. capacity factor > 1, single-pass conversion > 1. The displayed results will be physically unreasonable. \
             User is responsible for checking that their inputs are reasonable.')
