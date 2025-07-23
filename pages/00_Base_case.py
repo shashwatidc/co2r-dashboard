@@ -466,10 +466,10 @@ RdBu = LinearSegmentedColormap.from_list('diverging_cmap', colors)
 
 st.title("CO₂R Costing Dashboard: Home")
 st.write("*Developed by [Shashwati da Cunha](https://shashwatidc.github.io/) in the [Resasco Catalysis Lab](https://www.resascolab.com/)*")
-st.write('''Generate the capital and operating cost for a CO₂ reduction process converting captured CO₂
-         into CO or ethylene in a low-temperature membrane electrode assembly (MEA) at neutral pH. Navigate using the sidebar to also view 
-         the costs of non-aqueous CO₂R to CO or oxalic acid in a flow cell, or visualize the sensitivity of costs. Modify the settings in 
-         the left sidebar to see how the results change. Click [here](#process-flow-diagram) to see the electrolyzer and process design, as well as stream tables and results. 
+st.write('''Generate the [capital](#capital-cost) and [operating cost](#operating-cost) for a CO₂ reduction process converting captured CO₂
+         into CO or ethylene in a low-temperature membrane electrode assembly (MEA) at neutral pH. You can also view 
+         the costs of [non-aqueous CO₂R to CO](#nonaqueous-CO) or [oxalic acid](#nonaqueous-OA) in a flow cell, or visualize the [sensitivity](#MEA-CO) of costs. Modify the settings in 
+         the left sidebar to see how the results change. Click [here](#process-flow-diagram) to see the electrolyzer and process design, or [here](#raw-model-results) for stream tables and results. 
          This interactive tool is based on our papers,
 > Da Cunha, S.; Resasco, J. Insights from Techno-Economic Analysis Can Guide the Design of Low-Temperature CO₂ Electrolyzers towards Industrial Scaleup. ACS Energy Lett. 2024, 9, 11, 5550–5561. DOI: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647).
           
