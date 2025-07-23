@@ -1411,8 +1411,11 @@ else:
 
 ##################################### DIAGRAMS ###################################
 
-st.header("Process flow diagram")
+st.divider()
 
+middle_column, right_column = st.columns(2, gap = 'large')
+middle_column.header("Process flow diagram")
+right_column.header('MEA design schematic')
 # TODO
 def svg_write(fig, center=True):
     """
