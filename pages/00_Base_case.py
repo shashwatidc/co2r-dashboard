@@ -25,7 +25,6 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 import threading
 
-#TODO
 import base64
 from io import StringIO
 
@@ -297,6 +296,13 @@ def default_single_run(product_name,
     energy_default = df_energy_default.loc['Total', 'Energy (kJ/kg {})'.format(product_name)]
     emissions_default = df_energy_default.loc['Total', 'Emissions (kg CO2/kg {})'.format(product_name)]
     return capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default
+
+@st.cache_data(ttl = "1h")
+def render_svg(svg):
+    """Renders the given svg string."""
+    b64 = base64.b64encode(svg.encode('utf-8')).decode("utf-8")
+    html = r'<img src="data:image/svg+xml;base64,%s"/>' % b64
+    st.write(html, unsafe_allow_html=True)
 
 _render_lock = threading.RLock()
 
@@ -1434,16 +1440,20 @@ def svg_write(fig, center=True):
     # Write the HTML
     st.write(html, unsafe_allow_html=True)
 
-def render_svg(svg):
-    """Renders the given svg string."""
-    b64 = base64.b64encode(svg.encode('utf-8')).decode("utf-8")
-    html = r'<img src="data:image/svg+xml;base64,%s"/>' % b64
-    st.write(html, unsafe_allow_html=True)
-
 PFD_svg = open("figures/2a 20250317 PFD CO flow diagram - no boxes.svg", 
                'r', 
                encoding='utf-8')
 source_code = PFD_svg.read() 
-render_svg(source_code)
+
+with middle_column:
+    render_svg(source_code)
+
+electrolyzer_svg = open("figures/1a 20240708 Schematic - labeled.svg", 
+               'r', 
+               encoding='utf-8')
+source_code = electrolyzer_svg.read() 
+
+with right_column:
+    render_svg(source_code)
 
 st.write('Copyright © {} Shashwati C da Cunha. All rights reserved.'.format(datetime.now().date().strftime("%Y")))
