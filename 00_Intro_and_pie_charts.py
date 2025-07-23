@@ -13,7 +13,7 @@ import streamlit as st
 
 page_00 = st.Page(
     "pages/00_Base_case.py", 
-    title = "Base case techno-economics", 
+    title = "Base case", 
     icon = ":material/home:", 
     default = True,)
 page_01 = st.Page(
@@ -30,21 +30,21 @@ page_02 = st.Page(
     url_path = 'MEA-ethylene')
 page_03 = st.Page(
     "pages/03_CO_Nonaq.py", 
-    title = "Non-aqueous CO2R to CO", 
+    title = "CO, non-aqueous", 
     icon = None, # ":material/calculate:",
     default = False,
     url_path = 'nonaqueous-CO')
 page_04 = st.Page(
     "pages/04_OA_Nonaq.py", 
-    title = "Non-aqueous CO2R to oxalic acid", 
+    title = "Oxalic acid, non-aqueousd", 
     icon = None, # ":material/calculate:", 
     default=False,
     url_path = 'nonaqueous-OA')
 
 pg = st.navigation(
         pages = {
-            "Aqueous MEA": [page_00, page_01, page_02],
-            "Non-aqueous": [page_03, page_04],
+            "Aqueous CO2R, zero-gap MEA": [page_00, page_01, page_02],
+            "Non-aqueous CO2R, flow cell": [page_03, page_04],
         },
         position = 'top', # 'sidebar'
         # expanded = True,

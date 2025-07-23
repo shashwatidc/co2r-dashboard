@@ -463,17 +463,19 @@ RdBu = LinearSegmentedColormap.from_list('diverging_cmap', colors)
 st.title("CO₂R Costing Dashboard: Home")
 st.write("*Developed by [Shashwati da Cunha](https://shashwatidc.github.io/) in the [Resasco Catalysis Lab](https://www.resascolab.com/)*")
 st.write('''Generate the capital and operating cost for a CO₂ reduction process converting captured CO₂
-         into either CO or ethylene. Modify the settings on the left to see how the results change. 
-         This interactive tool is based on our paper,
+         into CO or ethylene in a low-temperature membrane electrode assembly (MEA) at neutral pH. Navigate using the sidebar to also view 
+         the costs of non-aqueous CO₂R to CO or oxalic acid in a flow cell, or visualize the sensitivity of costs. Modify the settings on 
+         the left to see how the results change. This interactive tool is based on our papers,
 > Da Cunha, S.; Resasco, J. Insights from Techno-Economic Analysis Can Guide the Design of Low-Temperature CO₂ Electrolyzers towards Industrial Scaleup. ACS Energy Lett. 2024, 9, 11, 5550–5561. DOI: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647). 
+> Da Cunha, S.; Resasco, J. Techno-Economic Assessment of Non-Aqueous CO2 Reduction. ChemRxiv, 2025. DOI:[10.26434/chemrxiv-2025-k071x](https://doi.org/10.26434/chemrxiv-2025-k071x).
          ''')
 
 with st.expander("**Update history**", expanded = False):
-    st.write('''The CO₂R Dashboard has been updated! Capital costs are now adjusted to the approximate average CEPCI for 2024 (800). 
-            Industrial electricity prices are now the average for 2024 (\$0.082/kWh). The base case single-pass conversion and total current density have been adjusted to the optimal in the Hawks model at these new costs.
-            The market price of ethylene is updated to the 2024 global average. Pure CO is a difficult chemical to price since it is rarely sold, usually used within a facility where it is generated.
-            The base price for CO (\$0.6/kg in 2001) has also been updated with an arbitrary 1% inflation rate. Note that it may be more likely to track natural gas prices, which slightly dipped from 2001 to 2024 on the Henry Hub.   
-            ''')
+    st.write('''**March 12, 2025:** Capital costs are now adjusted to the approximate average CEPCI for 2024 (800). 
+         Industrial electricity prices are now the average for 2024 (\$0.082/kWh). The base case single-pass conversion and total current density have been adjusted to the optimal in the Hawks model at these new costs.
+         The market price of ethylene is updated to the 2024 global average. Pure CO is a difficult chemical to price since it is rarely sold, usually used within a facility where it is generated.
+         The base price for CO (\$0.6/kg in 2001) has also been updated with an arbitrary 1% inflation rate. Note that it may be more likely to track natural gas prices, which slightly dipped from 2001 to 2024 on the Henry Hub.   
+         ''')
 with st.expander("**:red[Known issues]**", expanded = False):
     st.write(' Currently, there is no warning if you enter a numeric value in any text box that is out of  \
             physical range, e.g. capacity factor > 1, single-pass conversion > 1. The displayed results will be physically unreasonable. \

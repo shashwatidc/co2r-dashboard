@@ -463,7 +463,7 @@ st.write('''Visualize how the capex and opex respond to a change in a single pro
          ''')
 
 with st.expander("**Update history**", expanded = False):
-    st.write('''**March 12, 2025:** The CO₂R Dashboard has been updated! Capital costs are now adjusted to the approximate average CEPCI for 2024 (800). 
+    st.write('''**March 12, 2025:** Capital costs are now adjusted to the approximate average CEPCI for 2024 (800). 
          Industrial electricity prices are now the average for 2024 (\$0.082/kWh). The base case single-pass conversion and total current density have been adjusted to the optimal in the Hawks model at these new costs.
          The market price of ethylene is updated to the 2024 global average. Pure CO is a difficult chemical to price since it is rarely sold, usually used within a facility where it is generated.
          The base price for CO (\$0.6/kg in 2001) has also been updated with an arbitrary 1% inflation rate. Note that it may be more likely to track natural gas prices, which slightly dipped from 2001 to 2024 on the Henry Hub.   
@@ -500,7 +500,7 @@ with st.expander("**Help**", expanded = False):
             However, the PSA capex and labor costs will still differ from the original, so the resulting price will still be slightly higher. 
         """)
 
-st.write("**Cite this work**: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647)")
+st.write("**Cite this work**: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647), [10.26434/chemrxiv-2025-k071x](https://doi.org/10.26434/chemrxiv-2025-k071x)")
 st.write("**Questions, collaborations, requests?** Contact [shashwatidc@utexas.edu](mailto:shashwatidc@utexas.edu).")
 
 
