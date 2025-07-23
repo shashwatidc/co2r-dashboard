@@ -1401,11 +1401,21 @@ if not np.isnan(FE_product_checked):
     df_utility_imports
     
 else:
-    with middle_column:
-        # st.header(':red[Model is physically unviable. Please check $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio.]')
+    # with middle_column:
+    # st.header(':red[Model is physically unviable. Please check $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio.]')
+    @st.dialog("Error")
+    def error_dialog(FE_product_checked, SPC, crossover_ratio):
+        st.write('''The assumptions for the selectivity, single-pass conversion, and crossover ratio
+                    together violate mass balance.'''.format())
     
-        st.error(':red[Model is physically unviable. Please check $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio.]',
-                 icon = ":material/error:")
+    st.error('''Model is physically unviable. \n Please check the Reactor Model section under Electrolyzer Operation 
+             and verify the model for selectivity versus single-pass conversion, as well as the assumptions made for 
+             $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio. These three assumptions 
+            together violate mass balance. If the electrolyzer is following the Hawks model, this could be because the desired single-pass
+             conversion is too high to be achieved with the given $FE_{CO2R, 0}$ because of plug flow and crossover. 
+             To manually override this error, choose to manually specify $FE$ and single-pass conversion.
+             If you are still seeing an error, it may be because the crossover is too high and limits the possible single-pass conversion.''',
+                icon = ":material/error:")
 
 # ________________________________________________________________________________
 
@@ -1413,50 +1423,20 @@ else:
 
 st.divider()
 
-middle_column, right_column = st.columns(2, gap = 'large')
-middle_column.header("Process flow diagram")
-right_column.header('MEA design schematic')
-# TODO
-def svg_write(fig, center=True):
-    """
-    Renders a matplotlib figure object to SVG.
-    Disable center to left-margin align like other objects.
-    """
-    # Save to stringIO instead of file
-    imgdata = StringIO()
-    fig.savefig(imgdata, format="svg")
-
-    # Retrieve saved string
-    imgdata.seek(0)
-    svg_string = imgdata.getvalue()
-
-    # Encode as base 64
-    b64 = base64.b64encode(svg_string.encode("utf-8")).decode("utf-8")
-
-    # Add some CSS on top
-    css_justify = "center" if center else "left"
-    css = '<p style="text-align:center; display: flex; justify-content: {};">'.format(css_justify)
-    html = r'{}<img src="data:image/svg+xml;base64,{}"/>'.format(
-        css, b64
-    )
-
-    # Write the HTML
-    st.write(html, unsafe_allow_html=True)
+st.header("Process flow diagram")
 
 PFD_svg = open("figures/2a 20250317 PFD CO flow diagram - no boxes.svg", 
                'r', 
                encoding='utf-8')
 source_code = PFD_svg.read() 
+render_svg(source_code)
 
-with middle_column:
-    render_svg(source_code)
-
+st.header('MEA design schematic')
 electrolyzer_svg = open("figures/1a 20240708 Schematic - labeled.svg", 
                'r', 
                encoding='utf-8')
 source_code = electrolyzer_svg.read() 
 
-with right_column:
-    render_svg(source_code)
+render_svg(source_code)
 
 st.write('Copyright © {} Shashwati C da Cunha. All rights reserved.'.format(datetime.now().date().strftime("%Y")))
