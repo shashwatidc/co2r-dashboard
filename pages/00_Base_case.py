@@ -304,6 +304,13 @@ def render_svg(svg):
     html = r'<img src="data:image/svg+xml;base64,%s"/>' % b64
     st.write(html, unsafe_allow_html=True)
 
+@st.cache_data(ttl = "1h")
+@st.dialog("Error")
+def error_dialog(): # (FE_product_checked, SPC, crossover_ratio):
+    st.write('''The assumptions for the selectivity, single-pass conversion, and crossover ratio
+                together violate mass balance.'''.format())
+
+
 _render_lock = threading.RLock()
 
 ###################################################################################
@@ -471,6 +478,9 @@ RdBu = LinearSegmentedColormap.from_list('diverging_cmap', colors)
 # _lock = RendererAgg.lock # Lock figures so that concurrent users/threads can coexist independently
 
 st.title("CO₂R Costing Dashboard: Home")
+
+st.header(":red[WARNING: The dashboard is currently being updated! Some functionality may be broken.]")
+
 st.write("*Developed by [Shashwati da Cunha](https://shashwatidc.github.io/) in the [Resasco Catalysis Lab](https://www.resascolab.com/)*")
 st.write('''Generate the [capital](#capital-cost) and [operating cost](#operating-cost) for a CO₂ reduction process converting captured CO₂
          into CO or ethylene in a low-temperature membrane electrode assembly (MEA) at neutral pH. You can also view 
@@ -1044,6 +1054,7 @@ else:
 
 # ### Generate physical and costing model
 if not np.isnan(FE_product_checked): 
+    st.write("HERE")
     df_capex_BM, df_capex_totals, df_costing_assumptions, df_depreciation, df_electrolyzer_assumptions, df_electrolyzer_streams_mol_s,\
             df_energy, df_feedstocks, df_general, df_maintenance, df_operations, df_opex, df_opex_totals, df_outlet_assumptions,\
             df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities = cached_single_run(product_name = product_name, 
@@ -1401,14 +1412,11 @@ if not np.isnan(FE_product_checked):
     df_utility_imports
     
 else:
-    # with middle_column:
-    # st.header(':red[Model is physically unviable. Please check $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio.]')
-    @st.dialog("Error")
-    def error_dialog(FE_product_checked, SPC, crossover_ratio):
-        st.write('''The assumptions for the selectivity, single-pass conversion, and crossover ratio
-                    together violate mass balance.'''.format())
-    
-    st.error('''Model is physically unviable. \n Please check the Reactor Model section under Electrolyzer Operation 
+    with middle_column:
+        error_dialog()
+        # st.header(':red[Model is physically unviable. Please check $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio.]')
+        
+        st.error('''Model is physically unviable. \n Please check the Reactor Model section under Electrolyzer Operation 
              and verify the model for selectivity versus single-pass conversion, as well as the assumptions made for 
              $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio. These three assumptions 
             together violate mass balance. If the electrolyzer is following the Hawks model, this could be because the desired single-pass
