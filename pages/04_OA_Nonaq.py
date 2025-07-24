@@ -294,14 +294,14 @@ def cached_single_run(product_name,
 #     return capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default
 
 @st.cache_data(ttl = "1h")
-def _svg_write(_fig, center=True):
+def svg_write(fig, center=True):
     """
     Renders a matplotlib figure object to SVG.
     Disable center to left-margin align like other objects.
     """
     # Save to stringIO instead of file
     imgdata = StringIO()
-    _fig.savefig(imgdata, format="svg")
+    fig.savefig(imgdata, format="svg")
 
     # Retrieve saved string
     imgdata.seek(0)
@@ -530,8 +530,8 @@ with st.expander("**Help**", expanded = False):
         Plot formatting options to change the range and number of ticks (axis labels) can be found in **Plot formatting** in the sidebar.
             Please note that it can take some time to run the model for a large number of datapoints. If possible, start with a few points and add more once you have the settings you want. 
            \n By default, the cell voltage will be modeled using Tafel equations, and the Faradaic efficiency based on the single-pass conversion and the maximum Faradaic efficiency.
-        Mouse over the :grey[**?**] next to each input to see the default values for each parameter. Refresh the page to reset all values to their defaults.      
-        This dashboard will not exactly match the paper, since costs have been updated since its publication. You can get close to reproducing it
+           \n Mouse over the :grey[**?**] next to each input to see the default values for each parameter. Refresh the page to reset all values to their defaults.      
+           \n This dashboard will not exactly match the paper, since costs have been updated since its publication. You can get close to reproducing it
             by adjusting the electrolyzer capex to \$5000/m$^2$, electricity price to \$0.076/kWh, single-pass conversion for CO
             to 11.5%, total current density for CO to 472 mA/cm$^2$, single-pass conversion for ethylene to 2.7%, 
             and total current density for ethylene to 436 mA/cm$^2$, CO market price to \$0.6/kg, and ethylene market price to \$0.96. 
@@ -1715,7 +1715,10 @@ if not st.session_state.is_active_error_ethylene:
             ## Legend
             axs.legend(bbox_to_anchor=(1, 1), loc='upper left', reverse = True) # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
 
-            st.pyplot(capex_bar_fig, transparent = True, use_container_width = True)
+            # st.pyplot(capex_bar_fig, transparent = True, use_container_width = True)
+            capex_html = svg_write(capex_bar_fig, center = True)
+            
+            st.write(capex_html, unsafe_allow_html=True)
 
     ###### OPEX BAR CHART 
     with right_column.container(height = 300, border = False): 
@@ -1765,7 +1768,10 @@ if not st.session_state.is_active_error_ethylene:
             ## Legend
             axs.legend(bbox_to_anchor=(1.4, 1.1), loc='upper left', reverse = True) # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
             
-            st.pyplot(opex_bar_fig, transparent = True, use_container_width = True)   
+            # st.pyplot(opex_bar_fig, transparent = True, use_container_width = True)   
+            opex_html = svg_write(opex_bar_fig, center = True)
+            
+            st.write(opex_html, unsafe_allow_html=True)
 
     ###### LEVELIZED BAR CHART
     with middle_column.container(height = 300, border = False): 
@@ -1839,7 +1845,10 @@ if not st.session_state.is_active_error_ethylene:
             ## Legend
             axs.legend(ncol = 1, bbox_to_anchor=(1.4, 1.15), loc='upper left', reverse = True, fontsize = 16) # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
         #     axs.legend(bbox_to_anchor=(1, 1), loc='upper left') # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
-            st.pyplot(levelized_bar_fig, transparent = True, use_container_width = True)   
+            # st.pyplot(levelized_bar_fig, transparent = True, use_container_width = True)   
+            levelized_html = svg_write(levelized_bar_fig, center = True)
+            
+            st.write(levelized_html, unsafe_allow_html=True)
 
     with right_column.container(height = 300, border = False): 
         pass
@@ -1889,7 +1898,10 @@ if not st.session_state.is_active_error_ethylene:
                         
                 ## Legend
                 axs.legend(bbox_to_anchor=(1, 1), loc='upper left', reverse = True) # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
-                st.pyplot(potentials_bar_fig, transparent = True, use_container_width = True)
+                # st.pyplot(potentials_bar_fig, transparent = True, use_container_width = True)
+                capex_html = svg_write(potentials_bar_fig, center = True)
+                
+                st.write(capex_html, unsafe_allow_html=True)
 
     ###### FE-SPC SCATTERPLOT
     with right_column.container(height = 300, border = False): 

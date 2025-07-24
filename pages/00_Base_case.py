@@ -304,14 +304,14 @@ def render_svg(svg):
     st.write(html, unsafe_allow_html=True)
 
 @st.cache_data(ttl = "1h")
-def _svg_write(_fig, center=True):
+def svg_write(fig, center=True):
     """
     Renders a matplotlib figure object to SVG.
     Disable center to left-margin align like other objects.
     """
     # Save to stringIO instead of file
     imgdata = StringIO()
-    _fig.savefig(imgdata, format="svg")
+    fig.savefig(imgdata, format="svg")
 
     # Retrieve saved string
     imgdata.seek(0)
@@ -327,8 +327,7 @@ def _svg_write(_fig, center=True):
         css, b64
     )
 
-    # Write the HTML
-    st.write(html, unsafe_allow_html=True)
+    return html
 
 @st.dialog(title = "Error",
            width = 'large')
@@ -514,7 +513,7 @@ st.write('''This is a techno-economic assessment (TEA) of low-temperature CO₂ 
          This interactive tool is based on our papers,
 > Da Cunha, S.; Resasco, J. Insights from Techno-Economic Analysis Can Guide the Design of Low-Temperature CO₂ Electrolyzers towards Industrial Scaleup. ACS Energy Lett. 2024, 9, 11, 5550–5561. DOI: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647).
           
-> Da Cunha, S.; Resasco, J. Techno-Economic Assessment of Non-Aqueous CO₂ Reduction. ChemRxiv, 2025. DOI:[10.26434/chemrxiv-2025-k071x](https://doi.org/10.26434/chemrxiv-2025-k071x).
+> Da Cunha, S.; Resasco, J. Techno-Economic Assessment of Non-Aqueous CO₂ Reduction. ChemRxiv, 2025. DOI: [10.26434/chemrxiv-2025-k071x](https://doi.org/10.26434/chemrxiv-2025-k071x).
          ''')
 
 with st.expander("**Update history**", expanded = False):
@@ -544,8 +543,8 @@ with st.expander("**Help**", expanded = False):
            \n By default, the cell voltage will be modeled using Tafel equations, and the Faradaic efficiency based on the single-pass conversion and the maximum Faradaic efficiency.
              This model and its assumptions are based on our [2024 paper](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647). If you want to include a change that is not captured 
              in the model, you can use the toggles in the sidebar to manually specify an additional capex or opex.
-         Mouse over the :grey[**?**] next to each input to see the default values for each parameter. Refresh the page to reset all values to their defaults.
-         This dashboard will not exactly match the paper, since costs have been updated since its publication. You can get close to reproducing it
+           \n Mouse over the :grey[**?**] next to each input to see the default values for each parameter. Refresh the page to reset all values to their defaults.
+           \n This dashboard will not exactly match the paper, since costs have been updated since its publication. You can get close to reproducing it
              by adjusting the electrolyzer capex to \$5000/m$^2$, electricity price to \$0.076/kWh, single-pass conversion for CO
              to 11.5%, total current density for CO to 472 mA/cm$^2$, single-pass conversion for ethylene to 2.7%, 
              and total current density for ethylene to 436 mA/cm$^2$, CO market price to \$0.6/kg, and ethylene market price to \$0.96. 
@@ -1192,7 +1191,9 @@ if not np.isnan(FE_product_checked):
             # capex_pie_fig.savefig(buffer, format="png")
             # st.image(buffer, width = 400)
             # st.pyplot(capex_pie_fig, transparent = True, use_container_width = True)
-            _svg_write(capex_pie_fig, center = True)
+            capex_html = svg_write(capex_pie_fig, center = True)
+            
+            st.write(capex_html, unsafe_allow_html=True)
 
     @st.cache_data(ttl = "1h")
     def opex_delta_color_checker(df_opex_totals, opex_default):
@@ -1232,7 +1233,10 @@ if not np.isnan(FE_product_checked):
             axs.text(3.5, 0, ' ', color = 'white') # make figure bigger
             axs.text(-3.5, 0, ' ', color = 'white') # make figure bigger
             # st.pyplot(opex_pie_fig, transparent = True, use_container_width = True)   
-            _svg_write(opex_pie_fig, center = True)
+            opex_html = svg_write(opex_pie_fig, center = True)
+
+            # Write the HTML
+            st.write(opex_html, unsafe_allow_html=True)
 
     if opex_delta_color == 'inverse' or capex_delta_color == 'inverse':
         levelized_delta_color = 'inverse'
@@ -1295,8 +1299,11 @@ if not np.isnan(FE_product_checked):
                             verticalalignment = verticalalignment)
             plt.setp(autopercents, color="white")
             # st.pyplot(levelized_pie_fig, transparent = True, use_container_width = True)   
-            _svg_write(levelized_pie_fig, center = True)
+            levelized_html = svg_write(levelized_pie_fig, center = True)
 
+            # Write the HTML
+            st.write(levelized_html, unsafe_allow_html=True)
+            
     with right_column.container(height = 455, border = False): 
         pass
 
@@ -1335,8 +1342,11 @@ if not np.isnan(FE_product_checked):
                 ha='center', va='center', 
                 fontsize = MEDIUM_SIZE)  
                 # st.pyplot(potentials_pie_fig, transparent = True, use_container_width = True)
-                _svg_write(potentials_pie_fig, center = True)
+                potentials_html = svg_write(potentials_pie_fig, center = True)
 
+                # Write the HTML
+                st.write(potentials_html, unsafe_allow_html=True)
+                
     @st.cache_data(ttl = "1h")
     def energy_delta_color_checker(df_energy, energy_default):
         if np.isclose(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)], energy_default, rtol = 1e-6, equal_nan = True):
@@ -1372,8 +1382,10 @@ if not np.isnan(FE_product_checked):
                         ha='center', va='center', 
                         fontsize = MEDIUM_SIZE)                  
                 # st.pyplot(energy_pie_fig, transparent = True, use_container_width = True) 
-                _svg_write(energy_pie_fig, center = True)
+                energy_html = svg_write(energy_pie_fig, center = True)
   
+                # Write the HTML
+                st.write(energy_html, unsafe_allow_html=True)
 
     ###### EMISSIONS PIE CHART
     with middle_column.container(height = 455, border = False): 
@@ -1404,8 +1416,10 @@ if not np.isnan(FE_product_checked):
                     fontsize = MEDIUM_SIZE)  
                 
                     # st.pyplot(emissions_pie_fig, transparent = True, use_container_width = True)
-                    _svg_write(emissions_pie_fig, center = True)
+                    emissions_html = svg_write(emissions_pie_fig, center = True)
    
+                    # Write the HTML
+                    st.write(emissions_html, unsafe_allow_html=True)
 
     st.divider()
             
