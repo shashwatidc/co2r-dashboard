@@ -1192,7 +1192,7 @@ if not np.isnan(FE_product_checked):
             # capex_pie_fig.savefig(buffer, format="png")
             # st.image(buffer, width = 400)
             # st.pyplot(capex_pie_fig, transparent = True, use_container_width = True)
-            svg_write(capex_pie_fig, center = True)
+            _svg_write(capex_pie_fig, center = True)
 
     @st.cache_data(ttl = "1h")
     def opex_delta_color_checker(df_opex_totals, opex_default):
@@ -1232,7 +1232,7 @@ if not np.isnan(FE_product_checked):
             axs.text(3.5, 0, ' ', color = 'white') # make figure bigger
             axs.text(-3.5, 0, ' ', color = 'white') # make figure bigger
             # st.pyplot(opex_pie_fig, transparent = True, use_container_width = True)   
-            svg_write(opex_pie_fig, center = True)
+            _svg_write(opex_pie_fig, center = True)
 
     if opex_delta_color == 'inverse' or capex_delta_color == 'inverse':
         levelized_delta_color = 'inverse'
@@ -1295,7 +1295,7 @@ if not np.isnan(FE_product_checked):
                             verticalalignment = verticalalignment)
             plt.setp(autopercents, color="white")
             # st.pyplot(levelized_pie_fig, transparent = True, use_container_width = True)   
-            svg_write(levelized_pie_fig, center = True)
+            _svg_write(levelized_pie_fig, center = True)
 
     with right_column.container(height = 455, border = False): 
         pass
@@ -1335,7 +1335,7 @@ if not np.isnan(FE_product_checked):
                 ha='center', va='center', 
                 fontsize = MEDIUM_SIZE)  
                 # st.pyplot(potentials_pie_fig, transparent = True, use_container_width = True)
-                svg_write(potentials_pie_fig, center = True)
+                _svg_write(potentials_pie_fig, center = True)
 
     @st.cache_data(ttl = "1h")
     def energy_delta_color_checker(df_energy, energy_default):
@@ -1372,7 +1372,7 @@ if not np.isnan(FE_product_checked):
                         ha='center', va='center', 
                         fontsize = MEDIUM_SIZE)                  
                 # st.pyplot(energy_pie_fig, transparent = True, use_container_width = True) 
-                svg_write(energy_pie_fig, center = True)
+                _svg_write(energy_pie_fig, center = True)
   
 
     ###### EMISSIONS PIE CHART
@@ -1404,7 +1404,7 @@ if not np.isnan(FE_product_checked):
                     fontsize = MEDIUM_SIZE)  
                 
                     # st.pyplot(emissions_pie_fig, transparent = True, use_container_width = True)
-                    svg_write(emissions_pie_fig, center = True)
+                    _svg_write(emissions_pie_fig, center = True)
    
 
     st.divider()
