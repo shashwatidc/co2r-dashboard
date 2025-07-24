@@ -324,8 +324,7 @@ def svg_write(fig, center=True):
         css, b64
     )
 
-    # Write the HTML
-    st.write(html, unsafe_allow_html=True)
+    return html
 
 @st.dialog(title = "Error",
            width = 'large')

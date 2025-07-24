@@ -48,7 +48,7 @@ page_04 = st.Page(
 pg = st.navigation(
         pages = {
             "Aqueous CO₂R, zero-gap MEA": [page_00, page_01, page_02],
-           # TODO # "Non-aqueous CO₂R, flow cell": [page_03, page_04],
+            "Non-aqueous CO₂R, flow cell": [page_03, page_04],
         },
         position = 'sidebar', # 'top' 'sidebar'
         # expanded = True,

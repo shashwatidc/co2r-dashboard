@@ -58,119 +58,172 @@ from TEA_SingleRun import *
 
 # Cache single run of model
 @st.cache_data(ttl = "1h")
-def cached_single_run(product_name,
-        product_rate_kg_day,
-        df_products,
-        FE_CO2R_0,
-        FE_product_specified,
-        j_total_mA_cm2,
-        SPC,
-        crossover_ratio,
-        P,
-        T_streams,
-        R_ohmcm2,
-        an_E_eqm,
-        an_eta_ref,
-        an_Tafel_slope,
-        an_j_ref,
-        cathode_outlet_humidity,
-        excess_water_ratio,   
-        electrolyte_conc,  
-        density_kgm3,
-        PSA_second_law_efficiency,
-        carbon_capture_efficiency,
-        T_sep,         
-        electricity_cost_USD_kWh,
-        heat_cost_USD_kWh,
-        electricity_emissions_kgCO2_kWh,
-        heat_emissions_kgCO2_kWh,
-        product_cost_USD_kgprod,
-        H2_cost_USD_kgH2,
-        water_cost_USD_kg,
-        CO2_cost_USD_tCO2,
-        electrolyzer_capex_USD_m2,       
-        lifetime_years,
-        stack_lifetime_years,
-        capacity_factor,
-        battery_capex_USD_kWh,               
-        battery_capacity,
-        is_additional_capex,
-        is_additional_opex,
-        additional_capex_USD,
-        additional_opex_USD_kg,
-        model_FE,
-        overridden_vbl,
-        overridden_value,
-        overridden_unit,
-        override_optimization,
-        exponent,
-        scaling,
-        MW_CO2,
-        MW_H2O,
-        MW_O2,
-        MW_MX,
-        R, 
-        F,
-        K_to_C = 273.15,
-        kJ_per_kWh = 3.60E+03,
-        ):
+def cached_single_run_nonaq(product_name,
+                solvent_name,
+                supporting_electrolyte_name,
+                df_products,
+
+                product_rate_kg_day,
+                model_FE,
+                FE_CO2R_0,
+                FE_product_specified,
+                j_total_mA_cm2,
+                SPC,
+                crossover_ratio,
+                P,
+                T_streams,
+
+                R_membrane_ohmcm2,
+                electrolyte_thickness_cm,
+                
+                an_E_eqm,
+                an_eta_ref,
+                an_Tafel_slope,
+                an_j_ref,
+
+                cathode_outlet_humidity,
+                excess_water_ratio,   
+                excess_solvent_ratio,
+                catholyte_conc_M,  
+                anolyte_conc_M,
+                water_density_kg_m3,
+                electrolyte_density_kg_m3,
+                solvent_loss_fraction,
+
+                LL_second_law_efficiency,
+                PSA_second_law_efficiency,
+                T_sep,         
+                CO2_solubility_mol_mol,
+
+                carbon_capture_efficiency,
+                electricity_emissions_kgCO2_kWh,
+                heat_emissions_kgCO2_kWh,
+
+                electricity_cost_USD_kWh,
+                heat_cost_USD_kWh,
+                product_cost_USD_kgprod,
+                H2_cost_USD_kgH2,
+                water_cost_USD_kg,
+                CO2_cost_USD_tCO2,
+                electrolyzer_capex_USD_m2,  
+                PSA_capex_USD_1000m3_hr,
+                LL_capex_USD_1000mol_hr,     
+                solvent_cost_USD_kg,
+                electrolyte_cost_USD_kg,    
+
+                lifetime_years,
+                stack_lifetime_years,
+                capacity_factor,
+
+                battery_capex_USD_kWh,               
+                battery_capacity,
+
+                kappa_electrolyte_S_cm,
+                viscosity_cP,  
+
+                overridden_vbl,
+                overridden_value,
+                overridden_unit,
+                override_optimization,
+                exponent,
+                scaling,
+
+                MW_CO2,
+                MW_H2O,
+                MW_O2,
+                MW_MX,
+                MW_solvent,
+                MW_supporting,
+                R, 
+                F,
+                
+                K_to_C = 273.15,
+                kJ_per_kWh = 3.60E+03,
+            ):
     # Execute a single run of the model. The actual function is imported from TEA_SingleRun.ipynb.
     # This is useful becuase of the caching - it will only actually rerun the model if there is a change in the inputs
-    return single_run(product_name=product_name,
-        product_rate_kg_day=product_rate_kg_day,
-        df_products=df_products,
-        FE_CO2R_0=FE_CO2R_0,
-        FE_product_specified=FE_product_specified,
-        j_total_mA_cm2=j_total_mA_cm2,
-        SPC=SPC,
-        crossover_ratio=crossover_ratio,
-        P=P,
-        T_streams = T_streams,
-        R_ohmcm2 = R_ohmcm2,
-        an_E_eqm = an_E_eqm,
-        an_eta_ref = an_eta_ref,
-        an_Tafel_slope = an_Tafel_slope,
-        an_j_ref = an_j_ref,
-        cathode_outlet_humidity = cathode_outlet_humidity,
-        excess_water_ratio = excess_water_ratio,   
-        electrolyte_conc = electrolyte_conc,  
-        density_kgm3 = density_kgm3,
-        PSA_second_law_efficiency = PSA_second_law_efficiency,
-        carbon_capture_efficiency = carbon_capture_efficiency,
-        T_sep = T_sep,         
-        electricity_cost_USD_kWh = electricity_cost_USD_kWh,
-        heat_cost_USD_kWh = heat_cost_USD_kWh,
-        electricity_emissions_kgCO2_kWh = electricity_emissions_kgCO2_kWh,
-        heat_emissions_kgCO2_kWh = heat_emissions_kgCO2_kWh,
-        product_cost_USD_kgprod = product_cost_USD_kgprod,
-        H2_cost_USD_kgH2 = H2_cost_USD_kgH2,
-        water_cost_USD_kg = water_cost_USD_kg,
-        CO2_cost_USD_tCO2 = CO2_cost_USD_tCO2,
-        electrolyzer_capex_USD_m2 = electrolyzer_capex_USD_m2,       
-        lifetime_years = lifetime_years,
-        stack_lifetime_years = stack_lifetime_years,
-        capacity_factor = capacity_factor,
-        battery_capex_USD_kWh = battery_capex_USD_kWh,               
-        battery_capacity = battery_capacity,
-        model_FE = model_FE,
-        is_additional_capex=is_additional_capex,
-        is_additional_opex=is_additional_opex,
-        additional_opex_USD_kg = additional_opex_USD_kg,
-        additional_capex_USD = additional_capex_USD,
-        overridden_vbl = overridden_vbl,
-        overridden_value = overridden_value,
-        overridden_unit = overridden_unit,
-        override_optimization = override_optimization,
-        exponent = exponent,
-        scaling = scaling,
-        MW_CO2 = MW_CO2,
-        MW_H2O = MW_H2O,
-        MW_O2 = MW_O2,
-        MW_MX = MW_MX,
-        R = R, 
-        F = F,
-        K_to_C = K_to_C,
-        kJ_per_kWh = kJ_per_kWh,
+    return single_run_nonaq(product_name = product_name,
+                solvent_name = solvent_name,
+                supporting_electrolyte_name = supporting_electrolyte_name,
+                df_products = df_products,
+
+                product_rate_kg_day = product_cost_USD_kgprod,
+                model_FE = model_FE,
+                FE_CO2R_0 = FE_CO2R_0,
+                FE_product_specified = FE_product_specified,
+                j_total_mA_cm2 = j_total_mA_cm2,
+                SPC = SPC,
+                crossover_ratio = crossover_ratio,
+                P = P,
+                T_streams = T_streams,
+
+                R_membrane_ohmcm2 = R_membrane_ohmcm2,
+                electrolyte_thickness_cm = electrolyte_thickness_cm,
+                
+                an_E_eqm = an_E_eqm,
+                an_eta_ref = an_eta_ref,
+                an_Tafel_slope = an_Tafel_slope,
+                an_j_ref = an_j_ref,
+
+                cathode_outlet_humidity = cathode_outlet_humidity,
+                excess_water_ratio = excess_water_ratio,   
+                excess_solvent_ratio = excess_solvent_ratio,
+                catholyte_conc_M = catholyte_conc_M,  
+                anolyte_conc_M = anolyte_conc_M,
+                water_density_kg_m3 = water_density_kg_m3,
+                electrolyte_density_kg_m3 = electrolyte_density_kg_m3,
+                solvent_loss_fraction = solvent_loss_fraction,
+
+                LL_second_law_efficiency = LL_second_law_efficiency,
+                PSA_second_law_efficiency = LL_second_law_efficiency,
+                T_sep = T_sep,         
+                CO2_solubility_mol_mol = CO2_solubility_mol_mol,
+
+                carbon_capture_efficiency = carbon_capture_efficiency,
+                electricity_emissions_kgCO2_kWh = electricity_emissions_kgCO2_kWh,
+                heat_emissions_kgCO2_kWh = heat_emissions_kgCO2_kWh,
+
+                electricity_cost_USD_kWh = electricity_cost_USD_kWh,
+                heat_cost_USD_kWh = heat_cost_USD_kWh,
+                product_cost_USD_kgprod = product_cost_USD_kgprod,
+                H2_cost_USD_kgH2 = H2_cost_USD_kgH2,
+                water_cost_USD_kg = water_cost_USD_kg,
+                CO2_cost_USD_tCO2 = CO2_cost_USD_tCO2,
+                electrolyzer_capex_USD_m2 = electrolyzer_capex_USD_m2,  
+                PSA_capex_USD_1000m3_hr = PSA_capex_USD_1000m3_hr,
+                LL_capex_USD_1000mol_hr = LL_capex_USD_1000mol_hr,     
+                solvent_cost_USD_kg = solvent_cost_USD_kg,
+                electrolyte_cost_USD_kg = electrolyte_cost_USD_kg,    
+
+                lifetime_years = lifetime_years,
+                stack_lifetime_years = stack_lifetime_years,
+                capacity_factor = capacity_factor,
+
+                battery_capex_USD_kWh = battery_capex_USD_kWh,               
+                battery_capacity = battery_capacity,
+
+                kappa_electrolyte_S_cm = kappa_electrolyte_S_cm,
+                viscosity_cP = viscosity_cP,  
+
+                overridden_vbl = overridden_vbl,
+                overridden_value = overridden_value,
+                overridden_unit = overridden_unit,
+                override_optimization = override_optimization,
+                exponent = exponent,
+                scaling = scaling,
+
+                MW_CO2 = MW_CO2,
+                MW_H2O = MW_H2O,
+                MW_O2 = MW_O2,
+                MW_MX = MW_MX,
+                MW_solvent = MW_solvent,
+                MW_supporting = MW_supporting,
+                R = R, 
+                F = F,
+                
+                K_to_C = K_to_C,
+                kJ_per_kWh = kJ_per_kWh,
+    
         )
 
 # Cache default model run 
@@ -293,6 +346,13 @@ def cached_single_run(product_name,
 #     emissions_default = sum(df_energy_default.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)])
 #     return capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default
 
+@st.cache_data(ttl = "1h")
+def render_svg(svg):
+    """Renders the given svg string."""
+    b64 = base64.b64encode(svg.encode('utf-8')).decode("utf-8")
+    html = r'<img src="data:image/svg+xml;base64,%s"/>' % b64
+    st.write(html, unsafe_allow_html=True)
+
 # @st.cache_data(ttl = "1h")
 def svg_write(fig, center=True):
     """
@@ -317,15 +377,7 @@ def svg_write(fig, center=True):
         css, b64
     )
 
-    # Write the HTML
-    st.write(html, unsafe_allow_html=True)
-
-@st.cache_data(ttl = "1h")
-def render_svg(svg):
-    """Renders the given svg string."""
-    b64 = base64.b64encode(svg.encode('utf-8')).decode("utf-8")
-    html = r'<img src="data:image/svg+xml;base64,%s"/>' % b64
-    st.write(html, unsafe_allow_html=True)
+    return html
 
 @st.dialog(title = "Error",
            width = 'large')

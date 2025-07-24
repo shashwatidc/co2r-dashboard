@@ -58,122 +58,174 @@ from NonAqDownstreamProcessModel import *
 from NonAqProcessEconomics import *
 from NonAqTEA_SingleRun import *
 
-# TODO
 # Cache single run of model
 @st.cache_data(ttl = "1h")
 def cached_single_run_nonaq(product_name,
-        product_rate_kg_day,
-        df_products,
-        FE_CO2R_0,
-        FE_product_specified,
-        j_total_mA_cm2,
-        SPC,
-        crossover_ratio,
-        P,
-        T_streams,
-        R_ohmcm2,
-        an_E_eqm,
-        an_eta_ref,
-        an_Tafel_slope,
-        an_j_ref,
-        cathode_outlet_humidity,
-        excess_water_ratio,   
-        electrolyte_conc,  
-        density_kgm3,
-        PSA_second_law_efficiency,
-        carbon_capture_efficiency,
-        T_sep,         
-        electricity_cost_USD_kWh,
-        heat_cost_USD_kWh,
-        electricity_emissions_kgCO2_kWh,
-        heat_emissions_kgCO2_kWh,
-        product_cost_USD_kgprod,
-        H2_cost_USD_kgH2,
-        water_cost_USD_kg,
-        CO2_cost_USD_tCO2,
-        electrolyzer_capex_USD_m2,       
-        lifetime_years,
-        stack_lifetime_years,
-        capacity_factor,
-        battery_capex_USD_kWh,               
-        battery_capacity,
-        model_FE,
-        is_additional_opex,
-        is_additional_capex,
-        additional_opex_USD_kg,
-        additional_capex_USD,
-        overridden_vbl,
-        overridden_value,
-        overridden_unit,
-        override_optimization,
-        exponent,
-        scaling,
-        MW_CO2,
-        MW_H2O,
-        MW_O2,
-        MW_MX,
-        R, 
-        F,
-        K_to_C = 273.15,
-        kJ_per_kWh = 3.60E+03,
-        ):
+                solvent_name,
+                supporting_electrolyte_name,
+                df_products,
+
+                product_rate_kg_day,
+                model_FE,
+                FE_CO2R_0,
+                FE_product_specified,
+                j_total_mA_cm2,
+                SPC,
+                crossover_ratio,
+                P,
+                T_streams,
+
+                R_membrane_ohmcm2,
+                electrolyte_thickness_cm,
+                
+                an_E_eqm,
+                an_eta_ref,
+                an_Tafel_slope,
+                an_j_ref,
+
+                cathode_outlet_humidity,
+                excess_water_ratio,   
+                excess_solvent_ratio,
+                catholyte_conc_M,  
+                anolyte_conc_M,
+                water_density_kg_m3,
+                electrolyte_density_kg_m3,
+                solvent_loss_fraction,
+
+                LL_second_law_efficiency,
+                PSA_second_law_efficiency,
+                T_sep,         
+                CO2_solubility_mol_mol,
+
+                carbon_capture_efficiency,
+                electricity_emissions_kgCO2_kWh,
+                heat_emissions_kgCO2_kWh,
+
+                electricity_cost_USD_kWh,
+                heat_cost_USD_kWh,
+                product_cost_USD_kgprod,
+                H2_cost_USD_kgH2,
+                water_cost_USD_kg,
+                CO2_cost_USD_tCO2,
+                electrolyzer_capex_USD_m2,  
+                PSA_capex_USD_1000m3_hr,
+                LL_capex_USD_1000mol_hr,     
+                solvent_cost_USD_kg,
+                electrolyte_cost_USD_kg,    
+
+                lifetime_years,
+                stack_lifetime_years,
+                capacity_factor,
+
+                battery_capex_USD_kWh,               
+                battery_capacity,
+
+                kappa_electrolyte_S_cm,
+                viscosity_cP,  
+
+                overridden_vbl,
+                overridden_value,
+                overridden_unit,
+                override_optimization,
+                exponent,
+                scaling,
+
+                MW_CO2,
+                MW_H2O,
+                MW_O2,
+                MW_MX,
+                MW_solvent,
+                MW_supporting,
+                R, 
+                F,
+                
+                K_to_C = 273.15,
+                kJ_per_kWh = 3.60E+03,
+            ):
     # Execute a single run of the model. The actual function is imported from TEA_SingleRun.ipynb.
     # This is useful becuase of the caching - it will only actually rerun the model if there is a change in the inputs
-    return single_run_nonaq(product_name=product_name,
-        product_rate_kg_day=product_rate_kg_day,
-        df_products=df_products,
-        FE_CO2R_0=FE_CO2R_0,
-        FE_product_specified=FE_product_specified,
-        j_total_mA_cm2=j_total_mA_cm2,
-        SPC=SPC,
-        crossover_ratio=crossover_ratio,
-        P=P,
-        T_streams = T_streams,
-        R_ohmcm2 = R_ohmcm2,
-        an_E_eqm = an_E_eqm,
-        an_eta_ref = an_eta_ref,
-        an_Tafel_slope = an_Tafel_slope,
-        an_j_ref = an_j_ref,
-        cathode_outlet_humidity = cathode_outlet_humidity,
-        excess_water_ratio = excess_water_ratio,   
-        electrolyte_conc = electrolyte_conc,  
-        density_kgm3 = density_kgm3,
-        PSA_second_law_efficiency = PSA_second_law_efficiency,
-        carbon_capture_efficiency = carbon_capture_efficiency,
-        T_sep = T_sep,         
-        electricity_cost_USD_kWh = electricity_cost_USD_kWh,
-        heat_cost_USD_kWh = heat_cost_USD_kWh,
-        electricity_emissions_kgCO2_kWh = electricity_emissions_kgCO2_kWh,
-        heat_emissions_kgCO2_kWh = heat_emissions_kgCO2_kWh,
-        product_cost_USD_kgprod = product_cost_USD_kgprod,
-        H2_cost_USD_kgH2 = H2_cost_USD_kgH2,
-        water_cost_USD_kg = water_cost_USD_kg,
-        CO2_cost_USD_tCO2 = CO2_cost_USD_tCO2,
-        electrolyzer_capex_USD_m2 = electrolyzer_capex_USD_m2,       
-        lifetime_years = lifetime_years,
-        stack_lifetime_years = stack_lifetime_years,
-        capacity_factor = capacity_factor,
-        battery_capex_USD_kWh = battery_capex_USD_kWh,               
-        battery_capacity = battery_capacity,
-        model_FE = model_FE,
-        is_additional_opex= is_additional_opex,
-        is_additional_capex= is_additional_capex,
-        additional_opex_USD_kg = additional_opex_USD_kg,
-        additional_capex_USD = additional_capex_USD,
-        overridden_vbl = overridden_vbl,
-        overridden_value = overridden_value,
-        overridden_unit = overridden_unit,
-        override_optimization = override_optimization,
-        exponent = exponent,
-        scaling = scaling,
-        MW_CO2 = MW_CO2,
-        MW_H2O = MW_H2O,
-        MW_O2 = MW_O2,
-        MW_MX = MW_MX,
-        R = R, 
-        F = F,
-        K_to_C = K_to_C,
-        kJ_per_kWh = kJ_per_kWh,
+    return single_run_nonaq(product_name = product_name,
+                solvent_name = solvent_name,
+                supporting_electrolyte_name = supporting_electrolyte_name,
+                df_products = df_products,
+
+                product_rate_kg_day = product_cost_USD_kgprod,
+                model_FE = model_FE,
+                FE_CO2R_0 = FE_CO2R_0,
+                FE_product_specified = FE_product_specified,
+                j_total_mA_cm2 = j_total_mA_cm2,
+                SPC = SPC,
+                crossover_ratio = crossover_ratio,
+                P = P,
+                T_streams = T_streams,
+
+                R_membrane_ohmcm2 = R_membrane_ohmcm2,
+                electrolyte_thickness_cm = electrolyte_thickness_cm,
+                
+                an_E_eqm = an_E_eqm,
+                an_eta_ref = an_eta_ref,
+                an_Tafel_slope = an_Tafel_slope,
+                an_j_ref = an_j_ref,
+
+                cathode_outlet_humidity = cathode_outlet_humidity,
+                excess_water_ratio = excess_water_ratio,   
+                excess_solvent_ratio = excess_solvent_ratio,
+                catholyte_conc_M = catholyte_conc_M,  
+                anolyte_conc_M = anolyte_conc_M,
+                water_density_kg_m3 = water_density_kg_m3,
+                electrolyte_density_kg_m3 = electrolyte_density_kg_m3,
+                solvent_loss_fraction = solvent_loss_fraction,
+
+                LL_second_law_efficiency = LL_second_law_efficiency,
+                PSA_second_law_efficiency = LL_second_law_efficiency,
+                T_sep = T_sep,         
+                CO2_solubility_mol_mol = CO2_solubility_mol_mol,
+
+                carbon_capture_efficiency = carbon_capture_efficiency,
+                electricity_emissions_kgCO2_kWh = electricity_emissions_kgCO2_kWh,
+                heat_emissions_kgCO2_kWh = heat_emissions_kgCO2_kWh,
+
+                electricity_cost_USD_kWh = electricity_cost_USD_kWh,
+                heat_cost_USD_kWh = heat_cost_USD_kWh,
+                product_cost_USD_kgprod = product_cost_USD_kgprod,
+                H2_cost_USD_kgH2 = H2_cost_USD_kgH2,
+                water_cost_USD_kg = water_cost_USD_kg,
+                CO2_cost_USD_tCO2 = CO2_cost_USD_tCO2,
+                electrolyzer_capex_USD_m2 = electrolyzer_capex_USD_m2,  
+                PSA_capex_USD_1000m3_hr = PSA_capex_USD_1000m3_hr,
+                LL_capex_USD_1000mol_hr = LL_capex_USD_1000mol_hr,     
+                solvent_cost_USD_kg = solvent_cost_USD_kg,
+                electrolyte_cost_USD_kg = electrolyte_cost_USD_kg,    
+
+                lifetime_years = lifetime_years,
+                stack_lifetime_years = stack_lifetime_years,
+                capacity_factor = capacity_factor,
+
+                battery_capex_USD_kWh = battery_capex_USD_kWh,               
+                battery_capacity = battery_capacity,
+
+                kappa_electrolyte_S_cm = kappa_electrolyte_S_cm,
+                viscosity_cP = viscosity_cP,  
+
+                overridden_vbl = overridden_vbl,
+                overridden_value = overridden_value,
+                overridden_unit = overridden_unit,
+                override_optimization = override_optimization,
+                exponent = exponent,
+                scaling = scaling,
+
+                MW_CO2 = MW_CO2,
+                MW_H2O = MW_H2O,
+                MW_O2 = MW_O2,
+                MW_MX = MW_MX,
+                MW_solvent = MW_solvent,
+                MW_supporting = MW_supporting,
+                R = R, 
+                F = F,
+                
+                K_to_C = K_to_C,
+                kJ_per_kWh = kJ_per_kWh,
+    
         )
 
 # Cache default model run 
@@ -331,8 +383,7 @@ def svg_write(fig, center=True):
         css, b64
     )
 
-    # Write the HTML
-    st.write(html, unsafe_allow_html=True)
+    return html
 
 @st.dialog(title = "Error",
            width = 'large')
@@ -1378,43 +1429,400 @@ with st.sidebar:
 
 ##########################  RUN MODEL AT DEFAULT VALUES  ###########################
 
-# capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default = default_single_run(product_name = product_name, 
-#                         product_rate_kg_day = default_product_rate_kg_day, 
-#                         df_products = df_products, FE_CO2R_0 = default_FE_CO2R_0, 
-#                         FE_product_specified = default_FE_product_specified, 
-#                         j_total_mA_cm2 = default_j_total_mA_cm2,SPC = default_SPC, 
-#                         crossover_ratio = default_crossover_ratio, model_FE = 'Hawks',  
-#                         is_additional_opex = False, is_additional_capex = False,
-#                         additional_opex_USD_kg = 0,
-#                         additional_capex_USD = 0,
-#                         overridden_vbl = '', overridden_value = np.NaN, overridden_unit = '', 
-#                         override_optimization =  False, P = default_P, T_streams = default_T_streams, 
-#                         R_ohmcm2 = default_R_ohmcm2, an_E_eqm = default_an_E_eqm, MW_CO2 = MW_CO2, 
-#                         MW_H2O = MW_H2O, MW_O2 = MW_O2,  MW_MX = MW_K2CO3,
-#                         cathode_outlet_humidity = default_cathode_outlet_humidity,
-#                         excess_water_ratio = default_excess_water_ratio,
-#                         an_eta_ref = default_an_eta_ref, 
-#                         an_Tafel_slope = default_an_Tafel_slope, 
-#                         an_j_ref = default_an_j_ref, 
-#                         electricity_emissions_kgCO2_kWh = default_electricity_emissions_kgCO2_kWh,
-#                         heat_emissions_kgCO2_kWh = default_heat_emissions_kgCO2_kWh,
-#                         electrolyte_conc = default_electrolyte_conc, 
-#                         density_kgm3 = default_density_kgm3,
-#                         PSA_second_law_efficiency = default_PSA_second_law_efficiency, 
-#                         T_sep = T_sep, electricity_cost_USD_kWh = default_electricity_cost_USD_kWh, 
-#                         heat_cost_USD_kWh = default_heat_cost_USD_kWh,product_cost_USD_kgprod = default_product_cost_USD_kgprod,
-#                         H2_cost_USD_kgH2 = default_H2_cost_USD_kgH2,water_cost_USD_kg = default_water_cost_USD_kg,
-#                         CO2_cost_USD_tCO2 = default_CO2_cost_USD_tCO2,lifetime_years = default_lifetime_years,
-#                         stack_lifetime_years = default_stack_lifetime_years,
-#                         electrolyzer_capex_USD_m2 = default_electrolyzer_capex_USD_m2,
-#                         capacity_factor = default_capacity_factor,battery_capex_USD_kWh = default_battery_capex_USD_kWh,               
-#                         battery_capacity = default_battery_capacity, exponent=default_exponent, scaling=default_scaling,
-#                         carbon_capture_efficiency = default_carbon_capture_efficiency,
-#                         R = R,
-#                         F = F) 
+capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default = default_single_run(product_name = product_name, 
+                        product_rate_kg_day = default_product_rate_kg_day, 
+                        df_products = df_products, FE_CO2R_0 = default_FE_CO2R_0, 
+                        FE_product_specified = default_FE_product_specified, 
+                        j_total_mA_cm2 = default_j_total_mA_cm2,SPC = default_SPC, 
+                        crossover_ratio = default_crossover_ratio, model_FE = 'Hawks',
+                        is_additional_capex= False,
+                        is_additional_opex= False,  
+                        additional_opex_USD_kg = 0,
+                        additional_capex_USD = 0,
+                        overridden_vbl = '', overridden_value = np.NaN, overridden_unit = '', 
+                        override_optimization =  override_optimization, P = default_P, T_streams = default_T_streams, 
+                        R_ohmcm2 = default_R_ohmcm2, an_E_eqm = default_an_E_eqm, MW_CO2 = MW_CO2, 
+                        MW_H2O = MW_H2O, MW_O2 = MW_O2,  MW_MX = MW_K2CO3,
+                        cathode_outlet_humidity = default_cathode_outlet_humidity,
+                        excess_water_ratio = default_excess_water_ratio,
+                        an_eta_ref = default_an_eta_ref, 
+                        an_Tafel_slope = default_an_Tafel_slope, 
+                        an_j_ref = default_an_j_ref, 
+                        electricity_emissions_kgCO2_kWh = default_electricity_emissions_kgCO2_kWh,
+                        heat_emissions_kgCO2_kWh = default_heat_emissions_kgCO2_kWh,
+                        electrolyte_conc = default_electrolyte_conc, 
+                        density_kgm3 = default_density_kgm3,
+                        PSA_second_law_efficiency = default_PSA_second_law_efficiency, 
+                        T_sep = T_sep, electricity_cost_USD_kWh = default_electricity_cost_USD_kWh, 
+                        heat_cost_USD_kWh = default_heat_cost_USD_kWh,product_cost_USD_kgprod = default_product_cost_USD_kgprod,
+                        H2_cost_USD_kgH2 = default_H2_cost_USD_kgH2,water_cost_USD_kg = default_water_cost_USD_kg,
+                        CO2_cost_USD_tCO2 = default_CO2_cost_USD_tCO2,lifetime_years = default_lifetime_years,
+                        stack_lifetime_years = default_stack_lifetime_years,
+                        electrolyzer_capex_USD_m2 = default_electrolyzer_capex_USD_m2,
+                        capacity_factor = default_capacity_factor,battery_capex_USD_kWh = default_battery_capex_USD_kWh,               
+                        battery_capacity = default_battery_capacity, exponent=default_exponent, scaling=default_scaling,
+                        carbon_capture_efficiency = default_carbon_capture_efficiency,
+                        R = R,
+                        F = F)
 
 #___________________________________________________________________________________
     
+##########################  GENERATE SINGLE RUN OF MODEL  ##########################
+
+### Handle battery to flatten curve
+if is_battery:
+    battery_capacity = 1 - avbl_renewables # assumes daily storage battery
+    capacity_factor = 350/365 # capacity is re-maximized
+else:
+    battery_capacity = 0
+
+# ### Generate physical and costing model
+if not np.isnan(FE_product_checked): 
+    df_capex_BM, df_capex_totals, df_costing_assumptions, df_depreciation, df_electrolyzer_assumptions, df_electrolyzer_streams_mol_s,\
+            df_energy, df_feedstocks, df_general, df_maintenance, df_operations, df_opex, df_opex_totals, df_outlet_assumptions,\
+            df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities = cached_single_run(product_name = product_name, 
+                        product_rate_kg_day = product_rate_kg_day, 
+                        df_products = df_products, FE_CO2R_0 = FE_CO2R_0, 
+                        FE_product_specified = FE_product_specified, 
+                        j_total_mA_cm2 = j_total_mA_cm2,SPC = SPC, 
+                        crossover_ratio = crossover_ratio, model_FE = model_FE,  
+                        is_additional_opex = is_additional_opex,
+                        is_additional_capex = is_additional_capex,
+                        additional_opex_USD_kg = additional_opex_USD_kg,
+                        additional_capex_USD = additional_capex_USD,
+                        overridden_vbl = overridden_vbl, overridden_value = overridden_value, overridden_unit = overridden_unit, 
+                        override_optimization =  override_optimization, P = P, T_streams = T_streams, 
+                        R_ohmcm2 = R_ohmcm2, an_E_eqm = an_E_eqm,MW_CO2 = MW_CO2, 
+                        MW_H2O = MW_H2O, MW_O2 = MW_O2,  MW_MX = MW_K2CO3,
+                        cathode_outlet_humidity = cathode_outlet_humidity,
+                        excess_water_ratio = excess_water_ratio,
+                        an_eta_ref = an_eta_ref, 
+                        an_Tafel_slope = an_Tafel_slope, 
+                        an_j_ref = an_j_ref, 
+                        electricity_emissions_kgCO2_kWh = electricity_emissions_kgCO2_kWh,
+                        heat_emissions_kgCO2_kWh = heat_emissions_kgCO2_kWh,
+                        electrolyte_conc = electrolyte_conc, 
+                        density_kgm3 = density_kgm3,
+                        PSA_second_law_efficiency = PSA_second_law_efficiency, 
+                        T_sep = T_sep, electricity_cost_USD_kWh = electricity_cost_USD_kWh, 
+                        heat_cost_USD_kWh = heat_cost_USD_kWh,product_cost_USD_kgprod = product_cost_USD_kgprod,
+                        H2_cost_USD_kgH2 = H2_cost_USD_kgH2,water_cost_USD_kg = water_cost_USD_kg,
+                        CO2_cost_USD_tCO2 = CO2_cost_USD_tCO2,lifetime_years = lifetime_years,
+                        stack_lifetime_years = stack_lifetime_years,
+                        electrolyzer_capex_USD_m2 = electrolyzer_capex_USD_m2,
+                        capacity_factor = capacity_factor,battery_capex_USD_kWh = battery_capex_USD_kWh,               
+                        battery_capacity = battery_capacity, exponent=exponent, scaling=scaling,
+                        carbon_capture_efficiency = carbon_capture_efficiency,
+                        R = R,
+                        F = F)
+    df_emissions = pd.concat([ df_energy['Emissions (kg CO2/kg {})'.format(product_name)],pd.Series(df_outlet_assumptions.loc['Carbon capture loss', 'Value']) ])
+    df_emissions.index = np.append(df_energy.index, 'Carbon capture')
+
+    #___________________________________________________________________________________
+
+    ############################### FIGURE OUTPUTS #####################################
+
+    ###### PIE CHART FORMATTING
+    flag = {True: 1,
+            False: 0}
+    ### Define colors
+    BM_capex_colors = [bright_summer_r(i) for i in np.linspace(0, 1, len(df_capex_BM.index)- flag[is_battery] - flag[is_additional_capex])] # battery gets its own color, so 1 less than capex length for other units
+    if is_battery:
+        BM_capex_colors.append((0.65, 0.65, 0.65, 1)) # add in battery         
+    if is_additional_capex:
+        BM_capex_colors.append((0.85, 0.85, 0.85, 1)) # add in battery 
+        
+    # Blues from 0.2 to 1 not bad but low contrast; YlGnbu not but looks jank with PuOr; winter_r is best
+    # Opex colors
+    opex_colors = [diverging(i) for i in np.linspace(0, 0.85, len(df_opex.index) - flag[is_additional_opex]) ]
+    if is_additional_opex:
+        opex_colors.append((0.85, 0.85, 0.85, 1)) # add in battery 
+
+    levelized_colors = opex_colors + BM_capex_colors
+
+    # Potentials colors
+    potentials_colors = [RdYlBu(i) for i in np.linspace(0, 1, np.shape(df_potentials.iloc[2:7])[0] )  ] # last rows are totals
+
+    # Emissions colors
+    emissions_colors = [RdYlBu(i) for i in np.linspace(0, 1, sum(~df_energy['Emissions (kg CO2/kg {})'.format(product_name)].iloc[:-3].isnull()) + 1)  ] # len(df_energy_vs_vbl.index) - 2)] # last rows are totals
+    
+    # Energy colors
+    # energy_colors = [RdYlBu(i) for i in np.linspace(0, 1,  sum(~df_energy['Energy (kJ/kg {})'.format(product_name)].iloc[:-3].isnull()))  ] # last rows are totals
+    energy_colors = emissions_colors # energy is 1 shorter than emissions
+    
+    @st.cache_data(ttl = "1h")
+    def capex_delta_color_checker(df_capex_totals, capex_default):
+        if np.isclose(df_capex_totals.loc['Total permanent investment', 'Cost ($)'], capex_default, rtol = 1e-6, equal_nan = True):
+            delta_color = 'off'
+        else:
+            delta_color = 'inverse'       
+        return delta_color
+
+    capex_delta_color = capex_delta_color_checker(df_capex_totals = df_capex_totals, capex_default = capex_default)    
+
+    alternating = 1
+    flag = False
+    far_near = {1: 3.5, -1: 4.5}
+
+    ###### CAPEX PIE CHART
+    with middle_column.container(height = 455, border = False): 
+        st.subheader('Capital cost')
+        # st.write('Capex: \${:.2f} million'.format(df_capex_totals.loc['Total permanent investment', 'Cost ($)']/1e6) )
+        st.metric(label = 'Capex', value = '${:.2f} million'.format(df_capex_totals.loc['Total permanent investment', 'Cost ($)']/1e6), 
+                delta = '{:.2f}%'.format(100*(df_capex_totals.loc['Total permanent investment', 'Cost ($)'] - capex_default)/capex_default),
+                delta_color = capex_delta_color, label_visibility='collapsed') 
+        with _render_lock:
+            capex_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
+            __, __, autopercents = axs.pie(df_capex_BM.loc[:, 'Cost ($)'], 
+                    labels = df_capex_BM.index, labeldistance = 1.1,
+                    autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
+                    pctdistance = 0.7,
+                    colors = BM_capex_colors, startangle = 90, 
+                    textprops = {'fontsize' : SMALL_SIZE}, 
+                    radius = 2, wedgeprops= {'width' : 1}, # donut
+                    counterclock = False,
+                        )   
+            plt.setp(autopercents, color="white")
+            axs.text(0, 0,  
+                'Capex: \n ${:.2f} million'.format(df_capex_totals.loc[ 'Total permanent investment', 'Cost ($)']/1e6 ), # All capex except working capital, which is recovered during operation
+                ha='center', va='center', 
+                fontsize = MEDIUM_SIZE)  
+            # buffer = BytesIO()
+            # capex_pie_fig.savefig(buffer, format="png")
+            # st.image(buffer, width = 400)
+            # st.pyplot(capex_pie_fig, transparent = True, use_container_width = True)
+            capex_html = svg_write(capex_pie_fig, center = True)
+            
+            st.write(capex_html, unsafe_allow_html=True)
+
+    @st.cache_data(ttl = "1h")
+    def opex_delta_color_checker(df_opex_totals, opex_default):
+        if np.isclose(df_opex_totals.loc['Production cost', 'Cost ($/kg {})'.format(product_name)], opex_default, rtol = 1e-6, equal_nan = True):
+            delta_color = 'off'
+        else:
+            delta_color = 'inverse'       
+        return delta_color
+
+    opex_delta_color = opex_delta_color_checker(df_opex_totals = df_opex_totals, opex_default = opex_default)    
+
+    ###### OPEX PIE CHART 
+    with right_column.container(height = 455, border = False): 
+        st.subheader('Operating cost')
+        # st.write('Opex: \${:.2f}/kg$_{{{}}}$'.format(df_opex_totals.loc['Production cost', 'Cost ($/kg {})'.format(product_name)], product_name) )
+        st.metric(label = 'Opex', value = r'${:.2f}/kg {} '.format(df_opex_totals.loc['Production cost', 'Cost ($/kg {})'.format(product_name)], product_name),
+                delta = '{:.2f}%'.format(100*(df_opex_totals.loc['Production cost', 'Cost ($/kg {})'.format(product_name)] - opex_default)/opex_default),
+                delta_color = opex_delta_color, label_visibility = 'collapsed') 
+
+        with _render_lock:
+            opex_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
+            __, __, autopercents = axs.pie(df_opex.loc[:, 'Cost ($/kg {})'.format(product_name)], 
+                    labels = df_opex.index, labeldistance = 1.1,
+                    autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
+                    pctdistance = 0.8,
+                    colors = opex_colors, startangle = 90, 
+                    textprops = {'fontsize' : SMALL_SIZE}, 
+                    radius = 2, wedgeprops= {'width' : 1}, # donut
+                    counterclock = False,
+                    # explode = 0.2*np.ones(len(df_opex.index),
+                    )           
+            plt.setp(autopercents, color="white")
+            axs.text(0, 0,  
+            'Opex: \n \${:.2f}/kg$_{{{}}}$'.format(df_opex_totals.loc[ 'Production cost', 'Cost ($/kg {})'.format(product_name)], product_name), # All capex except working capital, which is recovered during operation
+            ha='center', va='center', 
+            fontsize = MEDIUM_SIZE)  
+            axs.text(3.5, 0, ' ', color = 'white') # make figure bigger
+            axs.text(-3.5, 0, ' ', color = 'white') # make figure bigger
+            # st.pyplot(opex_pie_fig, transparent = True, use_container_width = True)   
+            opex_html = svg_write(opex_pie_fig, center = True)
+
+            # Write the HTML
+            st.write(opex_html, unsafe_allow_html=True)
+
+    if opex_delta_color == 'inverse' or capex_delta_color == 'inverse':
+        levelized_delta_color = 'inverse'
+    else:
+        levelized_delta_color = 'off'
+
+    ###### LEVELIZED PIE CHART
+    with middle_column.container(height = 455, border = False): 
+        st.subheader('Levelized cost')
+        # st.write('Levelized cost: ${:.2f}/kg$_{{{}}}$'.format(df_opex_totals.loc['Levelized cost', 'Cost ($/kg {})'.format(product_name)], product_name ) )
+        st.metric(label = 'Levelized', value = r'${:.2f}/kg {}'.format(df_opex_totals.loc['Levelized cost', 'Cost ($/kg {})'.format(product_name)], product_name),
+                delta = '{:.2f}%'.format(100*(df_opex_totals.loc['Levelized cost', 'Cost ($/kg {})'.format(product_name)] - levelized_default)/levelized_default),
+                delta_color = levelized_delta_color, label_visibility='collapsed') 
+        levelized_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
+        
+        full_list_of_costs = pd.concat([df_opex.loc[:, 'Cost ($/kg {})'.format(product_name)],
+                            df_capex_BM.loc[:,'Cost ($)']/(365*capacity_factor*lifetime_years*product_rate_kg_day)], axis = 0)
+
+        with _render_lock:
+            wedges, __, autopercents = axs.pie(full_list_of_costs, 
+                            # labels = full_list_of_costs.index, 
+                            # labeldistance = 1.1,
+                            autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
+                            pctdistance = 0.8,
+                            colors = levelized_colors, startangle = 0, 
+                            textprops = {'fontsize' : SMALL_SIZE}, 
+                            radius = 2, wedgeprops= {'width' : 1}, # donut
+                            counterclock = False,
+                            # explode = 0.2*np.ones(len(df_opex.index),
+                            )   
+            axs.text(0, 0,  
+            'Levelized cost: \n \${:.2f}/kg$_{{{}}}$'.format(df_opex_totals.loc[ 'Levelized cost', 'Cost ($/kg {})'.format(product_name)], product_name), # All capex except working capital, which is recovered during operation
+            ha='center', va='center', 
+            fontsize = MEDIUM_SIZE)
+            
+            box_properties = dict(boxstyle="square,pad=0.3", fc="none", lw=0)
+            label_properties_away = dict(arrowprops=dict(arrowstyle="-"),
+                                bbox=box_properties, zorder=0, va="center")
+            label_properties_near = dict(arrowprops=dict(arrowstyle="-",alpha = 0),
+                                bbox=box_properties, zorder=0, va="center")
+            for i, wedge in enumerate(wedges):
+                middle_angle = (wedge.theta2 - wedge.theta1)/2. + wedge.theta1 # in degrees
+                y_posn = np.sin(np.deg2rad(middle_angle))
+                x_posn = np.cos(np.deg2rad(middle_angle))
+                verticalalignment = {-1: "bottom", 1: "top"}[int(np.sign(y_posn))]
+                horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
+                if (wedge.theta2 - wedge.theta1) <22:
+                    alternating = -alternating
+                    connectionstyle = f"angle,angleA=0,angleB={middle_angle}"
+                    label_properties_away["arrowprops"].update({"connectionstyle": connectionstyle})
+                    axs.annotate(full_list_of_costs.index[i], xy=(x_posn, y_posn), 
+                                xytext=(far_near[alternating]*1*x_posn, 3.7*y_posn),
+                                horizontalalignment=horizontalalignment, 
+                                **label_properties_away)
+                else:                            
+                    horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x_posn))]
+                    axs.text(2.3*x_posn, 2.3*y_posn,
+                            full_list_of_costs.index[i],
+                            horizontalalignment=horizontalalignment, 
+                            verticalalignment = verticalalignment)
+            plt.setp(autopercents, color="white")
+            # st.pyplot(levelized_pie_fig, transparent = True, use_container_width = True)   
+            levelized_html = svg_write(levelized_pie_fig, center = True)
+
+            # Write the HTML
+            st.write(levelized_html, unsafe_allow_html=True)
+            
+    with right_column.container(height = 455, border = False): 
+        pass
+
+    @st.cache_data(ttl = "1h")
+    def potential_delta_color_checker(df_potentials, potential_default):
+        if np.isclose(df_potentials.loc['Cell potential', 'Value'], potential_default, rtol = 1e-6, equal_nan = True):
+            delta_color = 'off'
+        else:
+            delta_color = 'inverse'       
+        return delta_color
+
+    potential_delta_color = potential_delta_color_checker(df_potentials = df_potentials, potential_default = potential_default)    
+    
+    ###### POTENTIALS PIE CHART
+    with middle_column.container(height = 455, border = False):  
+        st.subheader('Cell potential')
+        # st.write('Full cell potential: {:.2f} V'.format(df_potentials.loc['Cell potential', 'Value']) )
+        st.metric(label = 'Cell potential', value = '{:.2f} V'.format(df_potentials.loc['Cell potential', 'Value']),
+                delta = '{:.2f}%'.format(100*(df_potentials.loc['Cell potential', 'Value'] - potential_default)/potential_default),
+                delta_color = potential_delta_color, label_visibility='collapsed') 
+        if not override_cell_voltage:
+            with _render_lock:
+                potentials_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
+                axs.pie(abs(df_potentials.iloc[2:7].loc[:,'Value']),
+                        labels = df_potentials.iloc[2:7].index, labeldistance = 1.1,
+                        autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
+                        pctdistance = 0.8,
+                        colors = potentials_colors, startangle = 90, 
+                        textprops = {'fontsize' : SMALL_SIZE}, 
+                        radius = 2, wedgeprops= {'width' : 1}, # donut
+                        counterclock = False,
+                        # explode = 0.2*np.ones(len(df_opex.index),
+                        )   
+                axs.text(0, 0,  
+                'Cell potential: \n {:.2f} V'.format(df_potentials.loc['Cell potential', 'Value']),
+                ha='center', va='center', 
+                fontsize = MEDIUM_SIZE)  
+                # st.pyplot(potentials_pie_fig, transparent = True, use_container_width = True)
+                potentials_html = svg_write(potentials_pie_fig, center = True)
+
+                # Write the HTML
+                st.write(potentials_html, unsafe_allow_html=True)
+                
+    @st.cache_data(ttl = "1h")
+    def energy_delta_color_checker(df_energy, energy_default):
+        if np.isclose(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)], energy_default, rtol = 1e-6, equal_nan = True):
+            delta_color = 'off'
+        else:
+            delta_color = 'inverse'       
+        return delta_color
+
+    energy_delta_color = energy_delta_color_checker(df_energy= df_energy, energy_default = energy_default)    
+ 
+     ###### ENERGY PIE CHART 
+    with right_column.container(height = 455, border = False): 
+        st.subheader('Process energy')
+        # st.write('Energy required: {:.0f} kJ/kg$_{{{}}}}$'.format(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)], product_name) )
+        st.metric(label = 'Energy', value = r'{:.2f} MJ/kg {}'.format(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)]/1000, product_name),
+                delta = '{:.2f}%'.format(100*(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)] - energy_default)/energy_default),
+                delta_color = energy_delta_color, label_visibility='collapsed') 
+        with _render_lock:
+            if not override_cell_voltage:
+                energy_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
+                axs.pie((abs(df_energy.iloc[2:-3].loc[:, 'Energy (kJ/kg {})'.format(product_name)])/1000)*df_products.loc[product_name, 'Molecular weight (g/mol)'],
+                        labels = df_energy.iloc[2:-3].index, labeldistance = 1.1,
+                        autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
+                        pctdistance = 0.8,
+                        colors = energy_colors, startangle = 0, 
+                        textprops = {'fontsize' : SMALL_SIZE}, 
+                        radius = 2, wedgeprops= {'width' : 1}, # donut
+                        counterclock = False,
+                        # explode = 0.2*np.ones(len(df_opex.index),
+                    )   
+                axs.text(0, 0,  
+                        'Energy: \n {:.0f} kJ/mol$_{{{}}}$'.format(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)]*(df_products.loc[product_name, 'Molecular weight (g/mol)']/1000), product_name),
+                        ha='center', va='center', 
+                        fontsize = MEDIUM_SIZE)                  
+                # st.pyplot(energy_pie_fig, transparent = True, use_container_width = True) 
+                energy_html = svg_write(energy_pie_fig, center = True)
+  
+                # Write the HTML
+                st.write(energy_html, unsafe_allow_html=True)
+
+    ###### EMISSIONS PIE CHART
+    with middle_column.container(height = 455, border = False): 
+        st.subheader('Emissions')
+        if electricity_emissions_kgCO2_kWh > 0:
+            # st.write('Total emissions: {:.2f} kg$_{CO_2}$/kg$_{{{}}}$'.format(sum(df_energy.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)]), product_name ) )
+            st.metric(label = 'Emissions', value = r'{:.2f} kg CO2/kg {}'.format(df_energy.loc['Total', 'Emissions (kg CO2/kg {})'.format(product_name)], product_name),
+                delta = '{:.2f}%'.format(100*(df_energy.loc['Total', 'Emissions (kg CO2/kg {})'.format(product_name)]  - emissions_default)/emissions_default),
+                delta_color = energy_delta_color, label_visibility='collapsed') 
+            if not override_cell_voltage:
+                with _render_lock:
+                    emissions_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
+
+                    wedges, __, __ = axs.pie(df_emissions.drop(['Total', 'Cell potential', 'Efficiency vs LHV'], inplace = False, errors = 'ignore').loc[~np.isnan(df_emissions)], 
+                                labels = df_emissions.drop(['Total', 'Cell potential', 'Efficiency vs LHV'], inplace = False, errors = 'ignore').loc[~np.isnan(df_emissions)].index, 
+                                labeldistance = 1.1,
+                                autopct = lambda val: '{:.1f}%'.format(val) if val > 2 else '', 
+                                pctdistance = 0.8,
+                                colors = emissions_colors, startangle = 0, 
+                                textprops = {'fontsize' : SMALL_SIZE}, 
+                                radius = 2, wedgeprops= {'width' : 1}, # donut
+                                counterclock = False,
+                                # explode = 0.2*np.ones(len(df_opex.index),
+                                )   
+                    axs.text(0, 0,  
+                    'Emissions: \n {:.2f} kg$_{{CO_2}}$/kg$_{{{}}}$'.format(sum(df_emissions.fillna(0).drop(['Total', 'Cell potential', 'Efficiency vs LHV'], inplace = False, errors = 'ignore')), product_name), # All capex except working capital, which is recovered during operation
+                    ha='center', va='center', 
+                    fontsize = MEDIUM_SIZE)  
+                
+                    # st.pyplot(emissions_pie_fig, transparent = True, use_container_width = True)
+                    emissions_html = svg_write(emissions_pie_fig, center = True)
+   
+                    # Write the HTML
+                    st.write(emissions_html, unsafe_allow_html=True)
+
+    st.divider()
+
 ##########################  GENERATE MODEL OVER RANGE  ##########################
 with middle_column:
     if not st.session_state.is_active_error_CO:
