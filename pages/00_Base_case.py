@@ -303,6 +303,33 @@ def render_svg(svg):
     html = r'<img src="data:image/svg+xml;base64,%s"/>' % b64
     st.write(html, unsafe_allow_html=True)
 
+@st.cache_data(ttl = "1h")
+def svg_write(fig, center=True):
+    """
+    Renders a matplotlib figure object to SVG.
+    Disable center to left-margin align like other objects.
+    """
+    # Save to stringIO instead of file
+    imgdata = StringIO()
+    fig.savefig(imgdata, format="svg")
+
+    # Retrieve saved string
+    imgdata.seek(0)
+    svg_string = imgdata.getvalue()
+
+    # Encode as base 64
+    b64 = base64.b64encode(svg_string.encode("utf-8")).decode("utf-8")
+
+    # Add some CSS on top
+    css_justify = "center" if center else "left"
+    css = '<p style="text-align:center; display: flex; justify-content: {};">'.format(css_justify)
+    html = r'{}<img src="data:image/svg+xml;base64,{}"/>'.format(
+        css, b64
+    )
+
+    # Write the HTML
+    st.write(html, unsafe_allow_html=True)
+
 @st.dialog(title = "Error",
            width = 'large')
 def error_dialog(FE_product_checked, SPC, crossover_ratio):
@@ -487,7 +514,7 @@ st.write('''This is a techno-economic assessment (TEA) of low-temperature CO₂ 
          This interactive tool is based on our papers,
 > Da Cunha, S.; Resasco, J. Insights from Techno-Economic Analysis Can Guide the Design of Low-Temperature CO₂ Electrolyzers towards Industrial Scaleup. ACS Energy Lett. 2024, 9, 11, 5550–5561. DOI: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647).
           
-> Da Cunha, S.; Resasco, J. Techno-Economic Assessment of Non-Aqueous CO2 Reduction. ChemRxiv, 2025. DOI:[10.26434/chemrxiv-2025-k071x](https://doi.org/10.26434/chemrxiv-2025-k071x).
+> Da Cunha, S.; Resasco, J. Techno-Economic Assessment of Non-Aqueous CO₂ Reduction. ChemRxiv, 2025. DOI:[10.26434/chemrxiv-2025-k071x](https://doi.org/10.26434/chemrxiv-2025-k071x).
          ''')
 
 with st.expander("**Update history**", expanded = False):
@@ -1164,7 +1191,8 @@ if not np.isnan(FE_product_checked):
             # buffer = BytesIO()
             # capex_pie_fig.savefig(buffer, format="png")
             # st.image(buffer, width = 400)
-            st.pyplot(capex_pie_fig, transparent = True, use_container_width = True)
+            # st.pyplot(capex_pie_fig, transparent = True, use_container_width = True)
+            svg_write(capex_pie_fig, center = True)
 
     @st.cache_data(ttl = "1h")
     def opex_delta_color_checker(df_opex_totals, opex_default):
@@ -1203,7 +1231,8 @@ if not np.isnan(FE_product_checked):
             fontsize = MEDIUM_SIZE)  
             axs.text(3.5, 0, ' ', color = 'white') # make figure bigger
             axs.text(-3.5, 0, ' ', color = 'white') # make figure bigger
-            st.pyplot(opex_pie_fig, transparent = True, use_container_width = True)   
+            # st.pyplot(opex_pie_fig, transparent = True, use_container_width = True)   
+            svg_write(opex_pie_fig, center = True)
 
     if opex_delta_color == 'inverse' or capex_delta_color == 'inverse':
         levelized_delta_color = 'inverse'
@@ -1265,7 +1294,8 @@ if not np.isnan(FE_product_checked):
                             horizontalalignment=horizontalalignment, 
                             verticalalignment = verticalalignment)
             plt.setp(autopercents, color="white")
-            st.pyplot(levelized_pie_fig, transparent = True, use_container_width = True)   
+            # st.pyplot(levelized_pie_fig, transparent = True, use_container_width = True)   
+            svg_write(levelized_pie_fig, center = True)
 
     with right_column.container(height = 455, border = False): 
         pass
@@ -1304,7 +1334,8 @@ if not np.isnan(FE_product_checked):
                 'Cell potential: \n {:.2f} V'.format(df_potentials.loc['Cell potential', 'Value']),
                 ha='center', va='center', 
                 fontsize = MEDIUM_SIZE)  
-                st.pyplot(potentials_pie_fig, transparent = True, use_container_width = True)
+                # st.pyplot(potentials_pie_fig, transparent = True, use_container_width = True)
+                svg_write(potentials_pie_fig, center = True)
 
     @st.cache_data(ttl = "1h")
     def energy_delta_color_checker(df_energy, energy_default):
@@ -1340,7 +1371,9 @@ if not np.isnan(FE_product_checked):
                         'Energy: \n {:.0f} kJ/mol$_{{{}}}$'.format(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)]*(df_products.loc[product_name, 'Molecular weight (g/mol)']/1000), product_name),
                         ha='center', va='center', 
                         fontsize = MEDIUM_SIZE)                  
-                st.pyplot(energy_pie_fig, transparent = True, use_container_width = True)   
+                # st.pyplot(energy_pie_fig, transparent = True, use_container_width = True) 
+                svg_write(energy_pie_fig, center = True)
+  
 
     ###### EMISSIONS PIE CHART
     with middle_column.container(height = 455, border = False): 
@@ -1370,7 +1403,9 @@ if not np.isnan(FE_product_checked):
                     ha='center', va='center', 
                     fontsize = MEDIUM_SIZE)  
                 
-                    st.pyplot(emissions_pie_fig, transparent = True, use_container_width = True)   
+                    # st.pyplot(emissions_pie_fig, transparent = True, use_container_width = True)
+                    svg_write(emissions_pie_fig, center = True)
+   
 
     st.divider()
             
