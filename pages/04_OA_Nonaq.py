@@ -2055,7 +2055,7 @@ st.write('\n \n \n')
 
 st.subheader('MEA design schematic')
 st.write('\n')
-electrolyzer_svg = open("figures/1a 20240708 Schematic - labeled.svg", 
+electrolyzer_svg = open("figures/SI 2b non-aqueous half flow cell", 
                'r', 
                encoding='utf-8')
 source_code = electrolyzer_svg.read() 

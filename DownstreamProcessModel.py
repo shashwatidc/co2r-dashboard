@@ -1,9 +1,4 @@
-# %% [markdown]
-# # Downstream model: Notes
-# Date updated: 2024/06/11 \
-# Update notes: Strict function inputs\
-# Contact: Shashwati da Cunha, [shashwati.dacunha@austin.utexas.edu](mailto:shashwati.dacunha@austin.utexas.edu)
-# 
+
 # ### Instructions
 # 1. Not designed for standalone run - this is only a collection of functions. Other notebooks call it.
 # 
@@ -13,9 +8,6 @@
 
 # %% [markdown]
 # ### 0.1 Imports and styling
-
-# %%
-# UNCOMMENT TO RUN STANDALONE
 
 import streamlit as st
 import pandas as pd

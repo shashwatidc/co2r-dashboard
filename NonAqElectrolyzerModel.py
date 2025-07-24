@@ -1,4 +1,7 @@
-
+# %% [markdown]
+# # Electrolyzer model
+# Contact: Shashwati da Cunha, [shashwati.dc@utexas.edu](mailto:shashwati.dc@utexas.edu)
+# 
 # ### Instructions
 # 1. Not designed for standalone run - this is only a collection of functions. Other notebooks call it.
 # 
@@ -26,7 +29,7 @@ from scipy import optimize
 
 # %%
 ### Other units
-@st.cache_data(ttl = "1h")
+
 def kg_day_to_kg_s(rate_kg_day):
     """
     Convert mass flow rate in kg/day to kg/s
@@ -38,7 +41,6 @@ def kg_day_to_kg_s(rate_kg_day):
     
     return rate_kg_s
 
-@st.cache_data(ttl = "1h")
 def kg_s_to_mol_s(rate_kg_s, MW):
     """
     Convert mass flow rate in kg/s to mole flow rate in mol/s
@@ -50,7 +52,6 @@ def kg_s_to_mol_s(rate_kg_s, MW):
     
     return rate_mol_s
 
-@st.cache_data(ttl = "1h")
 def mol_s_to_sccm(rate_mol_s, R, P = 101325, T = 298.15):
     """
     Convert molar flow rate in mol/s to volumetric flow rate in standard cubic cm per minute
@@ -64,7 +65,6 @@ def mol_s_to_sccm(rate_mol_s, R, P = 101325, T = 298.15):
     
     return rate_sccm
 
-@st.cache_data(ttl = "1h")
 def mol_s_to_mA(rate_mol_s, n, F):
     """
     Convert product mole flow rate in mol/s to current in mA
@@ -80,7 +80,6 @@ def mol_s_to_mA(rate_mol_s, n, F):
 # ### 1.2 Electrolyzer area
 
 # %%
-@st.cache_data(ttl = "1h")
 def electrolyzer_area(i_total_mA, j_total_mA_cm2):
     """
     Use maximum allowed current density and desired current to compute total area
@@ -97,7 +96,6 @@ def electrolyzer_area(i_total_mA, j_total_mA_cm2):
 # ### 1.3 Currents
 
 # %%
-@st.cache_data(ttl = "1h")
 def currents(    
     product_rate_mol_s,
     FE_product,
@@ -126,7 +124,6 @@ def currents(
     
 
 # %%
-@st.cache_data(ttl = "1h")
 def voltage_to_energy(E_V, i_total_mA, product_rate_kg_s, product_rate_mol_s):
     """
     Compute power and energy from P = i.V
@@ -144,7 +141,6 @@ def voltage_to_energy(E_V, i_total_mA, product_rate_kg_s, product_rate_mol_s):
 # ### 1.4 Voltage
 
 # %%
-@st.cache_data(ttl = "1h")
 def cell_voltage(
     product_name,    
     product_rate_kg_day,
@@ -153,7 +149,9 @@ def cell_voltage(
     FE_CO2R_0,
     model_FE,
     j_total_mA_cm2,
-    R_ohmcm2,
+    R_membrane_ohmcm2,
+    kappa_electrolyte_S_cm,
+    electrolyte_thickness_cm,
     df_products, # product data - MW, n, B-V parameters
     an_E_eqm,
     an_eta_ref,
@@ -188,7 +186,10 @@ def cell_voltage(
     MW_product = df_products.loc[product_name, 'Molecular weight (g/mol)']
     n_product = df_products.loc[product_name, 'n (mol e-/ mol product)']
     cat_eta_ref = df_products.loc[product_name, 'Reference overpotential (V)']
-    cat_Tafel_slope = df_products.loc[product_name, 'Tafel slope (mV/dec)']
+    if 'Cathodic Tafel slope' not in overridden_vbl:
+        cat_Tafel_slope = df_products.loc[product_name, 'Tafel slope (mV/dec)']
+    else:
+        cat_Tafel_slope = overridden_value
     cat_j_ref = df_products.loc[product_name, 'Reference current density (mA/cm2)'] 
     
     ### Convert rates into currents
@@ -207,11 +208,11 @@ def cell_voltage(
     j_H2_mA_cm2 = i_H2_mA/area_cm2 # mA/cm2
     
     # Import equilibrium potentials
-    cat_E_eqm = df_products.loc[product_name, 'Standard potential (V vs RHE)']    
+    cat_E_eqm = df_products.loc[product_name, 'Standard potential, pH = 0 (V vs SHE)']    
     
     ### Calculate cell potential
     
-    if overridden_vbl == 'Cell voltage':
+    if 'Cell voltage' in overridden_vbl:
         # Directly assign cell voltage if overridden
         cell_E_V = overridden_value
         cat_E_eqm = np.NaN
@@ -224,7 +225,9 @@ def cell_voltage(
         # an_power_kW = np.NaN
         ohmic_E_V = np.NaN
         # ohmic_power_kW = np.NaN
-        
+        R_ohm_electrolyte = np.NaN
+        R_ohm_membrane = np.NaN
+
     else:
         
         ### Handle invalid cases
@@ -240,13 +243,13 @@ def cell_voltage(
             
         else:
             # Butler-Volmer overpotentials
-            if overridden_vbl != 'Cathodic overpotential':
+            if 'Cathodic overpotential' not in overridden_vbl:
                 BV_eta_cat_V = cat_eta_ref + cat_Tafel_slope/1000*np.log10(abs(j_product_mA_cm2/cat_j_ref)) 
                 # V. B-V overpotential = Ref overpotential + Tafel slope*log_10(product current/ reference current); Tafel slope in mV/dec 
             else:
                 BV_eta_cat_V = overridden_value
 
-            if overridden_vbl != 'Anodic overpotential':
+            if 'Anodic overpotential' not in overridden_vbl:
                 BV_eta_an_V = an_eta_ref + an_Tafel_slope/1000*np.log10(abs(j_O2_mA_cm2/an_j_ref)) 
                 # V. B-V overpotential = Ref overpotential + Tafel slope*log_10(product current/ reference current); Tafel slope in mV/dec
             else:  
@@ -256,7 +259,9 @@ def cell_voltage(
         # cell_E_eqm_V = cat_E_eqm - an_E_eqm # full standard cell voltage
 
         # Ohmic loss
-        ohmic_E_V = -i_total_mA/1000 * R_ohmcm2/area_cm2 # V = IR. Assumes MEA => membrane resistance only
+        R_ohm_membrane = R_membrane_ohmcm2/area_cm2
+        R_ohm_electrolyte = (1/kappa_electrolyte_S_cm)*electrolyte_thickness_cm/area_cm2
+        ohmic_E_V = -i_total_mA/1000 * (R_ohm_membrane + R_ohm_electrolyte) # V = IR. Assumes flow cell => membrane resistance only if flow field thickness is 0, otherwise add resistance of electrolyte
         # ohmic_power_kW = (ohmic_E_V * i_total_mA/1000)/1000 # P = IV
         
         # Cathode power
@@ -292,6 +297,8 @@ def cell_voltage(
         'Cathodic overpotential': [BV_eta_cat_V , 'V'],
         'Anodic overpotential': [BV_eta_an_V, 'V'],
         'Ohmic loss': [ohmic_E_V, 'V'],
+        "Membrane resistance": [R_ohm_membrane, 'ohm'],
+        "Electrolyte resistance": [R_ohm_electrolyte, 'ohm'],
         'Cathode total potential': [cat_E_V, 'V'],
         'Anode total potential': [an_E_V, 'V'],
         
@@ -327,7 +334,9 @@ def cell_voltage(
         "Specified FE {}".format(product_name) : [FE_product_specified, ''],
         "FE {} at 0% SPC".format(product_name) : [FE_CO2R_0, ''],
         "Current density": [j_total_mA_cm2, 'mA/cm2'],
-        "Specific ohmic resistance": [R_ohmcm2, 'ohm.cm2'],
+        "Membrane specific ohmic resistance": [R_membrane_ohmcm2, 'ohm.cm2'],
+        "Conductivity of electrolyte": [kappa_electrolyte_S_cm, 'S/cm'],
+        "Electrolyte thickness": [electrolyte_thickness_cm, 'cm'],
         'Modeled FE?': [{None: 0, 
                          'Hawks': 1, 
                          'Kas': 2}[model_FE], ''],
@@ -350,7 +359,6 @@ def cell_voltage(
 # ### 2.1 Equation for Hawks, Baker (ACS Energy Lett. 2021) model
 
 # %%
-@st.cache_data(ttl = "1h")
 def eqn_known_SPC_jtotal(FE_product,
             j_total,
             FE_CO2R_0,
@@ -390,7 +398,6 @@ def eqn_known_SPC_jtotal(FE_product,
 # ### 2.2 Mass balance check and all model execution
 
 # %%
-@st.cache_data(ttl = "1h")
 def SPC_check(FE_product_specified,
               exponent, 
               scaling,
@@ -485,10 +492,10 @@ def SPC_check(FE_product_specified,
             
         elif model_FE == 'Kas':
             FE_product = FE_CO2R_0 - scaling*(SPC**exponent)         # FE_product = FE_CO2R_0 - 4.7306*(SPC**5.4936)
-            print('Using Kas Smith 2021 tradeoff with exponent = {}, scaling = {}'.format(exponent, scaling))
+            # print('Using Kas Smith 2021 tradeoff with exponent = {}, scaling = {}'.format(exponent, scaling))
         else:
             FE_product = FE_product_specified
-            print('Using manually specified FE_product = {}'.format(FE_product))
+            print('Using manually specified FE_product = {}'.format(FE_product)) 
                 
         # Get minimum allowed FE
         # By mass balance, the minimum FE = Ṅ_CO2R/ (Ṅ_CO2R + Ṅ_carbonate) = (z*FE_CO2R*i/n_CO2R*F) / ((z*FE_CO2R*i/n_CO2R*F) + (c*i/F))
@@ -500,7 +507,7 @@ def SPC_check(FE_product_specified,
             SPC = np.NaN
             FE_product = np.NaN # FE_product_specified
   
-    print('SPC_check returned SPC = {}%; FE {}% \n'.format(SPC*100, FE_product*100))
+    # print('SPC_check returned SPC = {}%; FE {}% \n'.format(SPC*100, FE_product*100)) # Suppressed for tracking MC
 
     return FE_product, SPC
 
@@ -508,18 +515,19 @@ def SPC_check(FE_product_specified,
 # ## 3. Mass balance around electrolyzer
 
 # %%
-@st.cache_data(ttl = "1h")
 def electrolyzer_SS_mass_balance(
     product_name,
     product_rate_kg_day,
     FE_product,
     SPC,
     df_potentials,
-    crossover_ratio ,
+    crossover_ratio,
     excess_water_ratio,
+    excess_solvent_ratio,
     cathode_outlet_humidity,
     j_total_mA_cm2 ,
-    electrolyte_conc, 
+    catholyte_conc_M, 
+    anolyte_conc_M,
     df_products , # product data - MW, n, z
     carbon_capture_efficiency,
     MW_CO2, 
@@ -566,8 +574,11 @@ def electrolyzer_SS_mass_balance(
     ## Anode inlet
     water_an_inlet_mol_s = excess_water_ratio * O2_outlet_mol_s # assume 2500x the consumed water is fed - vast excess
     
+    ## Solvent inlet
+    solvent_inlet_mol_s = excess_solvent_ratio * product_rate_mol_s # assume 500x the fed CO2 is fed as solvent - this is not a reactant, do not need much of it
+
     # Crossover
-    CO2_an_outlet_mol_s = crossover_ratio * (i_total_mA / (1000*F))
+    CO2_an_outlet_mol_s = crossover_ratio * (i_total_mA / (1000*F)) ## Assume that there is negligible CO2 transport through CEM - crossover_ratio is 0   
     an_gas_outlet_mol_s = O2_outlet_mol_s + CO2_an_outlet_mol_s
     
     ## Cathode gas and liquid outlets
@@ -580,14 +591,14 @@ def electrolyzer_SS_mass_balance(
     
     CO2_cat_outlet_mol_s = CO2_inlet_mol_s - product_rate_mol_s * z_product - CO2_an_outlet_mol_s # carbon mass balance    
     cat_gas_outlet_mol_s = (product_gas_outlet_mol_s + H2_outlet_mol_s + CO2_cat_outlet_mol_s)/(1-cathode_outlet_humidity) # 5% humid gas means total moles = (moles of everything else)/(1-mol fraction water)
-    cat_liq_outlet_mol_s = product_liq_outlet_mol_s 
-    # TODO: assign this a stream number and separations, also any liquid flow additional to product (water?) expected here
 
     ## Anode inlet
-    water_makeup_mol_s = H2_outlet_mol_s   # 2 * (n_product/4) * product_rate_mol_s 
-    # Assume that water is only consumed by HER
-    # Water is consumed at the anode, but is equally regenerated by ion recombination;
-    # More physically accurately, O2 is generated from hydroxide, not from water, resulting in a net zero water generation/consumption
+    water_makeup_mol_s = H2_outlet_mol_s 
+    if df_products.loc[product_name, 'Phase'] == 'liquid':
+        water_makeup_mol_s += 0.5*CO2_fresh_mol_s   # 2 * (n_product/4) * product_rate_mol_s 
+    # Assume that water is consumed by HER and CO2R. The reaction makes either oxalic acid, formic acid, or carbonic acid by proton migration through the membrane
+    # However, carbonic acid locally regenerates CO2 and water in the presence of protons. Therefore, when CO is made, there is no net water consumption.
+    # If formate and oxalate were made instead, they would also not consume water. There is a net consumption of water to make protons that are not reg
     # The only water deionized is the water condensed from the wet cathode outlet gas, defined by the cathode_outlet_humidity
     
     ### Calculate emissions due to inefficiency in carbon capture
@@ -604,7 +615,9 @@ def electrolyzer_SS_mass_balance(
         "Crossover ratio" : [crossover_ratio, 'mol CO2/ mol e-'],
         "Humidity of cathode gas outlet (molar)": [cathode_outlet_humidity, ''],
         "Excess ratio of water feed vs product rate (molar)": [excess_water_ratio, 'mol/s water/ mol/s {}'.format(product_name)],
-         "Electrolyte concentration" : [electrolyte_conc, 'M'],
+        "Excess ratio of solvent feed vs CO2 feed rate (molar)": [excess_solvent_ratio, 'mol/s solvent/ mol/s CO2'],
+        "Catholyte concentration" : [catholyte_conc_M, 'M'],
+        "Anolyte concentration" : [anolyte_conc_M, 'M'],
         'Carbon capture efficiency': [carbon_capture_efficiency, ''],
         'Carbon capture loss': [carbon_capture_loss_kgperkg, 'kg CO2/ kg {}'.format(product_name)]
     }
@@ -618,6 +631,7 @@ def electrolyzer_SS_mass_balance(
         'CO2 inlet': CO2_inlet_mol_s,
         'Water inlet': water_an_inlet_mol_s,
         'Water makeup': water_makeup_mol_s,
+        'Solvent inlet': solvent_inlet_mol_s,
         'O2 outlet': O2_outlet_mol_s,
         'CO2 anode outlet': CO2_an_outlet_mol_s,
         'Anode gas outlet': an_gas_outlet_mol_s,
@@ -626,7 +640,7 @@ def electrolyzer_SS_mass_balance(
         'Product liquid outlet': product_liq_outlet_mol_s ,
         'CO2 cathode outlet': CO2_cat_outlet_mol_s,
         'Cathode gas outlet': cat_gas_outlet_mol_s,
-        'Cathode liquid outlet': cat_liq_outlet_mol_s
+        'Liquid product outlet': product_liq_outlet_mol_s
     }
          
     df_electrolyzer_streams_mol_s = pd.Series(dict_electrolyzer_streams_mol_s) # convert to dataframe

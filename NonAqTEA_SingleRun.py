@@ -1,17 +1,13 @@
-# %% [markdown]
-# # Single model run: Notes
-# Date updated: 2024/06/11 \
-# Update notes: Strict function inputs\
-# Contact: Shashwati da Cunha, [shashwati.dacunha@austin.utexas.edu](mailto:shashwati.dacunha@austin.utexas.edu)
-# 
+
 # ### Instructions
 # 1. Not designed for standalone run - this is only a collection of functions. Other notebooks call it.
 
+
 import streamlit as st
 
-from ElectrolyzerModel import *
-from DownstreamProcessModel import *
-from ProcessEconomics import *
+from NonAqElectrolyzerModel import *
+from NonAqDownstreamProcessModel import *
+from NonAqProcessEconomics import *
 
 # %%
 ## Check if SPC is reasonable given FE and crossover. Generate FE and SPC - if model_FE is true, FE will be modeled; either way, both will be checked for mass balance
