@@ -293,15 +293,15 @@ def cached_single_run(product_name,
 #     emissions_default = sum(df_energy_default.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)])
 #     return capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default
 
-@st.cache_data(ttl = "1h")
-def svg_write(_fig, center=True):
+# @st.cache_data(ttl = "1h")
+def svg_write(fig, center=True):
     """
     Renders a matplotlib figure object to SVG.
     Disable center to left-margin align like other objects.
     """
     # Save to stringIO instead of file
     imgdata = StringIO()
-    _fig.savefig(imgdata, format="svg")
+    fig.savefig(imgdata, format="svg")
 
     # Retrieve saved string
     imgdata.seek(0)

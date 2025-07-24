@@ -304,15 +304,15 @@ def render_svg(svg):
     html = r'<img src="data:image/svg+xml;base64,%s"/>' % b64
     st.write(html, unsafe_allow_html=True)
 
-@st.cache_data(ttl = "1h")
-def svg_write(_fig, center=True):
+# @st.cache_data(ttl = "1h")
+def svg_write(fig, center=True):
     """
     Renders a matplotlib figure object to SVG.
     Disable center to left-margin align like other objects.
     """
     # Save to stringIO instead of file
     imgdata = StringIO()
-    _fig.savefig(imgdata, format="svg")
+    fig.savefig(imgdata, format="svg")
 
     # Retrieve saved string
     imgdata.seek(0)
