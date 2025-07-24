@@ -26,7 +26,8 @@ import numpy as np
 # ### 1.1 Create blank stream table
 
 # %%
-def blank_stream_table(df_products,
+@st.cache_data(ttl = "1h")
+def nonaq_blank_stream_table(df_products,
                        product_name):
     """
     Generates a skeleton dataframe for streams and hard codes stream numbers. These are based on the assumed PFD
@@ -117,7 +118,8 @@ def blank_stream_table(df_products,
 # ### 1.2 Electrolyzer and separator units for mass balances
 
 # %%
-def update_stream_table(product_name, 
+@st.cache_data(ttl = "1h")
+def nonaq_update_stream_table(product_name, 
                         solvent_name,
                         supporting_electrolyte_name,
                         df_products, # product data - MW 
@@ -639,35 +641,12 @@ def update_stream_table(product_name,
 # %% [markdown]
 # ### 2.1 Separation energies
 
-# %%
-def work_of_sep_kJ(x, 
-                   second_law_efficiency,
-                   T_sep,
-                   R, 
-):
-    """
-    Calculate real work of separation for binary mixture based on ideal work and second-law efficiency
-    
-    Arguments: mole fraction of species (), second-law efficiency of separation (), 
-    temperature of stream to separate (K), gas constant (J/mol.K)
-
-    Returns: real work of separation
-    
-    """
-    
-    if x == 0 or x == 1:
-        print(x)
-        ideal_work_of_sep = 0
-    else:
-        ideal_work_of_sep = R*T_sep*(x*np.log(x) + (1-x)*np.log(1-x))/1000 # note that np.log is ln
-    real_work_of_sep = ideal_work_of_sep / second_law_efficiency
-    return real_work_of_sep
-
 # %% [markdown]
 # ### 2.2 Energy table
 
 # %%
-def energy_table(product_name,
+@st.cache_data(ttl = "1h")
+def nonaq_energy_table(product_name,
                  df_products,
                  df_potentials,
                  df_streams, 

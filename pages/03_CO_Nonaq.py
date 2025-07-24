@@ -52,13 +52,16 @@ from io import StringIO
 # from testerscript import single_run
 
 from ElectrolyzerModel import *
-from DownstreamProcessModel import *
 from ProcessEconomics import *
-from TEA_SingleRun import *
+from NonAqElectrolyzerModel import *
+from NonAqDownstreamProcessModel import *
+from NonAqProcessEconomics import *
+from NonAqTEA_SingleRun import *
 
+# TODO
 # Cache single run of model
 @st.cache_data(ttl = "1h")
-def cached_single_run(product_name,
+def cached_single_run_nonaq(product_name,
         product_rate_kg_day,
         df_products,
         FE_CO2R_0,
@@ -116,7 +119,7 @@ def cached_single_run(product_name,
         ):
     # Execute a single run of the model. The actual function is imported from TEA_SingleRun.ipynb.
     # This is useful becuase of the caching - it will only actually rerun the model if there is a change in the inputs
-    return single_run(product_name=product_name,
+    return single_run_nonaq(product_name=product_name,
         product_rate_kg_day=product_rate_kg_day,
         df_products=df_products,
         FE_CO2R_0=FE_CO2R_0,
