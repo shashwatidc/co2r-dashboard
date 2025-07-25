@@ -769,7 +769,7 @@ with st.sidebar:
     ######## SOLVENT SELECTION
     # Choose a solvent
     solvent_name = st.radio(label = 'Non-aqueous catholyte solvent', options= ['DMF', 'DMSO', 'Acetonitrile', 'Propylene carbonate',], 
-                    index = 0, # default option
+                    index = 1, # default option
                     label_visibility='collapsed',
                     help = '''Choose the non-aqueous catholyte. The cell is a flow cell.
                       \n Default solvent: DMF'''
