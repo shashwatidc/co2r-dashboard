@@ -763,6 +763,27 @@ if 'minimum_value_input_CO_nonaq' not in st.session_state:
 if 'maximum_value_input_CO_nonaq' not in st.session_state:
     st.session_state.maximum_value_input_CO_nonaq = str(1500)
 
+with st.sidebar:
+    st.subheader('Electrolyte')
+    ######## SOLVENT SELECTION
+    # Choose a solvent
+    solvent_name = st.radio(label = 'Non-aqueous catholyte solvent', options= ['DMF', 'DMSO', 'Acetonitrile', 'Propylene carbonate',], 
+                    index = 0, # default option
+                    label_visibility='collapsed',
+                    help = '''Choose the non-aqueous catholyte. The cell is a flow cell.
+                      \n Default solvent: DMF'''
+    )
+
+    st.subheader('Supporting electrolyte')
+    ######## SOLVENT SELECTION
+    # Choose a solvent
+    solvent_name = st.radio(label = 'Non-aqueous catholyte supporting electrolyte', options= ['TEACl', 'TBAClO$_4$', 'TEAClO$_4$', 'TBABF$_4$'], 
+                    index = 0, # default option
+                    label_visibility='collapsed',
+                    help = '''Choose the non-aqueous catholyte. The cell is a flow cell.
+                      \n Default supporting electrolyte: TEACl'''
+    )
+
 ########## OTHER FIXED VALUES
 # PRODUCT COSTS
 product_cost_USD_kgprod = df_products.loc[product_name, 'Cost ($/kg product)']
@@ -840,352 +861,8 @@ options_list  = ['Cell voltage (V)',
  ] # Order must exactly match df_flags
 
 middle_column, right_column = st.columns(2, gap = 'large')
-st.sidebar.header('x-axis variable' )
 middle_column.header('Results')
 right_column.header('_')
-
-# Cache creation of flags dataframe
-@st.cache_data(ttl = "1h")
-def flags(product_name):
-    # Create flags for selecting variable
-    dict_flags = {   # Formatted as 'override_parameter': 'parameter name', 'unit', 'variable name', 'default value', 'minimum value', 'maximum value'
-            'override_cell_voltage':[ 'Cell voltage', 'V', 'cell_E_V',                                             cell_E_V,                          1.34, 15 ],
-            'override_eta_cat': ['Cathodic overpotential', 'V', 'BV_eta_cat_V',                                    BV_eta_cat_V,                      0, -6],
-            'override_Tafel'  : ['Cathodic Tafel slope', 'mV/dec', 'cat_Tafel_slope',                              df_products.loc[product_name, 'Tafel slope (mV/dec)'],               -50, -250 ] ,
-            'override_eta_an': ['Anodic overpotential', 'V', 'BV_eta_an_V',                                        BV_eta_an_V,                       0, 3 ],
-            'override_ohmic' : ['Membrane specific resistance', '$\Omega$.cm$^2$', 'R_membrane_ohmcm2',            R_membrane_ohmcm2,                 0, 25],
-            'override_electrolyte_conductivity' : ['Electrolyte conductivity', 'S/cm', 'kappa_electrolyte_S_cm',   df_supporting.loc[supporting_electrolyte_name, 'Conductivity in ACN, 0.3 M (S/cm)'] * df_solvents.loc[solvent_name, 'Conductivity factor relative to ACN'],  
-                                                                                                                                                    0.0001, 0.1],
-            'override_electrolye_thickness' : ['Electrolyte thickness', 'cm', 'electrolyte_thickness_cm',          electrolyte_thickness_cm,          0, 0.5],
-            # 'override_catholyte_M': ['Catholyte concentration', 'M', 'catholyte_conc_M',                           catholyte_conc_M,                  1e-6, 10 ] ,
-            # 'override_CO2_solubility' : ['CO$_2$ solubility, 10 bar', 'mol CO$_2$/mol solvent', 'CO2_solubility_mol_mol', CO2_solubility_mol_mol,     0, 1],
-            'override_solvent_loss': ['Solvent loss fraction', 'mol offgas/mol solvent', 'solvent_loss_fraction', solvent_loss_fraction,     0, 1e-3 ], 
-            # 'override_viscosity' : ['Solvent viscosity', 'cP', 'viscosity_cP',                                   viscosity_cP,                      0, 1.5],    # TODO
-            
-            'override_j': ['Current density', 'mA/cm$^2$', 'j_total_mA_cm2',                                       df_products.loc[product_name, 'Chosen total current density (mA/cm2)'], 25, 600],
-            'override_FE_specified': ['FE$_{{{} , specified}}$'.format(product_name), '', 'FE_product_specified',  df_products.loc[product_name, 'FECO2R at SPC = 0'],                  1e-3, 1 ],
-            # 'override_FE_CO2R_0': ['FE$_{CO_2R,0}$', '', 'FE_CO2R_0',                                            df_products.loc[product_name, 'FECO2R at SPC = 0'],                  1e-3, 1 ],
-            'override_SPC':['Single-pass conversion', '', 'SPC',                                                   df_products.loc[product_name, 'Chosen SPC, no tradeoff'],            1e-4, 1],
-            'override_crossover': ['Crossover', 'mol CO$_2$ per mol e$^-$', 'crossover_ratio',                     crossover_ratio,                    1e-4, 0.5],
-            
-            'override_rate': ['{} production rate'.format(product_name), 'kg/day', 'product_rate_kg_day',          product_rate_kg_day,                1e3, 1.25e6],
-            'override_capacity': ['Capacity factor' , '', 'capacity_factor',                                       capacity_factor,                    1e-4, 1 ],
-            'override_lifetime': ['Plant lifetime' , 'years', 'lifetime_years',                                    lifetime_years,                     1e-3, 50],
-            'override_stack_lifetime': ['Stack lifetime' , 'years', 'stack_lifetime_years',                        stack_lifetime_years,               1e-3, 30],
-            'override_solvent_ratio': ['Excess solvent ratio' , 'mol solvent/ mol product', 'excess_solvent_ratio', excess_solvent_ratio,               1e-3, 2500],
-            'override_gas_separation': ['PSA second-law separation efficiency', '', 'PSA_second_law_efficiency',   PSA_second_law_efficiency,          0.01, 0.5],
-            'override_liq_separation': ['Liquid second-law separation efficiency', '', 'LL_second_law_efficiency', LL_second_law_efficiency,           0.01, 0.5],
-            
-            'override_electricity_cost': [ 'Electricity cost' , '$/kWh', 'electricity_cost_USD_kWh',               electricity_cost_USD_kWh,           0, 0.1 ],
-            'override_CO2_cost': ['CO$_2$ cost'  , '\$/t CO$_2$', 'CO2_cost_USD_tCO2',                             CO2_cost_USD_tCO2,                  0, 200],
-            'override_H2_cost': ['H$_2$ cost'  , '\$/kg H$_2$', 'H2_cost_USD_kgH2',                                H2_cost_USD_kgH2,                   0, 10],
-            'override_water_cost': ['Water cost' , '\$/kg', 'water_cost_USD_kg',                                   water_cost_USD_kg,                  0, 0.30],
-            'override_solvent_cost': ['{} cost'.format(solvent_name)  , '\$/kg', 'solvent_cost_USD_kg',            solvent_cost_USD_kg,                0, 10],
-            'override_supporting_cost': ['{} cost'.format(supporting_electrolyte_name) , '\$/kg', 'electrolyte_cost_USD_kg', electrolyte_cost_USD_kg,  0, 2500],
-            'override_electrolyzer_capex': ['Electrolyzer capital cost' , '\$/m$^2$', 'electrolyzer_capex_USD_m2', electrolyzer_capex_USD_m2,          3000, 10000],
-            'override_PSA_capex': ['PSA capital cost', '\$/1000 m$^3_{{gas}}$/hr', 'PSA_capex_USD_1000m3_hr', PSA_capex_USD_1000m3_hr,                 1e5, 10e6],
-            'override_LL_capex': ['Liquid separation capital cost', '\$/1000 mol$_{{inlet}}$/hr', 'LL_capex_USD_1000mol_hr', LL_capex_USD_1000mol_hr,10000, 100000],
-
-            # 'override_carbon_intensity': ['Grid CO$_2$ intensity', 'kg CO$_2$/kWh', 'electricity_emissions_kgCO2_kWh',electricity_emissions_kgCO2_kWh, 0, 0.5],
-
-            # 'override_battery_capacity': ['Renewables capacity factor' , '', 'avbl_renewables',                    avbl_renewables,                    1e-4, 1 ],
-            }
-        # Note that percentages here are expressed directly as decimals. E.g. entering 0.01 above for default FE will result in default FE = 1%
-
-    df_flags = pd.DataFrame(dict_flags).T
-    df_flags.reset_index(inplace = True, drop = False)
-    df_flags.set_index(0, inplace = True, drop = True) # Set independent variable name as index
-    df_flags.index.name = 'Independent variable'
-    df_flags.columns = ['Old flag name', 'Unit', 'Python variable', 'Default value', 'Range min', 'Range max']
-
-    df_flags['T/F?'] = False # add column for truth value of given override
-    return df_flags
-
-@st.cache_data(ttl = "1h")
-def generate_range(df_flags, override_vbl_selection, vbl_min, vbl_max, vbl_num):
-    vbl_row = options_list.index(override_vbl_selection) # convert input into integer
-    
-    df_flags['T/F?'] = False # clear column
-    df_flags.iloc[vbl_row, 6] = True # set that flag to be True
-    vbl_name = df_flags.index[vbl_row] # set vbl_name from that row
-    vbl_unit = df_flags['Unit'].iloc[vbl_row] # set vbl_unit from that row
-
-    # Reorder potential limits defined and generate a range of the chosen independent variable
-    vbl_limits = [vbl_min, vbl_max]
-    vbl_min = min(vbl_limits)
-    vbl_max = max(vbl_limits)
-
-    # Generate range
-    
-    # Linearly space points based on step size
-    if range_selection == 'Linear':
-        vbl_range = np.linspace(start = vbl_min, stop = vbl_max, num = vbl_num) # include the last point as close as possible
-
-    # Log space points
-    else:
-        vbl_range = np.logspace(start = np.log10(vbl_min), stop = np.log10(vbl_max), num = vbl_num, base = 10, endpoint = True)
-
-    vbl_range_text = ['{} {}'.format(x, vbl_unit) for x in vbl_range]
-    
-    return vbl_name, vbl_unit, vbl_range, vbl_range_text, vbl_min, vbl_max
-
-# Cache creation of axis variables
-@st.cache_data(ttl = "1h")
-def x_axis_formatting(x_axis_min, x_axis_max, x_axis_num):    
-    if range_selection == 'Linear':
-        x_axis_major_ticks = np.linspace(start = x_axis_min, stop = x_axis_max, num = x_axis_num)
-    else:
-        x_axis_major_ticks = np.logspace(np.log10(x_axis_min), np.log10(x_axis_max), num = x_axis_num, endpoint = True)
-
-    # Some options for ticks:
-    # np.arange(min, max, step): returns a list of step-spaced entries between min and max EXCLUDING max
-    # np.linspace(min, max, n): returns a list of n linearly spaced entries between min and max, including max
-    # np.logspace(min, max, n, base=10.0): returns a list of n log-spaced entries between min and max
-    # axs.xaxis.set_major_locator(mpl.ticker.MultipleLocator(n)): sets axis ticks to be multiples of 
-                                                                    #n within the data range
-
-    return(x_axis_major_ticks)
-
-@st.cache_data(ttl = "1h")
-def y_axis_formatting(y_axis_min, y_axis_max, y_axis_num):    
-    if range_selection == 'Linear':
-        y_axis_major_ticks = np.linspace(start = y_axis_min, stop = y_axis_max, num = y_axis_num)
-    else:
-        y_axis_major_ticks = np.logspace(np.log10(y_axis_min), np.log10(y_axis_max), num = y_axis_num, endpoint = True)
-
-    # Some options for ticks:
-    # np.arange(min, max, step): returns a list of step-spaced entries between min and max EXCLUDING max
-    # np.linspace(min, max, n): returns a list of n linearly spaced entries between min and max, including max
-    # np.logspace(min, max, n, base=10.0): returns a list of n log-spaced entries between min and max
-    # axs.xaxis.set_major_locator(mpl.ticker.MultipleLocator(n)): sets axis ticks to be multiples of 
-                                                                    #n within the data range
-
-    return(y_axis_major_ticks)
-
-def updated_radio_state(df_flags):
-    vbl_row = options_list.index(st.session_state['overridden_vbl_radio_CO_nonaq']) # convert input into integer
-    vbl_name = df_flags.index[vbl_row] # set vbl_name from that row
-    vbl_unit = df_flags.loc[vbl_name, 'Unit']
-    st.session_state.minimum_value_input_CO_nonaq = str(df_flags.loc[vbl_name, 'Range min'])
-    st.session_state.maximum_value_input_CO_nonaq = str(df_flags.loc[vbl_name, 'Range max'])
-
-df_flags = flags(product_name)
-
-with st.sidebar:
-    ## Initialize overridden_vbl_radio_CO widget
-
-    override_vbl_selection = st.radio(label = 'Select variable to see cost sensitivity ', key='overridden_vbl_radio_CO_nonaq',
-                          options= options_list, 
-                    index = 4, # default option
-                    label_visibility='visible',
-                    help = '''Choose a variable as the x-axis (category) for the bar charts. 
-                      \n Then choose its range below by defining the minimum, maximum, and number of bars to generate between them.
-                      \n The actual range on the bar charts can be specified in the **Plot formatting** section below.
-                      \n Default option: Total current density''',
-                      on_change= updated_radio_state, args = (df_flags, )
-                    )
-    try:
-        st.write('Minimum value')
-        vbl_min = float(st.text_input(label = 'Minimum value',
-                    key = 'minimum_value_input_CO_nonaq', # value = str(df_flags.loc[vbl_name, 'Range min']),  
-                    label_visibility='collapsed'))
-        st.write('Maximum value')
-        vbl_max = float(st.text_input(label = 'Maximum value',
-                    key = 'maximum_value_input_CO_nonaq',#  value = str(df_flags.loc[vbl_name, 'Range max']),
-                    label_visibility='collapsed'))
-        
-        st.write('Number of points (integer)')
-        vbl_num = int(st.text_input(label = 'Number of points',
-                    value = 11, 
-                    label_visibility='collapsed'))
-        st.session_state.is_active_error_CO_nonaq = False
-    except:
-        st.error('One of your x-variable values is invalid. Please check that they are all numbers and \
-                  that the number of points is an integer.')
-        st.session_state.is_active_error_CO_nonaq = True
-        st.header('*:red[There is an error in the model inputs.]*')
-
-    st.write('Spacing for points')
-    range_selection = st.radio(label = 'Spacing for points', 
-                          options= ['Linear', 
-                                    'Logspace'], 
-                    index = 0, # default option
-                    label_visibility='collapsed',
-                    help = '''Check the variable that is the x-axis ('category') in the bar charts. 
-                      \n Then choose its range below.
-                      \n Default option: Total current density'''
-    )
-
-    # st.subheader('CO$_2$R product')
-    # ######## PRODUCT SELECTION
-    # # Choose a product
-    # product_name = st.radio(label = 'Reduction product', options= ['CO', 'Ethylene'], 
-    #                 index = 0, # default option
-    #                 label_visibility='collapsed',
-    #                 help = '''Choose the product that CO$_2$ is reduced into. 
-    #                 The only byproduct made is hydrogen. 
-    #                   \n Default product: CO'''
-    # )
-
-vbl_name, vbl_unit, vbl_range, vbl_range_text, vbl_min, vbl_max = generate_range(df_flags, override_vbl_selection, vbl_min, vbl_max, vbl_num)
-default_y_axis_max_opex = 2.0 if product_name == 'CO' else 12.0
-
-## Define axis limits and ticks - see note below for options
-with st.sidebar:
-    st.header('Plot formatting')
-    with st.expander('**x-axis formatting**', expanded=False):
-        st.write('x-axis minimum')
-        x_axis_min = st.text_input(label = 'x-axis minimum',
-                            value = vbl_min, label_visibility='collapsed',)
-        st.write('x-axis maximum')
-        x_axis_max = st.text_input(label = 'x-axis maximum',
-                            value = vbl_max, label_visibility='collapsed')
-        st.write('Number of x-ticks, including endpoints (integer)')
-        x_axis_num = st.text_input(label = 'x-axis ticks',
-                            value = 4, label_visibility='collapsed')
-        try:
-            x_axis_min = float(x_axis_min)
-            x_axis_max = float(x_axis_max)
-            x_axis_num = int(x_axis_num)
-            st.session_state.is_active_error_CO_nonaq = False
-        except:
-            st.error('One of your x-axis values is invalid. Please check that they are all numbers and \
-                    that the number of x-ticks is an integer.')
-            st.session_state.is_active_error_CO_nonaq = True
-            st.header('*:red[There is an error in the model inputs.]*')
-
-    with st.expander('**y-axes formatting**', expanded = False):
-
-        st.write('**Capex**')
-        st.write('Capex y-axis minimum (millions)')
-        y_axis_min_capex = st.text_input(label = 'capex y-axis minimum',
-                            value = 0, label_visibility='collapsed',)
-        st.write('Capex y-axis maximum (millions)')
-        y_axis_max_capex = st.text_input(label = 'capex y-axis maximum',
-                            value = 100, label_visibility='collapsed')
-        st.write('Number of capex y-ticks, including endpoints (integer)')
-        y_axis_num_capex = st.text_input(label = 'capex y-axis ticks',
-                            value = 6, label_visibility='collapsed')
-        try:
-            y_axis_min_capex = float(y_axis_min_capex)
-            y_axis_max_capex = float(y_axis_max_capex)
-            y_axis_num_capex = int(y_axis_num_capex)
-            st.session_state.is_active_error_CO_nonaq = False
-        except:
-            st.error('One of your capex y-axis values is invalid. Please check that they are all numbers and \
-                    that the number of y-ticks is an integer.')
-            st.session_state.is_active_error_CO_nonaq = True
-            st.header('*:red[There is an error in the model inputs..]*')
-
-        st.divider()
-        st.write('**Opex**')
-        st.write('Opex y-axis minimum ($/kg {})'.format(product_name))
-        y_axis_min_opex = st.text_input(label = 'opex y-axis minimum',
-                            value = 0, label_visibility='collapsed',)
-        st.write('Opex y-axis maximum ($/kg {})'.format(product_name))
-        y_axis_max_opex = st.text_input(label = 'opex y-axis maximum',
-                            value = default_y_axis_max_opex, label_visibility='collapsed')
-        st.write('Number of opex y-ticks, including endpoints (integer)')
-        y_axis_num_opex = st.text_input(label = 'opex y-axis ticks',
-                            value = 6, label_visibility='collapsed')
-        try:
-            y_axis_min_opex = float(y_axis_min_opex)
-            y_axis_max_opex = float(y_axis_max_opex)
-            y_axis_num_opex = int(y_axis_num_opex)
-            st.session_state.is_active_error_CO_nonaq = False
-        except:
-            st.error('One of your opex y-axis values is invalid. Please check that they are all numbers and \
-                    that the number of y-ticks is an integer.')
-            st.session_state.is_active_error_CO_nonaq = True
-            st.header('*:red[There is an error in the model inputs..]*')
-    
-        st.divider()
-        st.write('**Levelized cost**')
-        st.write('Levelized cost y-axis minimum')
-        y_axis_min_levelized = st.text_input(label = 'levelized y-axis minimum',
-                            value = 0, label_visibility='collapsed',)
-        st.write('Levelized cost y-axis maximum')
-        y_axis_max_levelized = st.text_input(label = 'levelized y-axis maximum',
-                            value = default_y_axis_max_opex, label_visibility='collapsed')
-        st.write('Number of levelized cost y-ticks, including endpoints (integer)')
-        y_axis_num_levelized = st.text_input(label = 'levelized x-axis ticks',
-                            value = 6, label_visibility='collapsed')
-        try:
-            y_axis_min_levelized = float(y_axis_min_levelized)
-            y_axis_max_levelized = float(y_axis_max_levelized)
-            y_axis_num_levelized = int(y_axis_num_levelized)
-            st.session_state.is_active_error_CO_nonaq = False
-        except:
-            st.error('One of your levelized cost y-axis values is invalid. Please check that they are all numbers and \
-                    that the number of y-ticks is an integer.')
-            st.session_state.is_active_error_CO_nonaq = True
-            st.header('*:red[There is an error in the model inputs..]*')
-
-        st.write('**Cell potential**')
-        st.write('Cell potential y-axis minimum')
-        y_axis_min_potential = st.text_input(label = 'E y-axis minimum',
-                            value = 0, label_visibility='collapsed',)
-        st.write('Cell potential y-axis maximum')
-        y_axis_max_potential = st.text_input(label = 'E y-axis maximum',
-                            value = 4, label_visibility='collapsed')
-        st.write('Number of potential y-ticks, including endpoints (integer)')
-        y_axis_num_potential = st.text_input(label = 'E y-axis ticks',
-                            value = 5, label_visibility='collapsed')
-        try:
-            y_axis_min_potential = float(y_axis_min_potential)
-            y_axis_max_potential = float(y_axis_max_potential)
-            y_axis_num_potential = int(y_axis_num_potential)
-            st.session_state.is_active_error_CO_nonaq = False
-        except:
-            st.error('One of your opex y-axis values is invalid. Please check that they are all numbers and \
-                    that the number of y-ticks is an integer.')
-            st.session_state.is_active_error_CO_nonaq = True
-            st.header('*:red[There is an error in the model inputs..]*')
-
-        st.divider()
-        st.write('**Energy**')
-        st.write('Energy y-axis minimum')
-        y_axis_min_energy = st.text_input(label = 'energy y-axis minimum',
-                            value = 0, label_visibility='collapsed',)
-        st.write('Energy y-axis maximum')
-        y_axis_max_energy = st.text_input(label = 'energy y-axis maximum',
-                            value = 1200, label_visibility='collapsed')
-        st.write('Number of energy y-ticks, including endpoints (integer)')
-        y_axis_num_energy = st.text_input(label = 'energy y-axis ticks',
-                            value = 7, label_visibility='collapsed')
-        try:
-            y_axis_min_energy = float(y_axis_min_energy)
-            y_axis_max_energy = float(y_axis_max_energy)
-            y_axis_num_energy = int(y_axis_num_energy)
-            st.session_state.is_active_error_CO_nonaq = False
-        except:
-            st.error('One of your energy y-axis values is invalid. Please check that they are all numbers and \
-                    that the number of y-ticks is an integer.')
-            st.session_state.is_active_error_CO_nonaq = True
-            st.header('*:red[There is an error in the model inputs..]*')
-    
-        st.divider()
-        st.write('**Emissions**')
-        st.write('Emissions y-axis minimum')
-        y_axis_min_emissions = st.text_input(label = 'emissions y-axis minimum',
-                            value = 0, label_visibility='collapsed',)
-        st.write('Emissions y-axis maximum')
-        y_axis_max_emissions = st.text_input(label = 'emissions y-axis maximum',
-                            value = 5, label_visibility='collapsed')
-        st.write('Number of emissions y-ticks, including endpoints (integer)')
-        y_axis_num_emissions = st.text_input(label = 'emissions y-axis ticks',
-                            value = 5, label_visibility='collapsed')
-        try:
-            y_axis_min_emissions = float(y_axis_min_emissions)
-            y_axis_max_emissions = float(y_axis_max_emissions)
-            y_axis_num_emissions = int(y_axis_num_emissions)
-            st.session_state.is_active_error_CO_nonaq = False
-        except:
-            st.error('One of your emissions y-axis values is invalid. Please check that they are all numbers and \
-                    that the number of y-ticks is an integer.')
-            st.session_state.is_active_error_CO_nonaq = True
-            st.header('*:red[There is an error in the model inputs..]*')
-
 
 # SLIDERS 
 st.sidebar.header('Model inputs' )
@@ -1528,6 +1205,352 @@ with st.sidebar:
                         help = '''Electricity emissions for partial life-cycle assessment.
                         \n Default value: {:.2f} kg$_{{CO_2}}$/kWh, based on the United States average.
                         '''.format(default_electricity_emissions_kgCO2_kWh))
+
+### x-AXIS VARIABLE FOR SENSITIVITY
+
+st.sidebar.header('x-axis variable' )
+
+# Cache creation of flags dataframe
+@st.cache_data(ttl = "1h")
+def flags(product_name):
+    # Create flags for selecting variable
+    dict_flags = {   # Formatted as 'override_parameter': 'parameter name', 'unit', 'variable name', 'default value', 'minimum value', 'maximum value'
+            'override_cell_voltage':[ 'Cell voltage', 'V', 'cell_E_V',                                             cell_E_V,                          1.34, 15 ],
+            'override_eta_cat': ['Cathodic overpotential', 'V', 'BV_eta_cat_V',                                    BV_eta_cat_V,                      0, -6],
+            'override_Tafel'  : ['Cathodic Tafel slope', 'mV/dec', 'cat_Tafel_slope',                              df_products.loc[product_name, 'Tafel slope (mV/dec)'],               -50, -250 ] ,
+            'override_eta_an': ['Anodic overpotential', 'V', 'BV_eta_an_V',                                        BV_eta_an_V,                       0, 3 ],
+            'override_ohmic' : ['Membrane specific resistance', '$\Omega$.cm$^2$', 'R_membrane_ohmcm2',            R_membrane_ohmcm2,                 0, 25],
+            'override_electrolyte_conductivity' : ['Electrolyte conductivity', 'S/cm', 'kappa_electrolyte_S_cm',   df_supporting.loc[supporting_electrolyte_name, 'Conductivity in ACN, 0.3 M (S/cm)'] * df_solvents.loc[solvent_name, 'Conductivity factor relative to ACN'],  
+                                                                                                                                                    0.0001, 0.1],
+            'override_electrolye_thickness' : ['Electrolyte thickness', 'cm', 'electrolyte_thickness_cm',          electrolyte_thickness_cm,          0, 0.5],
+            # 'override_catholyte_M': ['Catholyte concentration', 'M', 'catholyte_conc_M',                           catholyte_conc_M,                  1e-6, 10 ] ,
+            # 'override_CO2_solubility' : ['CO$_2$ solubility, 10 bar', 'mol CO$_2$/mol solvent', 'CO2_solubility_mol_mol', CO2_solubility_mol_mol,     0, 1],
+            'override_solvent_loss': ['Solvent loss fraction', 'mol offgas/mol solvent', 'solvent_loss_fraction', solvent_loss_fraction,     0, 1e-3 ], 
+            # 'override_viscosity' : ['Solvent viscosity', 'cP', 'viscosity_cP',                                   viscosity_cP,                      0, 1.5],    # TODO
+            
+            'override_j': ['Current density', 'mA/cm$^2$', 'j_total_mA_cm2',                                       df_products.loc[product_name, 'Chosen total current density (mA/cm2)'], 25, 600],
+            'override_FE_specified': ['FE$_{{{} , specified}}$'.format(product_name), '', 'FE_product_specified',  df_products.loc[product_name, 'FECO2R at SPC = 0'],                  1e-3, 1 ],
+            # 'override_FE_CO2R_0': ['FE$_{CO_2R,0}$', '', 'FE_CO2R_0',                                            df_products.loc[product_name, 'FECO2R at SPC = 0'],                  1e-3, 1 ],
+            'override_SPC':['Single-pass conversion', '', 'SPC',                                                   df_products.loc[product_name, 'Chosen SPC, no tradeoff'],            1e-4, 1],
+            'override_crossover': ['Crossover', 'mol CO$_2$ per mol e$^-$', 'crossover_ratio',                     crossover_ratio,                    1e-4, 0.5],
+            
+            'override_rate': ['{} production rate'.format(product_name), 'kg/day', 'product_rate_kg_day',          product_rate_kg_day,                1e3, 1.25e6],
+            'override_capacity': ['Capacity factor' , '', 'capacity_factor',                                       capacity_factor,                    1e-4, 1 ],
+            'override_lifetime': ['Plant lifetime' , 'years', 'lifetime_years',                                    lifetime_years,                     1e-3, 50],
+            'override_stack_lifetime': ['Stack lifetime' , 'years', 'stack_lifetime_years',                        stack_lifetime_years,               1e-3, 30],
+            'override_solvent_ratio': ['Excess solvent ratio' , 'mol solvent/ mol product', 'excess_solvent_ratio', excess_solvent_ratio,               1e-3, 2500],
+            'override_gas_separation': ['PSA second-law separation efficiency', '', 'PSA_second_law_efficiency',   PSA_second_law_efficiency,          0.01, 0.5],
+            'override_liq_separation': ['Liquid second-law separation efficiency', '', 'LL_second_law_efficiency', LL_second_law_efficiency,           0.01, 0.5],
+            
+            'override_electricity_cost': [ 'Electricity cost' , '$/kWh', 'electricity_cost_USD_kWh',               electricity_cost_USD_kWh,           0, 0.1 ],
+            'override_CO2_cost': ['CO$_2$ cost'  , '\$/t CO$_2$', 'CO2_cost_USD_tCO2',                             CO2_cost_USD_tCO2,                  0, 200],
+            'override_H2_cost': ['H$_2$ cost'  , '\$/kg H$_2$', 'H2_cost_USD_kgH2',                                H2_cost_USD_kgH2,                   0, 10],
+            'override_water_cost': ['Water cost' , '\$/kg', 'water_cost_USD_kg',                                   water_cost_USD_kg,                  0, 0.30],
+            'override_solvent_cost': ['{} cost'.format(solvent_name)  , '\$/kg', 'solvent_cost_USD_kg',            solvent_cost_USD_kg,                0, 10],
+            'override_supporting_cost': ['{} cost'.format(supporting_electrolyte_name) , '\$/kg', 'electrolyte_cost_USD_kg', electrolyte_cost_USD_kg,  0, 2500],
+            'override_electrolyzer_capex': ['Electrolyzer capital cost' , '\$/m$^2$', 'electrolyzer_capex_USD_m2', electrolyzer_capex_USD_m2,          3000, 10000],
+            'override_PSA_capex': ['PSA capital cost', '\$/1000 m$^3_{{gas}}$/hr', 'PSA_capex_USD_1000m3_hr', PSA_capex_USD_1000m3_hr,                 1e5, 10e6],
+            'override_LL_capex': ['Liquid separation capital cost', '\$/1000 mol$_{{inlet}}$/hr', 'LL_capex_USD_1000mol_hr', LL_capex_USD_1000mol_hr,10000, 100000],
+
+            # 'override_carbon_intensity': ['Grid CO$_2$ intensity', 'kg CO$_2$/kWh', 'electricity_emissions_kgCO2_kWh',electricity_emissions_kgCO2_kWh, 0, 0.5],
+
+            # 'override_battery_capacity': ['Renewables capacity factor' , '', 'avbl_renewables',                    avbl_renewables,                    1e-4, 1 ],
+            }
+        # Note that percentages here are expressed directly as decimals. E.g. entering 0.01 above for default FE will result in default FE = 1%
+
+    df_flags = pd.DataFrame(dict_flags).T
+    df_flags.reset_index(inplace = True, drop = False)
+    df_flags.set_index(0, inplace = True, drop = True) # Set independent variable name as index
+    df_flags.index.name = 'Independent variable'
+    df_flags.columns = ['Old flag name', 'Unit', 'Python variable', 'Default value', 'Range min', 'Range max']
+
+    df_flags['T/F?'] = False # add column for truth value of given override
+    return df_flags
+
+@st.cache_data(ttl = "1h")
+def generate_range(df_flags, override_vbl_selection, vbl_min, vbl_max, vbl_num):
+    vbl_row = options_list.index(override_vbl_selection) # convert input into integer
+    
+    df_flags['T/F?'] = False # clear column
+    df_flags.iloc[vbl_row, 6] = True # set that flag to be True
+    vbl_name = df_flags.index[vbl_row] # set vbl_name from that row
+    vbl_unit = df_flags['Unit'].iloc[vbl_row] # set vbl_unit from that row
+
+    # Reorder potential limits defined and generate a range of the chosen independent variable
+    vbl_limits = [vbl_min, vbl_max]
+    vbl_min = min(vbl_limits)
+    vbl_max = max(vbl_limits)
+
+    # Generate range
+    
+    # Linearly space points based on step size
+    if range_selection == 'Linear':
+        vbl_range = np.linspace(start = vbl_min, stop = vbl_max, num = vbl_num) # include the last point as close as possible
+
+    # Log space points
+    else:
+        vbl_range = np.logspace(start = np.log10(vbl_min), stop = np.log10(vbl_max), num = vbl_num, base = 10, endpoint = True)
+
+    vbl_range_text = ['{} {}'.format(x, vbl_unit) for x in vbl_range]
+    
+    return vbl_name, vbl_unit, vbl_range, vbl_range_text, vbl_min, vbl_max
+
+# Cache creation of axis variables
+@st.cache_data(ttl = "1h")
+def x_axis_formatting(x_axis_min, x_axis_max, x_axis_num):    
+    if range_selection == 'Linear':
+        x_axis_major_ticks = np.linspace(start = x_axis_min, stop = x_axis_max, num = x_axis_num)
+    else:
+        x_axis_major_ticks = np.logspace(np.log10(x_axis_min), np.log10(x_axis_max), num = x_axis_num, endpoint = True)
+
+    # Some options for ticks:
+    # np.arange(min, max, step): returns a list of step-spaced entries between min and max EXCLUDING max
+    # np.linspace(min, max, n): returns a list of n linearly spaced entries between min and max, including max
+    # np.logspace(min, max, n, base=10.0): returns a list of n log-spaced entries between min and max
+    # axs.xaxis.set_major_locator(mpl.ticker.MultipleLocator(n)): sets axis ticks to be multiples of 
+                                                                    #n within the data range
+
+    return(x_axis_major_ticks)
+
+@st.cache_data(ttl = "1h")
+def y_axis_formatting(y_axis_min, y_axis_max, y_axis_num):    
+    if range_selection == 'Linear':
+        y_axis_major_ticks = np.linspace(start = y_axis_min, stop = y_axis_max, num = y_axis_num)
+    else:
+        y_axis_major_ticks = np.logspace(np.log10(y_axis_min), np.log10(y_axis_max), num = y_axis_num, endpoint = True)
+
+    # Some options for ticks:
+    # np.arange(min, max, step): returns a list of step-spaced entries between min and max EXCLUDING max
+    # np.linspace(min, max, n): returns a list of n linearly spaced entries between min and max, including max
+    # np.logspace(min, max, n, base=10.0): returns a list of n log-spaced entries between min and max
+    # axs.xaxis.set_major_locator(mpl.ticker.MultipleLocator(n)): sets axis ticks to be multiples of 
+                                                                    #n within the data range
+
+    return(y_axis_major_ticks)
+
+def updated_radio_state(df_flags):
+    vbl_row = options_list.index(st.session_state['overridden_vbl_radio_CO_nonaq']) # convert input into integer
+    vbl_name = df_flags.index[vbl_row] # set vbl_name from that row
+    vbl_unit = df_flags.loc[vbl_name, 'Unit']
+    st.session_state.minimum_value_input_CO_nonaq = str(df_flags.loc[vbl_name, 'Range min'])
+    st.session_state.maximum_value_input_CO_nonaq = str(df_flags.loc[vbl_name, 'Range max'])
+
+df_flags = flags(product_name)
+
+with st.sidebar:
+    ## Initialize overridden_vbl_radio_CO widget
+
+    override_vbl_selection = st.radio(label = 'Select variable to see cost sensitivity ', key='overridden_vbl_radio_CO_nonaq',
+                          options= options_list, 
+                    index = 4, # default option
+                    label_visibility='visible',
+                    help = '''Choose a variable as the x-axis (category) for the bar charts. 
+                      \n Then choose its range below by defining the minimum, maximum, and number of bars to generate between them.
+                      \n The actual range on the bar charts can be specified in the **Plot formatting** section below.
+                      \n Default option: Total current density''',
+                      on_change= updated_radio_state, args = (df_flags, )
+                    )
+    try:
+        st.write('Minimum value')
+        vbl_min = float(st.text_input(label = 'Minimum value',
+                    key = 'minimum_value_input_CO_nonaq', # value = str(df_flags.loc[vbl_name, 'Range min']),  
+                    label_visibility='collapsed'))
+        st.write('Maximum value')
+        vbl_max = float(st.text_input(label = 'Maximum value',
+                    key = 'maximum_value_input_CO_nonaq',#  value = str(df_flags.loc[vbl_name, 'Range max']),
+                    label_visibility='collapsed'))
+        
+        st.write('Number of points (integer)')
+        vbl_num = int(st.text_input(label = 'Number of points',
+                    value = 11, 
+                    label_visibility='collapsed'))
+        st.session_state.is_active_error_CO_nonaq = False
+    except:
+        st.error('One of your x-variable values is invalid. Please check that they are all numbers and \
+                  that the number of points is an integer.')
+        st.session_state.is_active_error_CO_nonaq = True
+        st.header('*:red[There is an error in the model inputs.]*')
+
+    st.write('Spacing for points')
+    range_selection = st.radio(label = 'Spacing for points', 
+                          options= ['Linear', 
+                                    'Logspace'], 
+                    index = 0, # default option
+                    label_visibility='collapsed',
+                    help = '''Check the variable that is the x-axis ('category') in the bar charts. 
+                      \n Then choose its range below.
+                      \n Default option: Total current density'''
+    )
+
+    # st.subheader('CO$_2$R product')
+    # ######## PRODUCT SELECTION
+    # # Choose a product
+    # product_name = st.radio(label = 'Reduction product', options= ['CO', 'Ethylene'], 
+    #                 index = 0, # default option
+    #                 label_visibility='collapsed',
+    #                 help = '''Choose the product that CO$_2$ is reduced into. 
+    #                 The only byproduct made is hydrogen. 
+    #                   \n Default product: CO'''
+    # )
+
+vbl_name, vbl_unit, vbl_range, vbl_range_text, vbl_min, vbl_max = generate_range(df_flags, override_vbl_selection, vbl_min, vbl_max, vbl_num)
+default_y_axis_max_opex = 2.0 if product_name == 'CO' else 12.0
+
+## Define axis limits and ticks - see note below for options
+with st.sidebar:
+    st.header('Plot formatting')
+    with st.expander('**x-axis formatting**', expanded=False):
+        st.write('x-axis minimum')
+        x_axis_min = st.text_input(label = 'x-axis minimum',
+                            value = vbl_min, label_visibility='collapsed',)
+        st.write('x-axis maximum')
+        x_axis_max = st.text_input(label = 'x-axis maximum',
+                            value = vbl_max, label_visibility='collapsed')
+        st.write('Number of x-ticks, including endpoints (integer)')
+        x_axis_num = st.text_input(label = 'x-axis ticks',
+                            value = 4, label_visibility='collapsed')
+        try:
+            x_axis_min = float(x_axis_min)
+            x_axis_max = float(x_axis_max)
+            x_axis_num = int(x_axis_num)
+            st.session_state.is_active_error_CO_nonaq = False
+        except:
+            st.error('One of your x-axis values is invalid. Please check that they are all numbers and \
+                    that the number of x-ticks is an integer.')
+            st.session_state.is_active_error_CO_nonaq = True
+            st.header('*:red[There is an error in the model inputs.]*')
+
+    with st.expander('**y-axes formatting**', expanded = False):
+
+        st.write('**Capex**')
+        st.write('Capex y-axis minimum (millions)')
+        y_axis_min_capex = st.text_input(label = 'capex y-axis minimum',
+                            value = 0, label_visibility='collapsed',)
+        st.write('Capex y-axis maximum (millions)')
+        y_axis_max_capex = st.text_input(label = 'capex y-axis maximum',
+                            value = 100, label_visibility='collapsed')
+        st.write('Number of capex y-ticks, including endpoints (integer)')
+        y_axis_num_capex = st.text_input(label = 'capex y-axis ticks',
+                            value = 6, label_visibility='collapsed')
+        try:
+            y_axis_min_capex = float(y_axis_min_capex)
+            y_axis_max_capex = float(y_axis_max_capex)
+            y_axis_num_capex = int(y_axis_num_capex)
+            st.session_state.is_active_error_CO_nonaq = False
+        except:
+            st.error('One of your capex y-axis values is invalid. Please check that they are all numbers and \
+                    that the number of y-ticks is an integer.')
+            st.session_state.is_active_error_CO_nonaq = True
+            st.header('*:red[There is an error in the model inputs..]*')
+
+        st.divider()
+        st.write('**Opex**')
+        st.write('Opex y-axis minimum ($/kg {})'.format(product_name))
+        y_axis_min_opex = st.text_input(label = 'opex y-axis minimum',
+                            value = 0, label_visibility='collapsed',)
+        st.write('Opex y-axis maximum ($/kg {})'.format(product_name))
+        y_axis_max_opex = st.text_input(label = 'opex y-axis maximum',
+                            value = default_y_axis_max_opex, label_visibility='collapsed')
+        st.write('Number of opex y-ticks, including endpoints (integer)')
+        y_axis_num_opex = st.text_input(label = 'opex y-axis ticks',
+                            value = 6, label_visibility='collapsed')
+        try:
+            y_axis_min_opex = float(y_axis_min_opex)
+            y_axis_max_opex = float(y_axis_max_opex)
+            y_axis_num_opex = int(y_axis_num_opex)
+            st.session_state.is_active_error_CO_nonaq = False
+        except:
+            st.error('One of your opex y-axis values is invalid. Please check that they are all numbers and \
+                    that the number of y-ticks is an integer.')
+            st.session_state.is_active_error_CO_nonaq = True
+            st.header('*:red[There is an error in the model inputs..]*')
+    
+        st.divider()
+        st.write('**Levelized cost**')
+        st.write('Levelized cost y-axis minimum')
+        y_axis_min_levelized = st.text_input(label = 'levelized y-axis minimum',
+                            value = 0, label_visibility='collapsed',)
+        st.write('Levelized cost y-axis maximum')
+        y_axis_max_levelized = st.text_input(label = 'levelized y-axis maximum',
+                            value = default_y_axis_max_opex, label_visibility='collapsed')
+        st.write('Number of levelized cost y-ticks, including endpoints (integer)')
+        y_axis_num_levelized = st.text_input(label = 'levelized x-axis ticks',
+                            value = 6, label_visibility='collapsed')
+        try:
+            y_axis_min_levelized = float(y_axis_min_levelized)
+            y_axis_max_levelized = float(y_axis_max_levelized)
+            y_axis_num_levelized = int(y_axis_num_levelized)
+            st.session_state.is_active_error_CO_nonaq = False
+        except:
+            st.error('One of your levelized cost y-axis values is invalid. Please check that they are all numbers and \
+                    that the number of y-ticks is an integer.')
+            st.session_state.is_active_error_CO_nonaq = True
+            st.header('*:red[There is an error in the model inputs..]*')
+
+        st.write('**Cell potential**')
+        st.write('Cell potential y-axis minimum')
+        y_axis_min_potential = st.text_input(label = 'E y-axis minimum',
+                            value = 0, label_visibility='collapsed',)
+        st.write('Cell potential y-axis maximum')
+        y_axis_max_potential = st.text_input(label = 'E y-axis maximum',
+                            value = 4, label_visibility='collapsed')
+        st.write('Number of potential y-ticks, including endpoints (integer)')
+        y_axis_num_potential = st.text_input(label = 'E y-axis ticks',
+                            value = 5, label_visibility='collapsed')
+        try:
+            y_axis_min_potential = float(y_axis_min_potential)
+            y_axis_max_potential = float(y_axis_max_potential)
+            y_axis_num_potential = int(y_axis_num_potential)
+            st.session_state.is_active_error_CO_nonaq = False
+        except:
+            st.error('One of your opex y-axis values is invalid. Please check that they are all numbers and \
+                    that the number of y-ticks is an integer.')
+            st.session_state.is_active_error_CO_nonaq = True
+            st.header('*:red[There is an error in the model inputs..]*')
+
+        st.divider()
+        st.write('**Energy**')
+        st.write('Energy y-axis minimum')
+        y_axis_min_energy = st.text_input(label = 'energy y-axis minimum',
+                            value = 0, label_visibility='collapsed',)
+        st.write('Energy y-axis maximum')
+        y_axis_max_energy = st.text_input(label = 'energy y-axis maximum',
+                            value = 1200, label_visibility='collapsed')
+        st.write('Number of energy y-ticks, including endpoints (integer)')
+        y_axis_num_energy = st.text_input(label = 'energy y-axis ticks',
+                            value = 7, label_visibility='collapsed')
+        try:
+            y_axis_min_energy = float(y_axis_min_energy)
+            y_axis_max_energy = float(y_axis_max_energy)
+            y_axis_num_energy = int(y_axis_num_energy)
+            st.session_state.is_active_error_CO_nonaq = False
+        except:
+            st.error('One of your energy y-axis values is invalid. Please check that they are all numbers and \
+                    that the number of y-ticks is an integer.')
+            st.session_state.is_active_error_CO_nonaq = True
+            st.header('*:red[There is an error in the model inputs..]*')
+    
+        st.divider()
+        st.write('**Emissions**')
+        st.write('Emissions y-axis minimum')
+        y_axis_min_emissions = st.text_input(label = 'emissions y-axis minimum',
+                            value = 0, label_visibility='collapsed',)
+        st.write('Emissions y-axis maximum')
+        y_axis_max_emissions = st.text_input(label = 'emissions y-axis maximum',
+                            value = 5, label_visibility='collapsed')
+        st.write('Number of emissions y-ticks, including endpoints (integer)')
+        y_axis_num_emissions = st.text_input(label = 'emissions y-axis ticks',
+                            value = 5, label_visibility='collapsed')
+        try:
+            y_axis_min_emissions = float(y_axis_min_emissions)
+            y_axis_max_emissions = float(y_axis_max_emissions)
+            y_axis_num_emissions = int(y_axis_num_emissions)
+            st.session_state.is_active_error_CO_nonaq = False
+        except:
+            st.error('One of your emissions y-axis values is invalid. Please check that they are all numbers and \
+                    that the number of y-ticks is an integer.')
+            st.session_state.is_active_error_CO_nonaq = True
+            st.header('*:red[There is an error in the model inputs..]*')
 
 #___________________________________________________________________________________
 

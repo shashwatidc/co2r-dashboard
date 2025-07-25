@@ -744,6 +744,27 @@ if 'minimum_value_input_OA_nonaq' not in st.session_state:
 if 'maximum_value_input_OA_nonaq' not in st.session_state:
     st.session_state.maximum_value_input_OA_nonaq = str(1500)
 
+with st.sidebar:
+    st.subheader('Electrolyte')
+    ######## SOLVENT SELECTION
+    # Choose a solvent
+    solvent_name = st.radio(label = 'Non-aqueous catholyte solvent', options= ['DMF', 'DMSO', 'Acetonitrile', 'Propylene carbonate',], 
+                    index = 0, # default option
+                    label_visibility='collapsed',
+                    help = '''Choose the non-aqueous catholyte. The cell is a flow cell.
+                      \n Default solvent: DMF'''
+    )
+
+    st.subheader('Supporting electrolyte')
+    ######## SOLVENT SELECTION
+    # Choose a solvent
+    solvent_name = st.radio(label = 'Non-aqueous catholyte supporting electrolyte', options= ['TEACl', 'TBAClO$_4$', 'TEAClO$_4$', 'TBABF$_4$'], 
+                    index = 0, # default option
+                    label_visibility='collapsed',
+                    help = '''Choose the non-aqueous catholyte. The cell is a flow cell.
+                      \n Default supporting electrolyte: TEACl'''
+    )
+
 ########## OTHER FIXED VALUES
 # PRODUCT COSTS
 product_cost_USD_kgprod = df_products.loc[product_name, 'Cost ($/kg product)']
@@ -821,9 +842,353 @@ options_list  = ['Cell voltage (V)',
  ] # Order must exactly match df_flags
 
 middle_column, right_column = st.columns(2, gap = 'large')
-st.sidebar.header('x-axis variable' )
 middle_column.header('Results')
 right_column.header('_')
+
+# SLIDERS 
+st.sidebar.header('Model inputs' )
+
+with st.sidebar:
+    st.subheader('Cell potential model')
+    with st.expander(label = '**Simplified Butler-Volmer model assumptions**', expanded = False):
+    #     override_cell_voltage = st.checkbox('Manually specify full-cell voltage', value = False)
+    #     cell_E_V = st.slider(label = 'Cell voltage',
+    #                         min_value = 0.001, 
+    #                         max_value = 10.0, 
+    #                         step = 0.1, value = cell_E_V,
+    #                         format = '%.1f',
+    #                 help = '''Check the box above to set the full-cell voltage. No underlying voltage model will be used. 
+    #                 This means that current and voltage have no physical relationship.
+    #                   \n Default cell voltage: {} V'''.format(default_cell_E_V),
+    #                 disabled = not override_cell_voltage)
+    #     if override_cell_voltage:
+    #         st.write('*Using specified cell voltage*')
+    #     else:
+    #         st.write('*Modeling cell voltage from simplified Butler-Volmer model*')
+    #         override_eta_cat = st.checkbox('Specify cathode (CO$_2$R) overpotential', value = False)
+    #         BV_eta_cat_V = st.slider(label = 'Cathodic overpotential (V)',
+    #                         min_value = -10.0, 
+    #                         max_value = 0.0, 
+    #                         step = 0.1, value = BV_eta_cat_V,
+    #                         format = '%.1f',
+    #                         disabled = not override_eta_cat,
+    #                         help = '''Check the box above to set the cathodic overpotential. 
+    #                         Thermodynamics, cell resistance and anodic overpotential will be modeled. 
+    #                         Note that more negative overpotentials indicate slower kinetics.
+    #                           \n Default cathodic overpotential: {} V'''.format(default_BV_eta_cat_V),)
+    #         if override_eta_cat:
+    #             st.write('*Using manually specified cathodic overpotential*')
+    #         else:
+    #             st.write('*Modeling cathodic overpotential from Tafel slope, {:.0f} mV/dec*'.format(cat_Tafel_slope))
+
+    #         override_eta_an = st.checkbox('Specify anode (oxidation reaction) overpotential', value = False)
+    #         BV_eta_an_V = st.slider(label = 'Anodic overpotential (V)',
+    #                         min_value = 0.0, 
+    #                         max_value = 10.0, 
+    #                         step = 0.1, value = BV_eta_an_V,
+    #                         format = '%.1f',
+    #                         disabled = not override_eta_an,
+    #                         help = '''Check the box above to set the anodic overpotential. Thermodynamics, cell resistance and cathodic overpotential will be modeled. 
+    #                           \n Default anodic overpotential: {} V'''.format(default_BV_eta_an_V),) 
+    #         if override_eta_an:
+    #             st.write('*Using manually specified anodic overpotential*')
+    #         else:
+    #             st.write('*Modeling anodic overpotential from Tafel slope, {:.0f} mV/dec*'.format(an_Tafel_slope))
+            
+            override_ohmic = st.checkbox('Specify full-cell area-specific resistance', value = False)
+            R_ohmcm2 = st.slider(label = 'Area-specific resistance ($ \Omega \cdot$ cm$^2$)',
+                            min_value = 0.0, 
+                            max_value = 25.0, 
+                            step = 0.1, value = R_ohmcm2,
+                            format = '%.2f',
+                            disabled= not override_ohmic,
+                            help = '''Check the box above to set the area-specific ohmic resistance of the cell. Thermodynamics and kinetic overpotentials will be modeled. 
+                              \n Default specific resistance: {} $ \Omega \cdot$ cm$^2$'''.format(default_R_ohmcm2),)
+            if override_ohmic:
+                st.write('*Using manually specified cell specific resistance*')
+            else:
+                st.write('*Using default cell resistance for anion exchange membrane electrode assembly, {} $ \Omega \cdot$ cm$^2$*'.format(R_ohmcm2))
+
+with st.sidebar:
+    st.subheader('Electrolyzer operation')
+    with st.expander(label = '**Reactor model**', expanded = False):
+        j_total_mA_cm2 = st.slider(label = 'Total current density (mA/cm$^2$)',
+                            min_value = 0.0001, 
+                            max_value = 1500.0, 
+                            step = 1.0, value = j_total_mA_cm2,
+                            format = '%.0f',
+                            help = '''Total current density of the cell. This will determine the size and voltage of the cell.
+                              \n Default total current density: {} mA/cm$^2$'''.format(default_j_total_mA_cm2),)
+
+        ##### FE-SPC TRADEOFF  
+        option_1 = 'Plug flow in gas channel'
+        option_2 = 'Carbonate electrolyte supports CO$_2$ availability'
+        option_3 = 'Manually specify $ FE_{{{}}}$ and single-pass conversion'.format(product_name)
+        st.write('Model for selectivity tradeoff versus single-pass conversion')
+        answer = st.radio(label = 'FE-SPC model',
+                options = [option_1,
+                        option_2, 
+                        option_3 ],
+                index = 0,
+                label_visibility= 'collapsed')
+        if answer == option_1:
+            model_FE = 'Hawks'
+            st.write('*Using [Hawks and Baker model](https://doi.org/10.1021/acsenergylett.2c01106) for $ FE_{}$ - $ X_{CO_2}$ tradeoff*')
+            st.latex(r"""
+                    \scriptsize \implies \displaystyle \frac{FE_{CO_2R}}{FE_{CO_2R, \: 0}} + \displaystyle \frac{-X_{CO_2} \cdot (1 + \frac{c \cdot n_{i}}{z_i \cdot FE_{CO_2R}})}{\ln(1-X_{CO_2} \cdot (1 + \frac{c \cdot n_{i}}{z_i \cdot FE_{CO_2R}}))} = 0
+                    """)
+        elif answer == option_2:
+            model_FE = 'Kas'
+            st.write('*Using [Kas and Smith model](https://doi.org/10.1021/acssuschemeng.0c07694) for $ FE_{}$ - $ X_{CO_2}$ tradeoff*')
+            st.latex(r"""
+                    \footnotesize \implies FE_{CO_2R} = FE_{CO_2R, \: 0} - 4.7306 \cdot {X_{CO_2}}^{5.4936}
+                    """)
+        elif answer == option_3: # TODO I don't think this works rn?
+            model_FE = None
+            FE_product_specified = st.slider(label = 'FE$_{{{}}}$'.format(product_name),
+                    min_value = 0.0001,
+                    max_value = 1.0,
+                    step = 0.01, value = FE_CO2R_0,
+                    help = 'Faradaic efficiency, independent of any other variables. \
+                        This is not a recommended or default option, since it neglects electrolyzer geometry.\
+                        Therefore, it artificially lowers costs.')
+
+        FE_CO2R_0 = st.slider(label = '$ FE_{CO_2R, \: 0}$, maximum Faradaic efficiency',
+                            min_value = 0.0001, 
+                            max_value = 1.0, 
+                            step = 0.01, value = FE_CO2R_0,
+                            format = '%.2f',
+                            help = r'''Maximum Faradaic efficiency achieved in the limit of 0 single-pass conversion or vast excess of CO$_2$,
+                            $$$
+                            lim_{{X_{{CO_2}} → 0}} FE_{{CO_2R}}
+                            $$$
+                            ''' +   '\n  Default $ FE_{{CO_2R, \: 0}}$: {}'.format(default_FE_CO2R_0),
+                            disabled = answer == option_3)
+        SPC = st.slider(label = 'Single-pass conversion',
+                            min_value = 0.0001, 
+                            max_value = 1.0, 
+                            step = 0.01, value = SPC,
+                            format = '%.2f')        
+        crossover_ratio = st.slider(label = 'Crossover ratio (mol CO$_2$/mol e$^-$)',
+                            min_value = 0.0001, 
+                            max_value = 1.0, 
+                            step = 0.01, value = crossover_ratio,
+                            help = """The amount of CO$_2$ converted into carbonate ions that then crosses the membrane into the anode gas stream. 
+                              \n Default crossover ratio: 0.5
+                              \n This is based on the carbonate equilibrium: 
+                            $$$
+                            \\\  CO_2 + H_2O + 2e^- → CO + 2OH^-  
+                            \\\  2CO_2 + 8H_2O + 12e^- → C_2H_4 + 12OH^-
+                            \\\  2H_2O + 2e^- → H_2 + 2OH^-
+                            \\\   CO_{{2}} + 2OH^{{-}} → HCO_{{3}}^{{-}} + OH^- ⇌ CO_{{3}}^{{2-}} + H_2O 
+                            $$$
+                            """,
+                            format = '%.2f')
+        FE_product_checked, __ = SPC_check(FE_product_specified=FE_product_specified, 
+                exponent= exponent,
+                scaling = scaling,
+                SPC = SPC,
+                j_total= j_total_mA_cm2,
+                FE_CO2R_0= FE_CO2R_0,
+                product_name=product_name,
+                model_FE= model_FE,
+                df_products=df_products,
+                crossover_ratio=crossover_ratio)
+        if not np.isnan(FE_product_checked): 
+            st.session_state.is_active_error_OA_nonaq = False
+        else:
+            st.session_state.is_active_error_OA_nonaq = True
+            error_dialog(FE_product_checked, SPC, crossover_ratio)
+            # st.header(':red[Model is physically unviable. Please check $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio.]')
+            
+            st.error('''Model is physically unviable. \n Please check the Reactor Model section under Electrolyzer Operation 
+                    and verify the model for selectivity versus single-pass conversion, as well as the assumptions made for 
+                    $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio. These three assumptions 
+                together violate mass balance. If the electrolyzer is following the Hawks model, this could be because the desired single-pass
+                    conversion is too high to be achieved with the given $FE_{CO2R, 0}$ because of plug flow and crossover. 
+                    To manually override this error, choose to manually specify $FE$ and single-pass conversion.
+                    If you are still seeing an error, it may be because the crossover is too high and limits the possible single-pass conversion.''',
+                    icon = ":material/error:")
+        st.latex(r'''
+                 \footnotesize \implies  FE_{{{}}} = {:.2f}
+                 '''.format(product_name, FE_product_checked))
+
+with st.sidebar:
+    st.subheader('Process design')
+    with st.expander(label = '**Plant and separation parameters**', expanded = False):
+        product_rate_kg_day = 1000 * st.slider(label = '{} production rate (ton/day)'.format(product_name),
+                            min_value = 0.0001 / 1000, 
+                            max_value = 1.5e6 / 1000, 
+                            step = 10.0, value = product_rate_kg_day / 1000,
+                            format = '%.0f',
+                            help = '''Daily production rate. This is fixed for the entire plant lifetime and sets the total CO$_2$R current required.
+                              \n Default value: {} kg$ _{{{}}}$/day
+                            '''.format(product_rate_kg_day, product_name))
+        capacity_factor = st.slider(label = 'Capacity factor (days per 365 days)',
+                            min_value = 0.0001, 
+                            max_value = 1.0, 
+                            step = 0.01, value = capacity_factor,
+                            format = '%.2f',
+                            help = '''Fraction of time per year that the plant is operational.
+                              \n Default value: {:.2f}, based on 350/365 days per year
+                            '''.format(default_capacity_factor))
+        lifetime_years = st.slider(label = 'Plant lifetime (years)',
+                            min_value = 0.0001, 
+                            max_value = 100.0, 
+                            step = 1.0, value = lifetime_years,
+                            format = '%.0f',
+                            help = '''Plant lifetime in years. The process operates to produce {} kg/day of product for this many years.
+                              \n Default value: {} years
+                            '''.format(product_rate_kg_day, lifetime_years))
+        stack_lifetime_years = st.slider(label = 'Stack lifetime (years)',
+                            min_value = 0.0001, 
+                            max_value = 30.0, 
+                            step = 1.0, value = stack_lifetime_years,
+                            format = '%.0f',
+                            help = '''Stack replacement time in years. The entire electrolyzer must be replacemed at this interval.
+                              \n Default value: {} years
+                            '''.format(stack_lifetime_years))
+        PSA_second_law_efficiency = st.slider(label = 'Second-law separation efficiency',
+                            min_value = 0.0001, 
+                            max_value = 1.0, 
+                            step = 0.01, value = PSA_second_law_efficiency,
+                            format = '%.2f',
+                            help = '''Second-law efficiency of gas separations between CO$_2$/O$_2$, CO$_2$/CO, and CO/H$_2$.
+                            This adjusts the ideal work of binary separation, 
+                            $$$
+                             \\\  W_{{sep \: (j)}}^{{ideal}} = R \cdot T \cdot (\sum_i x_i\cdot ln(x_i)) \cdot \displaystyle \dot{{N}} \\
+                              \\\  \implies W = R \cdot T \cdot (x_i\cdot ln(x_i)) + (1-x_i)\cdot ln(1-x_i)) \cdot \displaystyle \dot{{N}} \\
+                              \\\  W_{{sep \: (j)}}^{{real}} = \displaystyle \\frac{{W_{{sep\: (j)}}^{{ideal}}}}{{\zeta}}
+                            $$$
+                              \n Default value: {}
+                            '''.format(default_PSA_second_law_efficiency))
+
+    ##### BATTERY  
+    answer = st.toggle('Include energy storage', value = False,
+                         help = 'Check this box to include utility-scale batteries. The cost of electricity should also be reduced to account for cheap, intermittent renewables like wind and solar. Battery capex can be adjusted in the Market variables section.')
+
+    if answer:            
+        # Handle battery to flatten curve and maximize capacity
+        is_battery = True
+        st.write('*Including utility-scale batteries*')
+        avbl_renewables = st.slider(label = 'Minimum fraction of time when renewables power the electrolyzer',
+                                    min_value = 0.0001, max_value = 1.000, 
+                                    step = 0.01, value = 0.236,
+                                    format = '%.2f',
+                                    help = '''Fraction of time per day that renewable power is available. 
+                                    The battery size will be large enough to make the plant capacity factor as listed below, i.e. battery size depends on the difference
+                                    between the capacity factor of available electricity versus the capacity factor of the plant.
+                                    \n Default value: {:.2f}, based on 5.6/24 hours per day
+                                    '''.format(0.236))
+        avbl_renewables = float(avbl_renewables)
+    else:
+        is_battery = False
+        battery_capacity = 0
+
+with st.sidebar:
+    st.subheader('Market variables')
+    with st.expander(label = '**Capital and operating costs**', expanded = False):
+        electricity_cost_USD_kWh = st.slider(label = 'Electricity cost ($/kWh)',
+                            min_value = 0.0, 
+                            max_value = 0.25, 
+                            step = 0.01, value = electricity_cost_USD_kWh,
+                            format = '%.2f',
+                            help = '''Electricity cost.
+                            \n Default value: \${}/kWh, based on average retail industrial electricity cost in April 2023 in the United States.
+                            '''.format(default_electricity_cost_USD_kWh))
+        CO2_cost_USD_tCO2 = st.slider(label = 'CO$_2$ cost (\$/t CO$_2$)',
+                            min_value = 0.0, 
+                            max_value = 500.0, 
+                            step = 1.0, value = CO2_cost_USD_tCO2,
+                            format = '%.0f',
+                            help = '''Default value: \${}/t$_{{CO_2}}$
+                            '''.format(default_CO2_cost_USD_tCO2))
+        H2_cost_USD_tCO2 = st.slider(label = 'H$_2$ cost (\$/kg H$_2$)',
+                            min_value = 0.0, 
+                            max_value = 5.0, 
+                            step = 0.1, value = H2_cost_USD_kgH2,
+                            format = '%.1f',
+                            help = '''Default value: \${}/kg
+                            '''.format(default_H2_cost_USD_kgH2))
+        product_cost_USD_kgprod = st.slider(label = '{} market price (\$/kg {})'.format(product_name, product_name),
+                            min_value = 0.0, 
+                            max_value = 10.0, 
+                            step = 0.1, value = product_cost_USD_kgprod,
+                            format = '%.1f',
+                            help = '''Default value: \${}/kg
+                            '''.format(default_product_cost_USD_kgprod))
+        water_cost_USD_kg = st.slider(label = 'Water cost (\$/kg)',
+                            min_value = 0.0, 
+                            max_value = 1.0, 
+                            step = 0.1, value = water_cost_USD_kg,
+                            format = '%.1f',
+                            help = '''Default value: \${}/kg
+                            '''.format(default_water_cost_USD_kg))
+        electrolyzer_capex_USD_m2 = st.slider(label = 'Electrolyzer capital cost (\$/m$^2$)' , 
+                            min_value = 0.0, 
+                            max_value = 15000.0, 
+                            step = 100.0, value = electrolyzer_capex_USD_m2,
+                            format = '%.0f',
+                            help = '''Default value: \${}/m$^2$
+                            '''.format(default_electrolyzer_capex_USD_m2))
+        battery_capex_USD_kWh = st.slider(label = 'Battery capital cost (\$/kWh)' , 
+                            min_value = 0.0, 
+                            max_value = 500.0, 
+                            step = 1.0, value = battery_capex_USD_kWh,
+                            format = '%.0f', disabled = not is_battery,
+                            help = '''Default value: \${}/kWh, based on 4-hour storage.
+                            '''.format(default_battery_capex_USD_kWh))
+        
+    ##### CUSTOM CAPEX OR OPEX  
+    answer = st.toggle('Add custom capex', value = False,
+                         help = 'Optional bare-module capital cost for any custom units')
+    if answer:            
+        # Handle battery to flatten curve and maximize capacity
+        is_additional_capex = True
+        additional_capex_USD = st.slider(label = 'Additional capital cost (\$ million)' ,
+                            min_value = 0.0, 
+                            max_value = 100.0, 
+                            step = 1.0, value = 0.0,
+                            format = '%.0f', disabled = not is_additional_capex,
+                            help = '''Optional additional capex. Default value: \${} million.
+                            '''.format(0)) *1e6
+    else:
+        is_additional_capex = False
+        additional_capex_USD = 0
+        
+    answer = st.toggle('Add custom opex', value = False,
+                         help = 'Optional operating cost')
+    if answer:            
+        # Handle battery to flatten curve and maximize capacity
+        is_additional_opex = True
+        additional_opex_USD_kg = st.slider(label = 'Additional operating cost (\$/kg {})'.format(product_name),  
+                            min_value = 0.0, 
+                            max_value = 5.0, 
+                            step = 0.1, value = 0.0,
+                            format = '%.1f', disabled = not is_additional_opex,
+                            help = '''Optional operating cost for any custom expenses. Convert daily costs to \$/kg product as follows:
+                            $$$
+                            \\\ \\frac{{\$ opex}}{{year}} = \\frac{{\$ opex}}{{day}} \cdot CF \cdot 365 \cdot plant lifetime
+                            $$$
+                            ''')    
+    else:
+        is_additional_opex = False
+        additional_opex_USD_kg = 0 
+        
+with st.sidebar:
+    st.subheader('Emissions assessment')
+    electricity_emissions_kgCO2_kWh = st.slider(label = 'Grid CO$_2$ intensity (kg$_{CO_2}$/kWh)',
+                        min_value = 0.0, 
+                        max_value = 1.0, 
+                        step = 0.01, value = electricity_emissions_kgCO2_kWh,
+                        format = '%.2f',
+                        help = '''Electricity emissions for partial life-cycle assessment.
+                        \n Default value: {:.2f} kg$_{{CO_2}}$/kWh, based on the United States average.
+                        '''.format(default_electricity_emissions_kgCO2_kWh))
+    
+### x-AXIS VARIABLE
+
+st.sidebar.header('x-axis variable' )
 
 # Cache creation of flags dataframe
 @st.cache_data(ttl = "1h")
@@ -1166,348 +1531,6 @@ with st.sidebar:
                     that the number of y-ticks is an integer.')
             st.session_state.is_active_error_OA_nonaq = True
             st.header('*:red[There is an error in the model inputs..]*')
-
-
-# SLIDERS 
-st.sidebar.header('Model inputs' )
-
-with st.sidebar:
-    st.subheader('Cell potential model')
-    with st.expander(label = '**Simplified Butler-Volmer model assumptions**', expanded = False):
-    #     override_cell_voltage = st.checkbox('Manually specify full-cell voltage', value = False)
-    #     cell_E_V = st.slider(label = 'Cell voltage',
-    #                         min_value = 0.001, 
-    #                         max_value = 10.0, 
-    #                         step = 0.1, value = cell_E_V,
-    #                         format = '%.1f',
-    #                 help = '''Check the box above to set the full-cell voltage. No underlying voltage model will be used. 
-    #                 This means that current and voltage have no physical relationship.
-    #                   \n Default cell voltage: {} V'''.format(default_cell_E_V),
-    #                 disabled = not override_cell_voltage)
-    #     if override_cell_voltage:
-    #         st.write('*Using specified cell voltage*')
-    #     else:
-    #         st.write('*Modeling cell voltage from simplified Butler-Volmer model*')
-    #         override_eta_cat = st.checkbox('Specify cathode (CO$_2$R) overpotential', value = False)
-    #         BV_eta_cat_V = st.slider(label = 'Cathodic overpotential (V)',
-    #                         min_value = -10.0, 
-    #                         max_value = 0.0, 
-    #                         step = 0.1, value = BV_eta_cat_V,
-    #                         format = '%.1f',
-    #                         disabled = not override_eta_cat,
-    #                         help = '''Check the box above to set the cathodic overpotential. 
-    #                         Thermodynamics, cell resistance and anodic overpotential will be modeled. 
-    #                         Note that more negative overpotentials indicate slower kinetics.
-    #                           \n Default cathodic overpotential: {} V'''.format(default_BV_eta_cat_V),)
-    #         if override_eta_cat:
-    #             st.write('*Using manually specified cathodic overpotential*')
-    #         else:
-    #             st.write('*Modeling cathodic overpotential from Tafel slope, {:.0f} mV/dec*'.format(cat_Tafel_slope))
-
-    #         override_eta_an = st.checkbox('Specify anode (oxidation reaction) overpotential', value = False)
-    #         BV_eta_an_V = st.slider(label = 'Anodic overpotential (V)',
-    #                         min_value = 0.0, 
-    #                         max_value = 10.0, 
-    #                         step = 0.1, value = BV_eta_an_V,
-    #                         format = '%.1f',
-    #                         disabled = not override_eta_an,
-    #                         help = '''Check the box above to set the anodic overpotential. Thermodynamics, cell resistance and cathodic overpotential will be modeled. 
-    #                           \n Default anodic overpotential: {} V'''.format(default_BV_eta_an_V),) 
-    #         if override_eta_an:
-    #             st.write('*Using manually specified anodic overpotential*')
-    #         else:
-    #             st.write('*Modeling anodic overpotential from Tafel slope, {:.0f} mV/dec*'.format(an_Tafel_slope))
-            
-            override_ohmic = st.checkbox('Specify full-cell area-specific resistance', value = False)
-            R_ohmcm2 = st.slider(label = 'Area-specific resistance ($ \Omega \cdot$ cm$^2$)',
-                            min_value = 0.0, 
-                            max_value = 25.0, 
-                            step = 0.1, value = R_ohmcm2,
-                            format = '%.2f',
-                            disabled= not override_ohmic,
-                            help = '''Check the box above to set the area-specific ohmic resistance of the cell. Thermodynamics and kinetic overpotentials will be modeled. 
-                              \n Default specific resistance: {} $ \Omega \cdot$ cm$^2$'''.format(default_R_ohmcm2),)
-            if override_ohmic:
-                st.write('*Using manually specified cell specific resistance*')
-            else:
-                st.write('*Using default cell resistance for anion exchange membrane electrode assembly, {} $ \Omega \cdot$ cm$^2$*'.format(R_ohmcm2))
-
-with st.sidebar:
-    st.subheader('Electrolyzer operation')
-    with st.expander(label = '**Reactor model**', expanded = False):
-        j_total_mA_cm2 = st.slider(label = 'Total current density (mA/cm$^2$)',
-                            min_value = 0.0001, 
-                            max_value = 1500.0, 
-                            step = 1.0, value = j_total_mA_cm2,
-                            format = '%.0f',
-                            help = '''Total current density of the cell. This will determine the size and voltage of the cell.
-                              \n Default total current density: {} mA/cm$^2$'''.format(default_j_total_mA_cm2),)
-
-        ##### FE-SPC TRADEOFF  
-        option_1 = 'Plug flow in gas channel'
-        option_2 = 'Carbonate electrolyte supports CO$_2$ availability'
-        option_3 = 'Manually specify $ FE_{{{}}}$ and single-pass conversion'.format(product_name)
-        st.write('Model for selectivity tradeoff versus single-pass conversion')
-        answer = st.radio(label = 'FE-SPC model',
-                options = [option_1,
-                        option_2, 
-                        option_3 ],
-                index = 0,
-                label_visibility= 'collapsed')
-        if answer == option_1:
-            model_FE = 'Hawks'
-            st.write('*Using [Hawks and Baker model](https://doi.org/10.1021/acsenergylett.2c01106) for $ FE_{}$ - $ X_{CO_2}$ tradeoff*')
-            st.latex(r"""
-                    \scriptsize \implies \displaystyle \frac{FE_{CO_2R}}{FE_{CO_2R, \: 0}} + \displaystyle \frac{-X_{CO_2} \cdot (1 + \frac{c \cdot n_{i}}{z_i \cdot FE_{CO_2R}})}{\ln(1-X_{CO_2} \cdot (1 + \frac{c \cdot n_{i}}{z_i \cdot FE_{CO_2R}}))} = 0
-                    """)
-        elif answer == option_2:
-            model_FE = 'Kas'
-            st.write('*Using [Kas and Smith model](https://doi.org/10.1021/acssuschemeng.0c07694) for $ FE_{}$ - $ X_{CO_2}$ tradeoff*')
-            st.latex(r"""
-                    \footnotesize \implies FE_{CO_2R} = FE_{CO_2R, \: 0} - 4.7306 \cdot {X_{CO_2}}^{5.4936}
-                    """)
-        elif answer == option_3: # TODO I don't think this works rn?
-            model_FE = None
-            FE_product_specified = st.slider(label = 'FE$_{{{}}}$'.format(product_name),
-                    min_value = 0.0001,
-                    max_value = 1.0,
-                    step = 0.01, value = FE_CO2R_0,
-                    help = 'Faradaic efficiency, independent of any other variables. \
-                        This is not a recommended or default option, since it neglects electrolyzer geometry.\
-                        Therefore, it artificially lowers costs.')
-
-        FE_CO2R_0 = st.slider(label = '$ FE_{CO_2R, \: 0}$, maximum Faradaic efficiency',
-                            min_value = 0.0001, 
-                            max_value = 1.0, 
-                            step = 0.01, value = FE_CO2R_0,
-                            format = '%.2f',
-                            help = r'''Maximum Faradaic efficiency achieved in the limit of 0 single-pass conversion or vast excess of CO$_2$,
-                            $$$
-                            lim_{{X_{{CO_2}} → 0}} FE_{{CO_2R}}
-                            $$$
-                            ''' +   '\n  Default $ FE_{{CO_2R, \: 0}}$: {}'.format(default_FE_CO2R_0),
-                            disabled = answer == option_3)
-        SPC = st.slider(label = 'Single-pass conversion',
-                            min_value = 0.0001, 
-                            max_value = 1.0, 
-                            step = 0.01, value = SPC,
-                            format = '%.2f')        
-        crossover_ratio = st.slider(label = 'Crossover ratio (mol CO$_2$/mol e$^-$)',
-                            min_value = 0.0001, 
-                            max_value = 1.0, 
-                            step = 0.01, value = crossover_ratio,
-                            help = """The amount of CO$_2$ converted into carbonate ions that then crosses the membrane into the anode gas stream. 
-                              \n Default crossover ratio: 0.5
-                              \n This is based on the carbonate equilibrium: 
-                            $$$
-                            \\\  CO_2 + H_2O + 2e^- → CO + 2OH^-  
-                            \\\  2CO_2 + 8H_2O + 12e^- → C_2H_4 + 12OH^-
-                            \\\  2H_2O + 2e^- → H_2 + 2OH^-
-                            \\\   CO_{{2}} + 2OH^{{-}} → HCO_{{3}}^{{-}} + OH^- ⇌ CO_{{3}}^{{2-}} + H_2O 
-                            $$$
-                            """,
-                            format = '%.2f')
-        FE_product_checked, __ = SPC_check(FE_product_specified=FE_product_specified, 
-                exponent= exponent,
-                scaling = scaling,
-                SPC = SPC,
-                j_total= j_total_mA_cm2,
-                FE_CO2R_0= FE_CO2R_0,
-                product_name=product_name,
-                model_FE= model_FE,
-                df_products=df_products,
-                crossover_ratio=crossover_ratio)
-        if not np.isnan(FE_product_checked): 
-            st.session_state.is_active_error_OA_nonaq = False
-        else:
-            st.session_state.is_active_error_OA_nonaq = True
-            error_dialog(FE_product_checked, SPC, crossover_ratio)
-            # st.header(':red[Model is physically unviable. Please check $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio.]')
-            
-            st.error('''Model is physically unviable. \n Please check the Reactor Model section under Electrolyzer Operation 
-                    and verify the model for selectivity versus single-pass conversion, as well as the assumptions made for 
-                    $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio. These three assumptions 
-                together violate mass balance. If the electrolyzer is following the Hawks model, this could be because the desired single-pass
-                    conversion is too high to be achieved with the given $FE_{CO2R, 0}$ because of plug flow and crossover. 
-                    To manually override this error, choose to manually specify $FE$ and single-pass conversion.
-                    If you are still seeing an error, it may be because the crossover is too high and limits the possible single-pass conversion.''',
-                    icon = ":material/error:")
-        st.latex(r'''
-                 \footnotesize \implies  FE_{{{}}} = {:.2f}
-                 '''.format(product_name, FE_product_checked))
-
-with st.sidebar:
-    st.subheader('Process design')
-    with st.expander(label = '**Plant and separation parameters**', expanded = False):
-        product_rate_kg_day = 1000 * st.slider(label = '{} production rate (ton/day)'.format(product_name),
-                            min_value = 0.0001 / 1000, 
-                            max_value = 1.5e6 / 1000, 
-                            step = 10.0, value = product_rate_kg_day / 1000,
-                            format = '%.0f',
-                            help = '''Daily production rate. This is fixed for the entire plant lifetime and sets the total CO$_2$R current required.
-                              \n Default value: {} kg$ _{{{}}}$/day
-                            '''.format(product_rate_kg_day, product_name))
-        capacity_factor = st.slider(label = 'Capacity factor (days per 365 days)',
-                            min_value = 0.0001, 
-                            max_value = 1.0, 
-                            step = 0.01, value = capacity_factor,
-                            format = '%.2f',
-                            help = '''Fraction of time per year that the plant is operational.
-                              \n Default value: {:.2f}, based on 350/365 days per year
-                            '''.format(default_capacity_factor))
-        lifetime_years = st.slider(label = 'Plant lifetime (years)',
-                            min_value = 0.0001, 
-                            max_value = 100.0, 
-                            step = 1.0, value = lifetime_years,
-                            format = '%.0f',
-                            help = '''Plant lifetime in years. The process operates to produce {} kg/day of product for this many years.
-                              \n Default value: {} years
-                            '''.format(product_rate_kg_day, lifetime_years))
-        stack_lifetime_years = st.slider(label = 'Stack lifetime (years)',
-                            min_value = 0.0001, 
-                            max_value = 30.0, 
-                            step = 1.0, value = stack_lifetime_years,
-                            format = '%.0f',
-                            help = '''Stack replacement time in years. The entire electrolyzer must be replacemed at this interval.
-                              \n Default value: {} years
-                            '''.format(stack_lifetime_years))
-        PSA_second_law_efficiency = st.slider(label = 'Second-law separation efficiency',
-                            min_value = 0.0001, 
-                            max_value = 1.0, 
-                            step = 0.01, value = PSA_second_law_efficiency,
-                            format = '%.2f',
-                            help = '''Second-law efficiency of gas separations between CO$_2$/O$_2$, CO$_2$/CO, and CO/H$_2$.
-                            This adjusts the ideal work of binary separation, 
-                            $$$
-                             \\\  W_{{sep \: (j)}}^{{ideal}} = R \cdot T \cdot (\sum_i x_i\cdot ln(x_i)) \cdot \displaystyle \dot{{N}} \\
-                              \\\  \implies W = R \cdot T \cdot (x_i\cdot ln(x_i)) + (1-x_i)\cdot ln(1-x_i)) \cdot \displaystyle \dot{{N}} \\
-                              \\\  W_{{sep \: (j)}}^{{real}} = \displaystyle \\frac{{W_{{sep\: (j)}}^{{ideal}}}}{{\zeta}}
-                            $$$
-                              \n Default value: {}
-                            '''.format(default_PSA_second_law_efficiency))
-
-    ##### BATTERY  
-    answer = st.toggle('Include energy storage', value = False,
-                         help = 'Check this box to include utility-scale batteries. The cost of electricity should also be reduced to account for cheap, intermittent renewables like wind and solar. Battery capex can be adjusted in the Market variables section.')
-
-    if answer:            
-        # Handle battery to flatten curve and maximize capacity
-        is_battery = True
-        st.write('*Including utility-scale batteries*')
-        avbl_renewables = st.slider(label = 'Minimum fraction of time when renewables power the electrolyzer',
-                                    min_value = 0.0001, max_value = 1.000, 
-                                    step = 0.01, value = 0.236,
-                                    format = '%.2f',
-                                    help = '''Fraction of time per day that renewable power is available. 
-                                    The battery size will be large enough to make the plant capacity factor as listed below, i.e. battery size depends on the difference
-                                    between the capacity factor of available electricity versus the capacity factor of the plant.
-                                    \n Default value: {:.2f}, based on 5.6/24 hours per day
-                                    '''.format(0.236))
-        avbl_renewables = float(avbl_renewables)
-    else:
-        is_battery = False
-        battery_capacity = 0
-
-with st.sidebar:
-    st.subheader('Market variables')
-    with st.expander(label = '**Capital and operating costs**', expanded = False):
-        electricity_cost_USD_kWh = st.slider(label = 'Electricity cost ($/kWh)',
-                            min_value = 0.0, 
-                            max_value = 0.25, 
-                            step = 0.01, value = electricity_cost_USD_kWh,
-                            format = '%.2f',
-                            help = '''Electricity cost.
-                            \n Default value: \${}/kWh, based on average retail industrial electricity cost in April 2023 in the United States.
-                            '''.format(default_electricity_cost_USD_kWh))
-        CO2_cost_USD_tCO2 = st.slider(label = 'CO$_2$ cost (\$/t CO$_2$)',
-                            min_value = 0.0, 
-                            max_value = 500.0, 
-                            step = 1.0, value = CO2_cost_USD_tCO2,
-                            format = '%.0f',
-                            help = '''Default value: \${}/t$_{{CO_2}}$
-                            '''.format(default_CO2_cost_USD_tCO2))
-        H2_cost_USD_tCO2 = st.slider(label = 'H$_2$ cost (\$/kg H$_2$)',
-                            min_value = 0.0, 
-                            max_value = 5.0, 
-                            step = 0.1, value = H2_cost_USD_kgH2,
-                            format = '%.1f',
-                            help = '''Default value: \${}/kg
-                            '''.format(default_H2_cost_USD_kgH2))
-        product_cost_USD_kgprod = st.slider(label = '{} market price (\$/kg {})'.format(product_name, product_name),
-                            min_value = 0.0, 
-                            max_value = 10.0, 
-                            step = 0.1, value = product_cost_USD_kgprod,
-                            format = '%.1f',
-                            help = '''Default value: \${}/kg
-                            '''.format(default_product_cost_USD_kgprod))
-        water_cost_USD_kg = st.slider(label = 'Water cost (\$/kg)',
-                            min_value = 0.0, 
-                            max_value = 1.0, 
-                            step = 0.1, value = water_cost_USD_kg,
-                            format = '%.1f',
-                            help = '''Default value: \${}/kg
-                            '''.format(default_water_cost_USD_kg))
-        electrolyzer_capex_USD_m2 = st.slider(label = 'Electrolyzer capital cost (\$/m$^2$)' , 
-                            min_value = 0.0, 
-                            max_value = 15000.0, 
-                            step = 100.0, value = electrolyzer_capex_USD_m2,
-                            format = '%.0f',
-                            help = '''Default value: \${}/m$^2$
-                            '''.format(default_electrolyzer_capex_USD_m2))
-        battery_capex_USD_kWh = st.slider(label = 'Battery capital cost (\$/kWh)' , 
-                            min_value = 0.0, 
-                            max_value = 500.0, 
-                            step = 1.0, value = battery_capex_USD_kWh,
-                            format = '%.0f', disabled = not is_battery,
-                            help = '''Default value: \${}/kWh, based on 4-hour storage.
-                            '''.format(default_battery_capex_USD_kWh))
-        
-    ##### CUSTOM CAPEX OR OPEX  
-    answer = st.toggle('Add custom capex', value = False,
-                         help = 'Optional bare-module capital cost for any custom units')
-    if answer:            
-        # Handle battery to flatten curve and maximize capacity
-        is_additional_capex = True
-        additional_capex_USD = st.slider(label = 'Additional capital cost (\$ million)' ,
-                            min_value = 0.0, 
-                            max_value = 100.0, 
-                            step = 1.0, value = 0.0,
-                            format = '%.0f', disabled = not is_additional_capex,
-                            help = '''Optional additional capex. Default value: \${} million.
-                            '''.format(0)) *1e6
-    else:
-        is_additional_capex = False
-        additional_capex_USD = 0
-        
-    answer = st.toggle('Add custom opex', value = False,
-                         help = 'Optional operating cost')
-    if answer:            
-        # Handle battery to flatten curve and maximize capacity
-        is_additional_opex = True
-        additional_opex_USD_kg = st.slider(label = 'Additional operating cost (\$/kg {})'.format(product_name),  
-                            min_value = 0.0, 
-                            max_value = 5.0, 
-                            step = 0.1, value = 0.0,
-                            format = '%.1f', disabled = not is_additional_opex,
-                            help = '''Optional operating cost for any custom expenses. Convert daily costs to \$/kg product as follows:
-                            $$$
-                            \\\ \\frac{{\$ opex}}{{year}} = \\frac{{\$ opex}}{{day}} \cdot CF \cdot 365 \cdot plant lifetime
-                            $$$
-                            ''')    
-    else:
-        is_additional_opex = False
-        additional_opex_USD_kg = 0 
-        
-with st.sidebar:
-    st.subheader('Emissions assessment')
-    electricity_emissions_kgCO2_kWh = st.slider(label = 'Grid CO$_2$ intensity (kg$_{CO_2}$/kWh)',
-                        min_value = 0.0, 
-                        max_value = 1.0, 
-                        step = 0.01, value = electricity_emissions_kgCO2_kWh,
-                        format = '%.2f',
-                        help = '''Electricity emissions for partial life-cycle assessment.
-                        \n Default value: {:.2f} kg$_{{CO_2}}$/kWh, based on the United States average.
-                        '''.format(default_electricity_emissions_kgCO2_kWh))
 
 #___________________________________________________________________________________
 
