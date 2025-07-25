@@ -353,12 +353,7 @@ st.set_page_config(page_title = 'CO2R Costing Dashboard - Home',
 SMALL_SIZE = 20 # set smallest font size
 MEDIUM_SIZE = 24 # set medium font size
 BIGGER_SIZE = 27 # set
-# font_dir = Path(mp.get_data_path(), r'/.streamlit/Arial/Arial.ttf')
-# for font in font_manager.findSystemFonts(font_dir):
-#     font_manager.fontManager.addfont(fontpaths = font)
-# mp.rc('font', family = 'sans-serif') # 'Arial' # font group is sans-serif
-mp.rcParams["font.family"] = "sans-serif"
-mp.rcParams["font.sans-serif"] = "Liberation Sans"
+mp.rc('font', family = 'Arial') # font group is sans-serif
 mp.rc('font', size=MEDIUM_SIZE)     # controls default text sizes if unspecified
 mp.rc('axes', titlesize=MEDIUM_SIZE)    # fontsize of the axes title; I think this is for subplots 
 mp.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
@@ -433,20 +428,20 @@ mp.rcParams['lines.markersize'] = 6 # sets the scatter/line marker size; roughly
 # defaults for lines
 mp.rcParams['lines.linestyle'] = '-' # solid lines unless otherwise specified
 mp.rcParams['lines.linewidth'] = 2 # default linewidth
+mp.rcParams['hatch.linewidth'] = 3  # previous svg hatch linewidth
 
 # defaults for errorbars
 mp.rcParams['errorbar.capsize'] = 4
 
 ### Fix random state for reproducibility
-np.random.seed(19680801)
+rng = np.random.default_rng(seed=19680801)
 
 ### Some options for ticks:
 # np.arange(min, max, step): returns a list of step-spaced entries between min and max EXCLUDING max
 # np.linspace(min, max, n): returns a list of n linearly spaced entries between min and max, including max
 # np.logspace(min, max, n, base=10.0): returns a list of n log-spaced entries between min and max
 # axs.xaxis.set_major_locator(mpl.ticker.MultipleLocator(n)): sets axis ticks to be multiples of 
-                                                            #n within the data range
-
+                                                             #n within the data range
 ## Theme colors 
 theme_colors = ['#bf5700',  '#ffc919', '#8f275d', '#73a3b3', '#193770', '#e35555', '#191f24' ] #ffffff (white)
 
@@ -460,14 +455,14 @@ viridis = mp.colormaps['viridis']
 # greys = mp.colormaps['gist_yarg'] # 'Gray'
 # RdBu = mp.colormaps['RdBu'] # seismic
 RdYlBu = mp.colormaps['RdYlBu']
-# inferno = mp.colormaps['inferno_r']
+inferno = mp.colormaps['inferno_r']
 # Blues = mp.colormaps['Blues']
 # winter = mp.colormaps['winter_r']
 # cool = mp.colormaps['cool_r']
 
 ## Custom colormaps
 # Endpoint colors
-colors = [ '#fff01f', '#00503d']  # gold to sherwood green
+colors = [ '#eddb1e', '#00503d']  # gold to sherwood green
 bright_summer_r = LinearSegmentedColormap.from_list('custom_cmap', colors) # create colormap
 
 colors = ['#abd5e2', '#190033', '#a60027', theme_colors[1]  ] #  
@@ -476,9 +471,8 @@ diverging = LinearSegmentedColormap.from_list('diverging_cmap', colors) # create
 # colors = ['#a60027', theme_colors[1], theme_colors[3], '#012469'  ] #  
 # RdYlBu = LinearSegmentedColormap.from_list('diverging_cmap', colors)
 
-colors = ['#a60027', '#ffefdc', '#012469'  ] #  
+colors = ['#a60027', '#ef7a7a', '#fde7cd', theme_colors[3], '#012469'  ] #  
 RdBu = LinearSegmentedColormap.from_list('diverging_cmap', colors)
-
 
 # st.markdown(
 #     """
@@ -577,16 +571,12 @@ def import_data(file_imports):
     xlsx = pd.ExcelFile(file_imports) # Read each data Excel file
     df_constants = xlsx.parse(sheet_name = sheet_constants) # Read the sheet with the constants
     df_constants.set_index('Variable name', drop = True, inplace = True) # Reset index to variable name
-    xlsx.close() # close xlsx file
 
     df_products = pd.DataFrame # Create dataframe for product data
-    xlsx = pd.ExcelFile(file_imports) # Read each data Excel file
     df_products = xlsx.parse(sheet_name = sheet_products) # Read the sheet with the product data
     df_products.set_index('Product', drop = True, inplace = True) # reset index to product name
-    xlsx.close() # close xlsx file
-        
+
     df_utility_imports = pd.DataFrame # Create dataframe for costs
-    xlsx = pd.ExcelFile(file_imports) # Read each data Excel file
     df_utility_imports = xlsx.parse(sheet_name = sheet_utility_imports) # Read the sheet with the costing
     df_utility_imports.set_index('Utility', drop = True, inplace = True) # reset index to utility name
     xlsx.close() # close xlsx file

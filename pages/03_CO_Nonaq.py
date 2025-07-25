@@ -130,6 +130,11 @@ def cached_single_run_nonaq(product_name,
                 exponent,
                 scaling,
 
+                is_additional_capex,
+                additional_capex_USD,
+                is_additional_opex,  
+                additional_opex_USD_kg,
+
                 MW_CO2,
                 MW_H2O,
                 MW_O2,
@@ -149,7 +154,7 @@ def cached_single_run_nonaq(product_name,
                 supporting_electrolyte_name = supporting_electrolyte_name,
                 df_products = df_products,
 
-                product_rate_kg_day = product_cost_USD_kgprod,
+                product_rate_kg_day = product_rate_kg_day,
                 model_FE = model_FE,
                 FE_CO2R_0 = FE_CO2R_0,
                 FE_product_specified = FE_product_specified,
@@ -177,7 +182,7 @@ def cached_single_run_nonaq(product_name,
                 solvent_loss_fraction = solvent_loss_fraction,
 
                 LL_second_law_efficiency = LL_second_law_efficiency,
-                PSA_second_law_efficiency = LL_second_law_efficiency,
+                PSA_second_law_efficiency = PSA_second_law_efficiency,
                 T_sep = T_sep,         
                 CO2_solubility_mol_mol = CO2_solubility_mol_mol,
 
@@ -214,6 +219,11 @@ def cached_single_run_nonaq(product_name,
                 exponent = exponent,
                 scaling = scaling,
 
+                is_additional_capex = is_additional_capex,
+                additional_capex_USD = additional_capex_USD,
+                is_additional_opex = is_additional_opex,  
+                additional_opex_USD_kg = additional_opex_USD_kg,
+
                 MW_CO2 = MW_CO2,
                 MW_H2O = MW_H2O,
                 MW_O2 = MW_O2,
@@ -225,132 +235,197 @@ def cached_single_run_nonaq(product_name,
                 
                 K_to_C = K_to_C,
                 kJ_per_kWh = kJ_per_kWh,
-    
         )
 
-# Cache default model run 
-# @st.cache_data(ttl = "1h")
-# def default_single_run(product_name,
-#         product_rate_kg_day,
-#         df_products,
-#         FE_CO2R_0,
-#         FE_product_specified,
-#         j_total_mA_cm2,
-#         SPC,
-#         crossover_ratio,
-#         P,
-#         T_streams,
-#         R_ohmcm2,
-#         an_E_eqm,
-#         an_eta_ref,
-#         an_Tafel_slope,
-#         an_j_ref,
-#         cathode_outlet_humidity,
-#         excess_water_ratio,   
-#         electrolyte_conc,  
-#         density_kgm3,
-#         PSA_second_law_efficiency,
-#         carbon_capture_efficiency,
-#         T_sep,         
-#         electricity_cost_USD_kWh,
-#         heat_cost_USD_kWh,
-#         electricity_emissions_kgCO2_kWh,
-#         heat_emissions_kgCO2_kWh,
-#         product_cost_USD_kgprod,
-#         H2_cost_USD_kgH2,
-#         water_cost_USD_kg,
-#         CO2_cost_USD_tCO2,
-#         electrolyzer_capex_USD_m2,       
-#         lifetime_years,
-#         stack_lifetime_years,
-#         capacity_factor,
-#         battery_capex_USD_kWh,               
-#         battery_capacity,
-#         additional_capex_USD,
-#         additional_opex_USD_kg,
-#         is_additional_capex,
-#         is_additional_opex,
-#         model_FE,
-#         overridden_vbl,
-#         overridden_value,
-#         overridden_unit,
-#         override_optimization,
-#         exponent,
-#         scaling,
-#         MW_CO2,
-#         MW_H2O,
-#         MW_O2,
-#         MW_MX,
-#         R, 
-#         F,
-#         K_to_C = 273.15,
-#         kJ_per_kWh = 3.60E+03,
-#         ):
-#     __, df_capex_totals_default, __, __, __, __,\
-#                 df_energy_default, __, __, __, __, __, df_opex_totals_default, __,\
-#                 __, df_potentials_default, __, __, __, __, __ = cached_single_run(product_name,
-#         product_rate_kg_day,
-#         df_products,
-#         FE_CO2R_0,
-#         FE_product_specified,
-#         j_total_mA_cm2,
-#         SPC,
-#         crossover_ratio,
-#         P,
-#         T_streams,
-#         R_ohmcm2,
-#         an_E_eqm,
-#         an_eta_ref,
-#         an_Tafel_slope,
-#         an_j_ref,
-#         cathode_outlet_humidity,
-#         excess_water_ratio,   
-#         electrolyte_conc,  
-#         density_kgm3,
-#         PSA_second_law_efficiency,
-#         carbon_capture_efficiency,
-#         T_sep,         
-#         electricity_cost_USD_kWh,
-#         heat_cost_USD_kWh,
-#         electricity_emissions_kgCO2_kWh,
-#         heat_emissions_kgCO2_kWh,
-#         product_cost_USD_kgprod,
-#         H2_cost_USD_kgH2,
-#         water_cost_USD_kg,
-#         CO2_cost_USD_tCO2,
-#         electrolyzer_capex_USD_m2,       
-#         lifetime_years,
-#         stack_lifetime_years,
-#         capacity_factor,
-#         battery_capex_USD_kWh,               
-#         battery_capacity,
-#         model_FE,
-#         is_additional_opex,
-#         is_additional_capex,
-#         additional_capex_USD,
-#         additional_opex_USD_kg,
-#         overridden_vbl,
-#         overridden_value,
-#         overridden_unit,
-#         override_optimization,
-#         exponent,
-#         scaling,
-#         MW_CO2,
-#         MW_H2O,
-#         MW_O2,
-#         MW_MX,
-#         R, 
-#         F,
-#         K_to_C,
-#         kJ_per_kWh,
-#         )
-#     capex_default = df_capex_totals_default.loc['Total permanent investment', 'Cost ($)']
-#     opex_default = df_opex_totals_default.loc['Production cost', 'Cost ($/kg {})'.format(product_name)]
-#     levelized_default = df_opex_totals_default.loc['Levelized cost', 'Cost ($/kg {})'.format(product_name)]
-#     potential_default = df_potentials_default.loc['Cell potential', 'Value'] 
-#     energy_default = df_energy_default.loc['Total', 'Energy (kJ/kg {})'.format(product_name)]
-#     emissions_default = sum(df_energy_default.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)])
-#     return capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default
+# Cache single run of model
+@st.cache_data(ttl = "1h")
+def default_single_run_nonaq(product_name,
+                solvent_name,
+                supporting_electrolyte_name,
+                df_products,
+
+                product_rate_kg_day,
+                model_FE,
+                FE_CO2R_0,
+                FE_product_specified,
+                j_total_mA_cm2,
+                SPC,
+                crossover_ratio,
+                P,
+                T_streams,
+
+                R_membrane_ohmcm2,
+                electrolyte_thickness_cm,
+                
+                an_E_eqm,
+                an_eta_ref,
+                an_Tafel_slope,
+                an_j_ref,
+
+                cathode_outlet_humidity,
+                excess_water_ratio,   
+                excess_solvent_ratio,
+                catholyte_conc_M,  
+                anolyte_conc_M,
+                water_density_kg_m3,
+                electrolyte_density_kg_m3,
+                solvent_loss_fraction,
+
+                LL_second_law_efficiency,
+                PSA_second_law_efficiency,
+                T_sep,         
+                CO2_solubility_mol_mol,
+
+                carbon_capture_efficiency,
+                electricity_emissions_kgCO2_kWh,
+                heat_emissions_kgCO2_kWh,
+
+                electricity_cost_USD_kWh,
+                heat_cost_USD_kWh,
+                product_cost_USD_kgprod,
+                H2_cost_USD_kgH2,
+                water_cost_USD_kg,
+                CO2_cost_USD_tCO2,
+                electrolyzer_capex_USD_m2,  
+                PSA_capex_USD_1000m3_hr,
+                LL_capex_USD_1000mol_hr,     
+                solvent_cost_USD_kg,
+                electrolyte_cost_USD_kg,    
+
+                lifetime_years,
+                stack_lifetime_years,
+                capacity_factor,
+
+                battery_capex_USD_kWh,               
+                battery_capacity,
+
+                kappa_electrolyte_S_cm,
+                viscosity_cP,  
+
+                overridden_vbl,
+                overridden_value,
+                overridden_unit,
+                override_optimization,
+                exponent,
+                scaling,
+
+                is_additional_capex,
+                additional_capex_USD,
+                is_additional_opex,  
+                additional_opex_USD_kg,
+
+                MW_CO2,
+                MW_H2O,
+                MW_O2,
+                MW_MX,
+                MW_solvent,
+                MW_supporting,
+                R, 
+                F,
+                
+                K_to_C = 273.15,
+                kJ_per_kWh = 3.60E+03,
+            ):
+    # Execute a single run of the model. The actual function is imported from TEA_SingleRun.ipynb.
+    # This is useful becuase of the caching - it will only actually rerun the model if there is a change in the inputs
+    __, df_capex_totals_default, __, __, __, __,\
+            df_energy_default, __, __, __, __, __, __, df_opex_totals_default, __,\
+            __, df_potentials_default, __, __, __, __, __, __, \
+            __, __, __, __ = single_run_nonaq(product_name = product_name,
+                solvent_name = solvent_name,
+                supporting_electrolyte_name = supporting_electrolyte_name,
+                df_products = df_products,
+
+                product_rate_kg_day = product_rate_kg_day,
+                model_FE = model_FE,
+                FE_CO2R_0 = FE_CO2R_0,
+                FE_product_specified = FE_product_specified,
+                j_total_mA_cm2 = j_total_mA_cm2,
+                SPC = SPC,
+                crossover_ratio = crossover_ratio,
+                P = P,
+                T_streams = T_streams,
+
+                R_membrane_ohmcm2 = R_membrane_ohmcm2,
+                electrolyte_thickness_cm = electrolyte_thickness_cm,
+                
+                an_E_eqm = an_E_eqm,
+                an_eta_ref = an_eta_ref,
+                an_Tafel_slope = an_Tafel_slope,
+                an_j_ref = an_j_ref,
+
+                cathode_outlet_humidity = cathode_outlet_humidity,
+                excess_water_ratio = excess_water_ratio,   
+                excess_solvent_ratio = excess_solvent_ratio,
+                catholyte_conc_M = catholyte_conc_M,  
+                anolyte_conc_M = anolyte_conc_M,
+                water_density_kg_m3 = water_density_kg_m3,
+                electrolyte_density_kg_m3 = electrolyte_density_kg_m3,
+                solvent_loss_fraction = solvent_loss_fraction,
+
+                LL_second_law_efficiency = LL_second_law_efficiency,
+                PSA_second_law_efficiency = PSA_second_law_efficiency,
+                T_sep = T_sep,         
+                CO2_solubility_mol_mol = CO2_solubility_mol_mol,
+
+                carbon_capture_efficiency = carbon_capture_efficiency,
+                electricity_emissions_kgCO2_kWh = electricity_emissions_kgCO2_kWh,
+                heat_emissions_kgCO2_kWh = heat_emissions_kgCO2_kWh,
+
+                electricity_cost_USD_kWh = electricity_cost_USD_kWh,
+                heat_cost_USD_kWh = heat_cost_USD_kWh,
+                product_cost_USD_kgprod = product_cost_USD_kgprod,
+                H2_cost_USD_kgH2 = H2_cost_USD_kgH2,
+                water_cost_USD_kg = water_cost_USD_kg,
+                CO2_cost_USD_tCO2 = CO2_cost_USD_tCO2,
+                electrolyzer_capex_USD_m2 = electrolyzer_capex_USD_m2,  
+                PSA_capex_USD_1000m3_hr = PSA_capex_USD_1000m3_hr,
+                LL_capex_USD_1000mol_hr = LL_capex_USD_1000mol_hr,     
+                solvent_cost_USD_kg = solvent_cost_USD_kg,
+                electrolyte_cost_USD_kg = electrolyte_cost_USD_kg,    
+
+                lifetime_years = lifetime_years,
+                stack_lifetime_years = stack_lifetime_years,
+                capacity_factor = capacity_factor,
+
+                battery_capex_USD_kWh = battery_capex_USD_kWh,               
+                battery_capacity = battery_capacity,
+
+                kappa_electrolyte_S_cm = kappa_electrolyte_S_cm,
+                viscosity_cP = viscosity_cP,  
+
+                overridden_vbl = overridden_vbl,
+                overridden_value = overridden_value,
+                overridden_unit = overridden_unit,
+                override_optimization = override_optimization,
+                exponent = exponent,
+                scaling = scaling,
+
+                is_additional_capex = is_additional_capex,
+                additional_capex_USD = additional_capex_USD,
+                is_additional_opex = is_additional_opex,  
+                additional_opex_USD_kg = additional_opex_USD_kg,
+
+                MW_CO2 = MW_CO2,
+                MW_H2O = MW_H2O,
+                MW_O2 = MW_O2,
+                MW_MX = MW_MX,
+                MW_solvent = MW_solvent,
+                MW_supporting = MW_supporting,
+                R = R, 
+                F = F,
+                
+                K_to_C = K_to_C,
+                kJ_per_kWh = kJ_per_kWh,
+        )
+    capex_default = df_capex_totals_default.loc['Total permanent investment', 'Cost ($)']
+    opex_default = df_opex_totals_default.loc['Production cost', 'Cost ($/kg {})'.format(product_name)]
+    levelized_default = df_opex_totals_default.loc['Levelized cost', 'Cost ($/kg {})'.format(product_name)]
+    potential_default = df_potentials_default.loc['Cell potential', 'Value'] 
+    energy_default = df_energy_default.loc['Total', 'Energy (kJ/kg {})'.format(product_name)]
+    emissions_default = sum(df_energy_default.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)])
+
+    return capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default
 
 @st.cache_data(ttl = "1h")
 def render_svg(svg):
@@ -398,7 +473,7 @@ _render_lock = threading.RLock()
 ###################################################################################
 
 # Streamlit page formatting
-st.set_page_config(page_title = 'CO2R Costing Dashboard - CO bar charts', 
+st.set_page_config(page_title = 'CO2R Costing Dashboard - non-aqueous to CO', 
                    page_icon = ":test_tube:",
                    initial_sidebar_state= 'expanded',
                    layout="wide")
@@ -409,8 +484,7 @@ st.set_page_config(page_title = 'CO2R Costing Dashboard - CO bar charts',
 SMALL_SIZE = 20 # set smallest font size
 MEDIUM_SIZE = 24 # set medium font size
 BIGGER_SIZE = 27 # set
-mp.rcParams["font.family"] = "sans-serif"
-mp.rcParams["font.sans-serif"] = "Liberation Sans"
+mp.rc('font', family = 'Arial') # font group is sans-serif
 mp.rc('font', size=MEDIUM_SIZE)     # controls default text sizes if unspecified
 mp.rc('axes', titlesize=MEDIUM_SIZE)    # fontsize of the axes title; I think this is for subplots 
 mp.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
@@ -485,20 +559,20 @@ mp.rcParams['lines.markersize'] = 6 # sets the scatter/line marker size; roughly
 # defaults for lines
 mp.rcParams['lines.linestyle'] = '-' # solid lines unless otherwise specified
 mp.rcParams['lines.linewidth'] = 2 # default linewidth
+mp.rcParams['hatch.linewidth'] = 3  # previous svg hatch linewidth
 
 # defaults for errorbars
 mp.rcParams['errorbar.capsize'] = 4
 
 ### Fix random state for reproducibility
-np.random.seed(19680801)
+rng = np.random.default_rng(seed=19680801)
 
 ### Some options for ticks:
 # np.arange(min, max, step): returns a list of step-spaced entries between min and max EXCLUDING max
 # np.linspace(min, max, n): returns a list of n linearly spaced entries between min and max, including max
 # np.logspace(min, max, n, base=10.0): returns a list of n log-spaced entries between min and max
 # axs.xaxis.set_major_locator(mpl.ticker.MultipleLocator(n)): sets axis ticks to be multiples of 
-                                                            #n within the data range
-
+                                                             #n within the data range
 ## Theme colors 
 theme_colors = ['#bf5700',  '#ffc919', '#8f275d', '#73a3b3', '#193770', '#e35555', '#191f24' ] #ffffff (white)
 
@@ -512,14 +586,14 @@ viridis = mp.colormaps['viridis']
 # greys = mp.colormaps['gist_yarg'] # 'Gray'
 # RdBu = mp.colormaps['RdBu'] # seismic
 RdYlBu = mp.colormaps['RdYlBu']
-# inferno = mp.colormaps['inferno_r']
+inferno = mp.colormaps['inferno_r']
 # Blues = mp.colormaps['Blues']
 # winter = mp.colormaps['winter_r']
 # cool = mp.colormaps['cool_r']
 
 ## Custom colormaps
 # Endpoint colors
-colors = [ '#fff01f', '#00503d']  # gold to sherwood green
+colors = [ '#eddb1e', '#00503d']  # gold to sherwood green
 bright_summer_r = LinearSegmentedColormap.from_list('custom_cmap', colors) # create colormap
 
 colors = ['#abd5e2', '#190033', '#a60027', theme_colors[1]  ] #  
@@ -528,9 +602,8 @@ diverging = LinearSegmentedColormap.from_list('diverging_cmap', colors) # create
 # colors = ['#a60027', theme_colors[1], theme_colors[3], '#012469'  ] #  
 # RdYlBu = LinearSegmentedColormap.from_list('diverging_cmap', colors)
 
-colors = ['#a60027', '#ffefdc', '#012469'  ] #  
+colors = ['#a60027', '#ef7a7a', '#fde7cd', theme_colors[3], '#012469'  ] #  
 RdBu = LinearSegmentedColormap.from_list('diverging_cmap', colors)
-
 
 # st.markdown(
 #     """
@@ -553,9 +626,9 @@ RdBu = LinearSegmentedColormap.from_list('diverging_cmap', colors)
 # from matplotlib.backends.backend_agg import RendererAgg
 # _lock = RendererAgg.lock # Lock figures so that concurrent users/threads can coexist independently
 
-st.title("CO$_2$R Costing Dashboard: Bar charts for sensitivity of CO$_2$R costs to CO")
+st.title("CO$_2$R Costing Dashboard: non-aqueous CO$_2$R costs to CO")
 st.write("*Developed by [Shashwati da Cunha](https://shashwatidc.github.io/) in the [Resasco Catalysis Lab](https://www.resascolab.com/)*")
-st.write('''Visualize how the capex and opex respond to a change in a single process parameter for CO₂R to CO.
+st.write('''Visualize how the capex and opex respond to changes in parameters for non-aqueous CO₂R to CO.
          Pick a parameter and modify the settings on the left to see how the results change. 
          ''')
 
@@ -600,15 +673,16 @@ with st.expander("**Help**", expanded = False):
 st.write("**Cite this work**: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647), [10.26434/chemrxiv-2025-k071x](https://doi.org/10.26434/chemrxiv-2025-k071x)")
 st.write("**Questions, collaborations, requests?** Contact [shashwatidc@utexas.edu](mailto:shashwatidc@utexas.edu).")
 
-
 #__________________________________________________________________________________
 
 ###############################  IMPORT SOURCE DATA ###############################
 
-file_imports = r"Supplementary Workbook.xlsx"
+file_imports = r"Supplementary Workbook Non-Aq.xlsx"
 sheet_utility_imports = 'Utilities'
 sheet_constants =  'Constants and assumptions'
 sheet_products =  'Products'
+sheet_solvents =  'Solvents'
+sheet_supporting =  'Supporting electrolytes'
 
 # Get current date and time to name files
 time_now = datetime.now().time()
@@ -623,23 +697,27 @@ def import_data(file_imports):
     xlsx = pd.ExcelFile(file_imports) # Read each data Excel file
     df_constants = xlsx.parse(sheet_name = sheet_constants) # Read the sheet with the constants
     df_constants.set_index('Variable name', drop = True, inplace = True) # Reset index to variable name
-    xlsx.close() # close xlsx file
 
     df_products = pd.DataFrame # Create dataframe for product data
-    xlsx = pd.ExcelFile(file_imports) # Read each data Excel file
     df_products = xlsx.parse(sheet_name = sheet_products) # Read the sheet with the product data
     df_products.set_index('Product', drop = True, inplace = True) # reset index to product name
-    xlsx.close() # close xlsx file
         
     df_utility_imports = pd.DataFrame # Create dataframe for costs
-    xlsx = pd.ExcelFile(file_imports) # Read each data Excel file
     df_utility_imports = xlsx.parse(sheet_name = sheet_utility_imports) # Read the sheet with the costing
     df_utility_imports.set_index('Utility', drop = True, inplace = True) # reset index to utility name
+    
+    df_solvents = pd.DataFrame # Create dataframe for product data
+    df_solvents = xlsx.parse(sheet_name = sheet_solvents) # Read the sheet with the product data
+    df_solvents.set_index('Solvent', drop = True, inplace = True) # reset index to product name
+
+    df_supporting = pd.DataFrame # Create dataframe for product data
+    df_supporting = xlsx.parse(sheet_name = sheet_supporting) # Read the sheet with the product data
+    df_supporting.set_index('Supporting electrolyte', drop = True, inplace = True) # reset index to product name
     xlsx.close() # close xlsx file
 
-    return(df_constants, df_products, df_utility_imports)
+    return(df_constants, df_products, df_utility_imports, df_solvents, df_supporting)
 
-df_constants, df_products, df_utility_imports = import_data(file_imports)
+df_constants, df_products, df_utility_imports, df_solvents, df_supporting = import_data(file_imports)
 
 #_________________________________________________________________________________
 
@@ -675,7 +753,7 @@ overridde_multivbl = False
 override_optimization = False
 override_animation = False
 override_single = False
-model_FE = 'Kas'
+model_FE = None
 is_battery = False
 is_additional_capex = False
 is_additional_opex = False
@@ -1424,46 +1502,96 @@ with st.sidebar:
                         \n Default value: {:.2f} kg$_{{CO_2}}$/kWh, based on the United States average.
                         '''.format(default_electricity_emissions_kgCO2_kWh))
 
-
 #___________________________________________________________________________________
 
 ##########################  RUN MODEL AT DEFAULT VALUES  ###########################
 
-capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default = default_single_run(product_name = product_name, 
-                        product_rate_kg_day = default_product_rate_kg_day, 
-                        df_products = df_products, FE_CO2R_0 = default_FE_CO2R_0, 
-                        FE_product_specified = default_FE_product_specified, 
-                        j_total_mA_cm2 = default_j_total_mA_cm2,SPC = default_SPC, 
-                        crossover_ratio = default_crossover_ratio, model_FE = 'Hawks',
-                        is_additional_capex= False,
-                        is_additional_opex= False,  
-                        additional_opex_USD_kg = 0,
-                        additional_capex_USD = 0,
-                        overridden_vbl = '', overridden_value = np.NaN, overridden_unit = '', 
-                        override_optimization =  override_optimization, P = default_P, T_streams = default_T_streams, 
-                        R_ohmcm2 = default_R_ohmcm2, an_E_eqm = default_an_E_eqm, MW_CO2 = MW_CO2, 
-                        MW_H2O = MW_H2O, MW_O2 = MW_O2,  MW_MX = MW_K2CO3,
-                        cathode_outlet_humidity = default_cathode_outlet_humidity,
-                        excess_water_ratio = default_excess_water_ratio,
-                        an_eta_ref = default_an_eta_ref, 
-                        an_Tafel_slope = default_an_Tafel_slope, 
-                        an_j_ref = default_an_j_ref, 
-                        electricity_emissions_kgCO2_kWh = default_electricity_emissions_kgCO2_kWh,
-                        heat_emissions_kgCO2_kWh = default_heat_emissions_kgCO2_kWh,
-                        electrolyte_conc = default_electrolyte_conc, 
-                        density_kgm3 = default_density_kgm3,
-                        PSA_second_law_efficiency = default_PSA_second_law_efficiency, 
-                        T_sep = T_sep, electricity_cost_USD_kWh = default_electricity_cost_USD_kWh, 
-                        heat_cost_USD_kWh = default_heat_cost_USD_kWh,product_cost_USD_kgprod = default_product_cost_USD_kgprod,
-                        H2_cost_USD_kgH2 = default_H2_cost_USD_kgH2,water_cost_USD_kg = default_water_cost_USD_kg,
-                        CO2_cost_USD_tCO2 = default_CO2_cost_USD_tCO2,lifetime_years = default_lifetime_years,
-                        stack_lifetime_years = default_stack_lifetime_years,
-                        electrolyzer_capex_USD_m2 = default_electrolyzer_capex_USD_m2,
-                        capacity_factor = default_capacity_factor,battery_capex_USD_kWh = default_battery_capex_USD_kWh,               
-                        battery_capacity = default_battery_capacity, exponent=default_exponent, scaling=default_scaling,
-                        carbon_capture_efficiency = default_carbon_capture_efficiency,
-                        R = R,
-                        F = F)
+capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default = default_single_run_nonaq(product_name = product_name,
+                solvent_name = solvent_name,
+                supporting_electrolyte_name = supporting_electrolyte_name,
+                df_products = df_products,
+
+                product_rate_kg_day = default_product_rate_kg_day,
+                model_FE = None,
+                FE_CO2R_0 = default_FE_CO2R_0,
+                FE_product_specified = default_FE_product_specified,
+                j_total_mA_cm2 = default_j_total_mA_cm2,
+                SPC = default_SPC,
+                crossover_ratio = default_crossover_ratio,
+                P = default_P,
+                T_streams = default_T_streams,
+
+                R_membrane_ohmcm2 = default_R_membrane_ohmcm2,
+                electrolyte_thickness_cm = default_electrolyte_thickness_cm,
+                
+                an_E_eqm = default_an_E_eqm,
+                an_eta_ref = default_an_eta_ref,
+                an_Tafel_slope = default_an_Tafel_slope,
+                an_j_ref = default_an_j_ref,
+
+                cathode_outlet_humidity = default_cathode_outlet_humidity,
+                excess_water_ratio = default_excess_water_ratio,   
+                excess_solvent_ratio = default_excess_solvent_ratio,
+                catholyte_conc_M = default_catholyte_conc_M,  
+                anolyte_conc_M = default_anolyte_conc_M,
+                water_density_kg_m3 = default_water_density_kg_m3,
+                electrolyte_density_kg_m3 = default_electrolyte_density_kg_m3,
+                solvent_loss_fraction = default_solvent_loss_fraction,
+
+                LL_second_law_efficiency = default_LL_second_law_efficiency,
+                PSA_second_law_efficiency = default_PSA_second_law_efficiency,
+                T_sep = default_T_sep,         
+                CO2_solubility_mol_mol = default_CO2_solubility_mol_mol,
+
+                carbon_capture_efficiency = default_carbon_capture_efficiency,
+                electricity_emissions_kgCO2_kWh = default_electricity_emissions_kgCO2_kWh,
+                heat_emissions_kgCO2_kWh = default_heat_emissions_kgCO2_kWh,
+
+                electricity_cost_USD_kWh = default_electricity_cost_USD_kWh,
+                heat_cost_USD_kWh = default_heat_cost_USD_kWh,
+                product_cost_USD_kgprod = default_product_cost_USD_kgprod,
+                H2_cost_USD_kgH2 = default_H2_cost_USD_kgH2,
+                water_cost_USD_kg = default_water_cost_USD_kg,
+                CO2_cost_USD_tCO2 = default_CO2_cost_USD_tCO2,
+                electrolyzer_capex_USD_m2 = default_electrolyzer_capex_USD_m2,  
+                PSA_capex_USD_1000m3_hr = default_PSA_capex_USD_1000m3_hr,
+                LL_capex_USD_1000mol_hr = default_LL_capex_USD_1000mol_hr,     
+                solvent_cost_USD_kg = default_solvent_cost_USD_kg,
+                electrolyte_cost_USD_kg = default_electrolyte_cost_USD_kg,    
+
+                lifetime_years = default_lifetime_years,
+                stack_lifetime_years = default_stack_lifetime_years,
+                capacity_factor = default_capacity_factor,
+
+                battery_capex_USD_kWh = default_battery_capex_USD_kWh,               
+                battery_capacity = default_battery_capacity,
+
+                kappa_electrolyte_S_cm = default_kappa_electrolyte_S_cm,
+                viscosity_cP = default_viscosity_cP,  
+
+                overridden_vbl = '',
+                overridden_value = np.NaN,
+                overridden_unit = '',
+                override_optimization = override_optimization,
+                exponent = exponent,
+                scaling = scaling,
+
+                is_additional_capex= False,
+                additional_capex_USD = 0,
+                is_additional_opex= False,  
+                additional_opex_USD_kg = 0,
+
+                MW_CO2 = MW_CO2,
+                MW_H2O = MW_H2O,
+                MW_O2 = MW_O2,
+                MW_MX = MW_MX,
+                MW_solvent = MW_solvent,
+                MW_supporting = MW_supporting,
+                R = R, 
+                F = F,
+                
+                K_to_C = K_to_C,
+                kJ_per_kWh = kJ_per_kWh)
 
 #___________________________________________________________________________________
     

@@ -88,6 +88,11 @@ def single_run_nonaq(product_name,
                 exponent,
                 scaling,
 
+                is_additional_capex,
+                additional_capex_USD,
+                is_additional_opex,
+                additional_opex_USD_kg,  
+
                 MW_CO2,
                 MW_H2O,
                 MW_O2,
@@ -256,6 +261,8 @@ def single_run_nonaq(product_name,
                                                     electrolyte_cost_USD_kg = electrolyte_cost_USD_kg,
                                                     battery_capacity = battery_capacity,
                                                     kJ_per_kWh = kJ_per_kWh,
+                                                    is_additional_capex = is_additional_capex,
+                                                    additional_capex_USD = additional_capex_USD
                                                     )
     ## Generate subparts of opex - SEIDER TEXTBOOK       
     df_sales = sales(product_name = product_name,
@@ -303,7 +310,9 @@ def single_run_nonaq(product_name,
             capacity_factor = capacity_factor,
             lifetime_years = lifetime_years,
             product_name = product_name,
-            product_rate_kg_day = product_rate_kg_day
+            product_rate_kg_day = product_rate_kg_day,
+            is_additional_opex = is_additional_opex,
+            additional_opex_USD_kg= additional_opex_USD_kg
             )
 
     #     ## Generate opex - SEIDER TEXTBOOK
