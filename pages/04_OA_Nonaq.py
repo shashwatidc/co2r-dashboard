@@ -778,14 +778,21 @@ default_solvent_cost_USD_kg = solvent_cost_USD_kg
 
 ## SOLVENT
 MW_solvent =  df_solvents.loc[solvent_name, 'Molecular weight (g/mol)']
+default_MW_solvent = MW_solvent
 electrolyte_density_kg_m3 = df_solvents.loc[solvent_name, 'Density (kg/m3)']
+default_electrolyte_density_kg_m3 = electrolyte_density_kg_m3
 viscosity_cP = df_solvents.loc[solvent_name, 'Viscosity (cP)']
+default_viscosity_cP = viscosity_cP
 CO2_solubility_mol_mol = df_solvents.loc[solvent_name, 'CO2 solubility, 10 bar (mol CO2/ mol solvent)']
+default_CO2_solubility_mol_mol = CO2_solubility_mol_mol
 solvent_loss_fraction = df_solvents.loc[solvent_name, 'Solvent loss fraction ((mol/s offgas)/ (mol/s solvent))']
+default_solvent_loss_fraction = solvent_loss_fraction
 
 ## SUPPORTING ELECTROLYTE
 MW_supporting =  df_supporting.loc[supporting_electrolyte_name, 'Molecular weight (g/mol)']
+default_MW_supporting = MW_supporting
 kappa_electrolyte_S_cm = df_supporting.loc[supporting_electrolyte_name, 'Conductivity in ACN, 0.3 M (S/cm)'] * df_solvents.loc[solvent_name, 'Conductivity factor relative to ACN']
+default_kappa_electrolyte_S_cm = kappa_electrolyte_S_cm
 
 # RAW INPUTS
 crossover_ratio = crossover_acid
@@ -1660,8 +1667,8 @@ capex_default, opex_default, levelized_default, potential_default, energy_defaul
                 MW_H2O = MW_H2O,
                 MW_O2 = MW_O2,
                 MW_MX = MW_MX,
-                MW_solvent = MW_solvent,
-                MW_supporting = MW_supporting,
+                MW_solvent = default_MW_solvent,
+                MW_supporting = default_MW_supporting,
                 R = R, 
                 F = F,
                 
