@@ -771,6 +771,21 @@ product_cost_USD_kgprod = df_products.loc[product_name, 'Cost ($/kg product)']
 default_product_cost_USD_kgprod = product_cost_USD_kgprod
 H2_cost_USD_kgH2 = float(df_products.loc['H2', 'Cost ($/kg product)']) # assume H2 is not sold
 default_H2_cost_USD_kgH2 = H2_cost_USD_kgH2
+electrolyte_cost_USD_kg = df_supporting.loc[supporting_electrolyte_name, 'Cost ($/kg supporting)']
+default_electrolyte_cost_USD_kg = electricity_cost_USD_kWh
+solvent_cost_USD_kg = df_solvents.loc[solvent_name, 'Cost ($/kg solvent)']
+default_solvent_cost_USD_kg = solvent_cost_USD_kg
+
+## SOLVENT
+MW_solvent =  df_solvents.loc[solvent_name, 'Molecular weight (g/mol)']
+electrolyte_density_kg_m3 = df_solvents.loc[solvent_name, 'Density (kg/m3)']
+viscosity_cP = df_solvents.loc[solvent_name, 'Viscosity (cP)']
+CO2_solubility_mol_mol = df_solvents.loc[solvent_name, 'CO2 solubility, 10 bar (mol CO2/ mol solvent)']
+solvent_loss_fraction = df_solvents.loc[solvent_name, 'Solvent loss fraction ((mol/s offgas)/ (mol/s solvent))']
+
+## SUPPORTING ELECTROLYTE
+MW_supporting =  df_supporting.loc[supporting_electrolyte_name, 'Molecular weight (g/mol)']
+kappa_electrolyte_S_cm = df_supporting.loc[supporting_electrolyte_name, 'Conductivity in ACN, 0.3 M (S/cm)'] * df_solvents.loc[solvent_name, 'Conductivity factor relative to ACN']
 
 # RAW INPUTS
 crossover_ratio = crossover_acid
@@ -787,6 +802,8 @@ BV_eta_an_V = 0.25
 default_BV_eta_an_V = BV_eta_an_V
 FE_CO2R_0 = df_products.loc[product_name, 'FECO2R at SPC = 0']
 default_FE_CO2R_0  = FE_CO2R_0
+FE_product_specified = df_products.loc[product_name, 'FECO2R at SPC = 0']
+default_FE_product_specified = FE_product_specified
 SPC = df_products.loc[product_name, 'Chosen SPC, no tradeoff']  #0.3 # 0.5 # %/100
 default_SPC = SPC
 cat_Tafel_slope = df_products.loc[product_name, 'Tafel slope (mV/dec)']

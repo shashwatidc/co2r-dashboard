@@ -718,6 +718,27 @@ df_constants, df_products, df_utility_imports, df_solvents, df_supporting = impo
 
 ############################# CONSTANTS AND PARAMETERS ############################
 
+with st.sidebar:
+    st.subheader('Electrolyte')
+    ######## SOLVENT SELECTION
+    # Choose a solvent
+    solvent_name = st.radio(label = 'Non-aqueous catholyte solvent', options= ['DMF', 'DMSO', 'Acetonitrile', 'Propylene carbonate',], 
+                    index = 0, # default option
+                    label_visibility='collapsed',
+                    help = '''Choose the non-aqueous catholyte. The cell is a flow cell.
+                      \n Default solvent: DMF'''
+    )
+
+    st.subheader('Supporting electrolyte')
+    ######## SOLVENT SELECTION
+    # Choose a solvent
+    supporting_electrolyte_name = st.radio(label = 'Non-aqueous catholyte supporting electrolyte', options= ['TEACl', 'TBAClO$_4$', 'TEAClO$_4$', 'TBABF$_4$'], 
+                    index = 0, # default option
+                    label_visibility='collapsed',
+                    help = '''Choose the non-aqueous catholyte. The cell is a flow cell.
+                      \n Default supporting electrolyte: TEACl'''
+    )
+
 ### Extract constants to use for costing and emissions calculations
 
 ## Update constants as variables 
@@ -763,33 +784,27 @@ if 'minimum_value_input_CO_nonaq' not in st.session_state:
 if 'maximum_value_input_CO_nonaq' not in st.session_state:
     st.session_state.maximum_value_input_CO_nonaq = str(1500)
 
-with st.sidebar:
-    st.subheader('Electrolyte')
-    ######## SOLVENT SELECTION
-    # Choose a solvent
-    solvent_name = st.radio(label = 'Non-aqueous catholyte solvent', options= ['DMF', 'DMSO', 'Acetonitrile', 'Propylene carbonate',], 
-                    index = 0, # default option
-                    label_visibility='collapsed',
-                    help = '''Choose the non-aqueous catholyte. The cell is a flow cell.
-                      \n Default solvent: DMF'''
-    )
-
-    st.subheader('Supporting electrolyte')
-    ######## SOLVENT SELECTION
-    # Choose a solvent
-    supporting_electrolyte_name = st.radio(label = 'Non-aqueous catholyte supporting electrolyte', options= ['TEACl', 'TBAClO$_4$', 'TEAClO$_4$', 'TBABF$_4$'], 
-                    index = 0, # default option
-                    label_visibility='collapsed',
-                    help = '''Choose the non-aqueous catholyte. The cell is a flow cell.
-                      \n Default supporting electrolyte: TEACl'''
-    )
-
 ########## OTHER FIXED VALUES
 # PRODUCT COSTS
 product_cost_USD_kgprod = df_products.loc[product_name, 'Cost ($/kg product)']
 default_product_cost_USD_kgprod = product_cost_USD_kgprod
 H2_cost_USD_kgH2 = float(df_products.loc['H2', 'Cost ($/kg product)']) # assume H2 is not sold
 default_H2_cost_USD_kgH2 = H2_cost_USD_kgH2
+electrolyte_cost_USD_kg = df_supporting.loc[supporting_electrolyte_name, 'Cost ($/kg supporting)']
+default_electrolyte_cost_USD_kg = electricity_cost_USD_kWh
+solvent_cost_USD_kg = df_solvents.loc[solvent_name, 'Cost ($/kg solvent)']
+default_solvent_cost_USD_kg = solvent_cost_USD_kg
+
+## SOLVENT
+MW_solvent =  df_solvents.loc[solvent_name, 'Molecular weight (g/mol)']
+electrolyte_density_kg_m3 = df_solvents.loc[solvent_name, 'Density (kg/m3)']
+viscosity_cP = df_solvents.loc[solvent_name, 'Viscosity (cP)']
+CO2_solubility_mol_mol = df_solvents.loc[solvent_name, 'CO2 solubility, 10 bar (mol CO2/ mol solvent)']
+solvent_loss_fraction = df_solvents.loc[solvent_name, 'Solvent loss fraction ((mol/s offgas)/ (mol/s solvent))']
+
+## SUPPORTING ELECTROLYTE
+MW_supporting =  df_supporting.loc[supporting_electrolyte_name, 'Molecular weight (g/mol)']
+kappa_electrolyte_S_cm = df_supporting.loc[supporting_electrolyte_name, 'Conductivity in ACN, 0.3 M (S/cm)'] * df_solvents.loc[solvent_name, 'Conductivity factor relative to ACN']
 
 # RAW INPUTS
 crossover_ratio = crossover_acid
@@ -806,6 +821,8 @@ BV_eta_an_V = 0.25
 default_BV_eta_an_V = BV_eta_an_V
 FE_CO2R_0 = df_products.loc[product_name, 'FECO2R at SPC = 0']
 default_FE_CO2R_0  = FE_CO2R_0
+FE_product_specified = df_products.loc[product_name, 'FECO2R at SPC = 0']
+default_FE_product_specified = FE_product_specified
 SPC = df_products.loc[product_name, 'Chosen SPC, no tradeoff']  #0.3 # 0.5 # %/100
 default_SPC = SPC
 cat_Tafel_slope = df_products.loc[product_name, 'Tafel slope (mV/dec)']
