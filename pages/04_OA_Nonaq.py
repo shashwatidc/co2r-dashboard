@@ -131,6 +131,11 @@ def cached_single_run_nonaq(product_name,
                 exponent,
                 scaling,
 
+                is_additional_capex,
+                additional_capex_USD,
+                is_additional_opex,  
+                additional_opex_USD_kg,
+
                 MW_CO2,
                 MW_H2O,
                 MW_O2,
@@ -215,10 +220,15 @@ def cached_single_run_nonaq(product_name,
                 exponent = exponent,
                 scaling = scaling,
 
+                is_additional_capex = is_additional_capex,
+                additional_capex_USD = additional_capex_USD,
+                is_additional_opex = is_additional_opex,  
+                additional_opex_USD_kg = additional_opex_USD_kg,
+
                 MW_CO2 = MW_CO2,
                 MW_H2O = MW_H2O,
                 MW_O2 = MW_O2,
-                MW_MX = MW_K2CO3,
+                MW_MX = MW_MX,
                 MW_solvent = MW_solvent,
                 MW_supporting = MW_supporting,
                 R = R, 
@@ -400,7 +410,7 @@ def default_single_run_nonaq(product_name,
                 MW_CO2 = MW_CO2,
                 MW_H2O = MW_H2O,
                 MW_O2 = MW_O2,
-                MW_MX = MW_K2CO3,
+                MW_MX = MW_MX,
                 MW_solvent = MW_solvent,
                 MW_supporting = MW_supporting,
                 R = R, 
@@ -1699,8 +1709,9 @@ else:
 # ### Generate physical and costing model
 if not np.isnan(FE_product_checked): 
     df_capex_BM, df_capex_totals, df_costing_assumptions, df_depreciation, df_electrolyzer_assumptions, df_electrolyzer_streams_mol_s,\
-            df_energy, df_feedstocks, df_general, df_maintenance, df_operations, df_opex, df_opex_totals, df_outlet_assumptions,\
-            df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities = cached_single_run_nonaq(product_name = product_name,
+            df_energy, df_feedstocks, df_general, df_maintenance, df_replacement, df_operations, df_opex, df_opex_totals, df_outlet_assumptions,\
+            df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities, df_cashflows, \
+            cashflows, NPV, IRR, breakeven_price_USD_kgprod = cached_single_run_nonaq(product_name = product_name,
                 solvent_name = solvent_name,
                 supporting_electrolyte_name = supporting_electrolyte_name,
                 df_products = df_products,
