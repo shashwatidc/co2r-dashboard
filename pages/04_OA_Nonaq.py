@@ -691,7 +691,7 @@ def import_data(file_imports):
     df_supporting.set_index('Supporting electrolyte', drop = True, inplace = True) # reset index to product name
     xlsx.close() # close xlsx file
 
-    return(df_constants, df_products, df_utility_imports)
+    return(df_constants, df_products, df_utility_imports, df_solvents, df_supporting)
 
 df_constants, df_products, df_utility_imports, df_solvents, df_supporting = import_data(file_imports)
 
@@ -781,26 +781,44 @@ additional_capex_USD = 0.0
 additional_opex_USD_kg = 0.0
 
 ##### CHOICE OF x-AXIS VARIABLE
-options_list  = ['Cell voltage (V)', 
-                'Cathodic overpotential (V)',
-                'Anodic overpotential (V)',
-                'Membrane resistance ($\Omega$.cm$^2$)',
-                'Total current density (mA/cm$^2$)',
-                '$FE_{CO_2R, \: 0}$',
-                'Single-pass conversion',
-                'Crossover ratio (mol CO$_2$ per mol e$^-$)',
-                'Production rate (kg/day)',
-                'Capacity factor',
-                'Lifetime (yrs)',
-                'Stack lifetime (yrs)',
-                'Separation efficiency',
-                'Electricity cost ($/kWh)',
-                'CO$_2$ cost ($/t)',
-                'H$_2$ cost ($/kg)',
-                'Water cost ($/kg)',
-                'Electrolyzer capex (\$/m$^2$)',
-                # 'Renewables capacity factor'
-                ] # Order must exactly match df_flags
+options_list  = ['Cell voltage (V)',
+        'Cathodic overpotential (V)', 
+        'Cathodic Tafel slope (mV/dec)', 
+        'Anodic overpotential (V)', 
+        'Membrane specific resistance ($\Omega$.cm$^2$)',
+        'Electrolyte conductivity (S/cm)', 
+        'Electrolyte thickness (cm)',
+        # 'Catholyte concentration (M)',
+        # 'CO$_2$ solubility at 10 bar, GASP (mol CO$_2$/mol solvent)', 
+        'Solvent loss fraction (mol offgas/mol solvent)',  
+        # 'Solvent viscosity (cP)',
+        
+        'Total current density (mA/cm$^2$)',
+        'FE$_{{{} , specified}}$'.format(product_name), 
+        # 'FE$_{CO_2R,0}$',
+        'Single-pass conversion',
+        'Crossover ratio (mol CO$_2$ per mol e$^-$)',
+        
+        'Production rate (kg/day)',
+        'Capacity factor' ,
+        'Lifetime (yrs)' ,
+        'Stack lifetime (yrs)' ,
+        'Excess solvent ratio (mol solvent/ mol product)' ,
+        'PSA second-law separation efficiency',
+        'Liquid second-law separation efficiency',
+        
+        'Electricity cost ($/kWh)' ,
+        'CO$_2$ cost (\$/t CO$_2$)'  ,
+        'H$_2$ cost (\$/t H$_2$)'  , 
+        'Water cost ($/kg)' ,
+        '{} cost ($/kg)'.format(solvent_name)  ,
+        '{} cost ($/kg)'.format(supporting_electrolyte_name) ,
+        'Electrolyzer capital cost (\$/m$^2$)',
+        'PSA capital cost (\$/1000 m$^3_{{gas}}$/hr)', 
+        'Liquid separation capital cost (\$/1000 mol$_{{inlet}}$/hr)', 
+        # 'Grid CO$_2$ intensity', 
+        # 'Renewables capacity factor' , 
+ ] # Order must exactly match df_flags
 
 middle_column, right_column = st.columns(2, gap = 'large')
 st.sidebar.header('x-axis variable' )
@@ -810,43 +828,57 @@ right_column.header('_')
 # Cache creation of flags dataframe
 @st.cache_data(ttl = "1h")
 def flags(product_name):
-    # Create flags for selecting variable
-    dict_flags = {   # Formatted as 'override_parameter': 'parameter name', 'unit', 'variable name', 'default value', 'minimum value', 'maximum value', 
-        'override_cell_voltage': [ 'Cell voltage', 'V', 'cell_E_V',                                   cell_E_V, 1.34, 5 ],
-        'override_eta_cat': ['Cathodic overpotential', 'V', 'BV_eta_cat_V',                          BV_eta_cat_V, 0, -2.5],
-        'override_eta_an': ['Anodic overpotential', 'V', 'BV_eta_an_V',                              BV_eta_an_V, 0, 2.5 ],
-        'override_ohmic' : ['Specific resistance', '$\Omega$.cm$^2$', 'R_ohmcm2',               R_ohmcm2, 0, 25],
+# Create flags for selecting variable
+    dict_flags = {   # Formatted as 'override_parameter': 'parameter name', 'unit', 'variable name', 'default value', 'minimum value', 'maximum value'
+            'override_cell_voltage':[ 'Cell voltage', 'V', 'cell_E_V',                                             cell_E_V,                          1.34, 15 ],
+            'override_eta_cat': ['Cathodic overpotential', 'V', 'BV_eta_cat_V',                                    BV_eta_cat_V,                      0, -6],
+            'override_Tafel'  : ['Cathodic Tafel slope', 'mV/dec', 'cat_Tafel_slope',                              df_products.loc[product_name, 'Tafel slope (mV/dec)'],               -50, -250 ] ,
+            'override_eta_an': ['Anodic overpotential', 'V', 'BV_eta_an_V',                                        BV_eta_an_V,                       0, 3 ],
+            'override_ohmic' : ['Membrane specific resistance', '$\Omega$.cm$^2$', 'R_membrane_ohmcm2',            R_membrane_ohmcm2,                 0, 25],
+            'override_electrolyte_conductivity' : ['Electrolyte conductivity', 'S/cm', 'kappa_electrolyte_S_cm',   df_supporting.loc[supporting_electrolyte_name, 'Conductivity in ACN, 0.3 M (S/cm)'] * df_solvents.loc[solvent_name, 'Conductivity factor relative to ACN'],  
+                                                                                                                                                    0.0001, 0.1],
+            'override_electrolye_thickness' : ['Electrolyte thickness', 'cm', 'electrolyte_thickness_cm',          electrolyte_thickness_cm,          0, 0.5],
+            # 'override_catholyte_M': ['Catholyte concentration', 'M', 'catholyte_conc_M',                           catholyte_conc_M,                  1e-6, 10 ] ,
+            # 'override_CO2_solubility' : ['CO$_2$ solubility, 10 bar', 'mol CO$_2$/mol solvent', 'CO2_solubility_mol_mol', CO2_solubility_mol_mol,     0, 1],
+            'override_solvent_loss': ['Solvent loss fraction', 'mol offgas/mol solvent', 'solvent_loss_fraction', solvent_loss_fraction,     0, 1e-3 ], 
+            # 'override_viscosity' : ['Solvent viscosity', 'cP', 'viscosity_cP',                                   viscosity_cP,                      0, 1.5],    # TODO
+            
+            'override_j': ['Current density', 'mA/cm$^2$', 'j_total_mA_cm2',                                       df_products.loc[product_name, 'Chosen total current density (mA/cm2)'], 25, 600],
+            'override_FE_specified': ['FE$_{{{} , specified}}$'.format(product_name), '', 'FE_product_specified',  df_products.loc[product_name, 'FECO2R at SPC = 0'],                  1e-3, 1 ],
+            # 'override_FE_CO2R_0': ['FE$_{CO_2R,0}$', '', 'FE_CO2R_0',                                            df_products.loc[product_name, 'FECO2R at SPC = 0'],                  1e-3, 1 ],
+            'override_SPC':['Single-pass conversion', '', 'SPC',                                                   df_products.loc[product_name, 'Chosen SPC, no tradeoff'],            1e-4, 1],
+            'override_crossover': ['Crossover', 'mol CO$_2$ per mol e$^-$', 'crossover_ratio',                     crossover_ratio,                    1e-4, 0.5],
+            
+            'override_rate': ['{} production rate'.format(product_name), 'kg/day', 'product_rate_kg_day',          product_rate_kg_day,                1e3, 1.25e6],
+            'override_capacity': ['Capacity factor' , '', 'capacity_factor',                                       capacity_factor,                    1e-4, 1 ],
+            'override_lifetime': ['Plant lifetime' , 'years', 'lifetime_years',                                    lifetime_years,                     1e-3, 50],
+            'override_stack_lifetime': ['Stack lifetime' , 'years', 'stack_lifetime_years',                        stack_lifetime_years,               1e-3, 30],
+            'override_solvent_ratio': ['Excess solvent ratio' , 'mol solvent/ mol product', 'excess_solvent_ratio', excess_solvent_ratio,               1e-3, 2500],
+            'override_gas_separation': ['PSA second-law separation efficiency', '', 'PSA_second_law_efficiency',   PSA_second_law_efficiency,          0.01, 0.5],
+            'override_liq_separation': ['Liquid second-law separation efficiency', '', 'LL_second_law_efficiency', LL_second_law_efficiency,           0.01, 0.5],
+            
+            'override_electricity_cost': [ 'Electricity cost' , '$/kWh', 'electricity_cost_USD_kWh',               electricity_cost_USD_kWh,           0, 0.1 ],
+            'override_CO2_cost': ['CO$_2$ cost'  , '\$/t CO$_2$', 'CO2_cost_USD_tCO2',                             CO2_cost_USD_tCO2,                  0, 200],
+            'override_H2_cost': ['H$_2$ cost'  , '\$/kg H$_2$', 'H2_cost_USD_kgH2',                                H2_cost_USD_kgH2,                   0, 10],
+            'override_water_cost': ['Water cost' , '\$/kg', 'water_cost_USD_kg',                                   water_cost_USD_kg,                  0, 0.30],
+            'override_solvent_cost': ['{} cost'.format(solvent_name)  , '\$/kg', 'solvent_cost_USD_kg',            solvent_cost_USD_kg,                0, 10],
+            'override_supporting_cost': ['{} cost'.format(supporting_electrolyte_name) , '\$/kg', 'electrolyte_cost_USD_kg', electrolyte_cost_USD_kg,  0, 2500],
+            'override_electrolyzer_capex': ['Electrolyzer capital cost' , '\$/m$^2$', 'electrolyzer_capex_USD_m2', electrolyzer_capex_USD_m2,          3000, 10000],
+            'override_PSA_capex': ['PSA capital cost', '\$/1000 m$^3_{{gas}}$/hr', 'PSA_capex_USD_1000m3_hr', PSA_capex_USD_1000m3_hr,                 1e5, 10e6],
+            'override_LL_capex': ['Liquid separation capital cost', '\$/1000 mol$_{{inlet}}$/hr', 'LL_capex_USD_1000mol_hr', LL_capex_USD_1000mol_hr,10000, 100000],
 
-        'override_j': ['Current density', 'mA/cm$^2$', 'j_total_mA_cm2',                             df_products.loc[product_name, 'Optimal j @ 8.2 c/kWh, Hawks model'], 25, 1275],
-        # 'override_FE': ['FE$_{{{}}}$'.format(product_name), '', 'FE_product_specified',              df_products.loc[product_name, 'FECO2R at SPC = 0'], 1e-3, 1 ],
-        'override_FE_CO2R_0': ['FE$_{CO_2R,0}$', '', 'FE_CO2R_0',                                    df_products.loc[product_name, 'FECO2R at SPC = 0'], 1e-3, 1 ],
-        'override_SPC':['Single-pass conversion' , '', 'SPC',                                        df_products.loc[product_name, 'Optimal SPC @ 8.2 c/kWh, Hawks model'], 1e-4, 0.5],
-        'override_crossover': ['Crossover' , 'mol CO$_2$ per mol e$^-$', 'crossover_ratio',          crossover_ratio, 1e-4, 0.5],
-        
-        'override_rate': ['{} production rate'.format(product_name), 'kg/day', 'product_rate_kg_day', product_rate_kg_day, 1e-3, 1.25e6],
-        'override_capacity': ['Capacity factor' , '', 'capacity_factor',                             capacity_factor, 1e-4, 1 ],
-        'override_lifetime': ['Plant lifetime' , 'years', 'lifetime_years',                          lifetime_years, 1e-3, 50],
-        'override_stack_lifetime': ['Stack lifetime' , 'years', 'stack_lifetime_years',              stack_lifetime_years, 1e-3, 30],
-        'override_separation': ['Second-law separation efficiency', '', 'PSA_second_law_efficiency',   PSA_second_law_efficiency, 0.01, 0.1],
-        
-        'override_electricity_cost':[ 'Electricity cost' , '$/kWh', 'electricity_cost_USD_kWh',      electricity_cost_USD_kWh, 0, 0.1 ],
-        'override_CO2_cost': ['CO$_2$ cost'  , '\$/t CO$_2$', 'CO2_cost_USD_tCO2',                   CO2_cost_USD_tCO2, 0, 200],
-        'override_H2_cost': ['H$_2$ cost'  , '\$/kg H$_2$', 'H2_cost_USD_kgH2',                   H2_cost_USD_kgH2, 0, 10],
-        'override_water_cost': ['Water cost' , '\$/kg', 'water_cost_USD_kg',                      water_cost_USD_kg, 0, 0.30],
-        'override_electrolyzer_capex': ['Electrolyzer capital cost' , '\$/m$^2$', 'electrolyzer_capex_USD_m2', electrolyzer_capex_USD_m2, 3000, 10000],
-        'override_carbon_intensity': ['Grid CO$_2$ intensity', 'kg CO$_2$/kWh', 'electricity_emissions_kgCO2_kWh',electricity_emissions_kgCO2_kWh, 0, 0.5],
-        
-        # 'override_battery_capacity': ['Renewables capacity factor' , '', 'avbl_renewables',        avbl_renewables, 1e-4, 1 ],
-        }
-    # Note that percentages here are expressed directly as decimals. E.g. entering 0.01 above for default FE will result in default FE = 1%
+            # 'override_carbon_intensity': ['Grid CO$_2$ intensity', 'kg CO$_2$/kWh', 'electricity_emissions_kgCO2_kWh',electricity_emissions_kgCO2_kWh, 0, 0.5],
+
+            # 'override_battery_capacity': ['Renewables capacity factor' , '', 'avbl_renewables',                    avbl_renewables,                    1e-4, 1 ],
+            }
+        # Note that percentages here are expressed directly as decimals. E.g. entering 0.01 above for default FE will result in default FE = 1%
 
     df_flags = pd.DataFrame(dict_flags).T
     df_flags.reset_index(inplace = True, drop = False)
     df_flags.set_index(0, inplace = True, drop = True) # Set independent variable name as index
     df_flags.index.name = 'Independent variable'
     df_flags.columns = ['Old flag name', 'Unit', 'Python variable', 'Default value', 'Range min', 'Range max']
-    
-    # Clear flags
+
     df_flags['T/F?'] = False # add column for truth value of given override
     return df_flags
 
