@@ -13,6 +13,8 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from scipy import optimize
+from ProcessEconomics import *
+
 
 # %% [markdown]
 # ### 0.1 Imports and styling

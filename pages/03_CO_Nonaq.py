@@ -52,6 +52,7 @@ from io import StringIO
 # from testerscript import single_run
 
 from ElectrolyzerModel import *
+from DownstreamProcessModel import *
 from ProcessEconomics import *
 from NonAqElectrolyzerModel import *
 from NonAqDownstreamProcessModel import *

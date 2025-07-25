@@ -9,6 +9,7 @@ import streamlit as st
 
 # Duplicate functions wherever possible
 from ElectrolyzerModel import *
+from DownstreamProcessModel import *
 from ProcessEconomics import *
 from NonAqElectrolyzerModel import *
 from NonAqDownstreamProcessModel import *
