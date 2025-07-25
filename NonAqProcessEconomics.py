@@ -112,6 +112,8 @@ def nonaq_capex(
     catholyte_conc_M,
     battery_capacity,
     kJ_per_kWh,
+    is_additional_capex,
+    additional_capex_USD
 ):
     """
     Calculate unit (bare-module) capital costs, and cumulative capital costs mostly according to the method of Seider, Lewin et. al.
@@ -190,7 +192,11 @@ def nonaq_capex(
                 df_capex_BM.loc['GASP - (COOH)$_2$/Catholyte', 'Cost ($)'] = 800/444.2 * 1.3 * 1.24 * 950000 * (CO2_GASP_kg_hr/2160)**0.7 # relative to 1000 mol solvent/hr, 1.3 factor for stainless steel             
                 
                 print('Costing L/L separation as GASP, {} molCO2/hr'.format(CO2_GASP_mol_hr))
-
+    
+    if is_additional_capex:
+        df_capex_BM.loc['Additional', 'Cost ($)'] = additional_capex_USD
+        df_capex_BM.loc['Additional', 'Description'] = 'User input'
+    
     # Create dataframe for capex summary
     df_capex_totals = pd.DataFrame(dict_capex_BM, columns = ['Capex summary', 'Stage', 
                                                          'Description', 'Cost ($)'])
@@ -396,7 +402,9 @@ def nonaq_opex_seider(df_feedstocks,
         lifetime_years,
         capacity_factor,
         product_name,
-        product_rate_kg_day
+        product_rate_kg_day,
+        is_additional_opex,
+        additional_opex_USD_kg
         ):
     """
     Calculates operating costs, mostly according to Seider, Lewin et. al.
@@ -427,6 +435,8 @@ def nonaq_opex_seider(df_feedstocks,
     df_opex.loc['Property taxes and insurance'] =  df_taxes.loc['Total', 'Cost ($/yr)']
     # df_opex.loc['Depreciation'] = df_depreciation.loc['Total', 'Cost ($/yr)']
     df_opex.loc['General expenses'] =  df_general.loc['Total', 'Cost ($/yr)']
+    if is_additional_opex:
+        df_opex.loc['Additional operating cost'] =  additional_opex_USD_kg/(product_rate_kg_day*365*capacity_factor)
 
     if np.isclose(df_utilities.loc['Total', 'Cost ($/kg {})'.format(product_name)], 0.00): # if process does not exist (NaNs in FE/SPC for instance)
         df_opex['Cost ($/yr)'] = np.NaN
@@ -461,7 +471,9 @@ def nonaq_opex_sinnott(C_ISBL, # currently C_TBM
                  lifetime_years,
                  capacity_factor,
                  product_name,
-                 product_rate_kg_day
+                 product_rate_kg_day,
+                 is_additional_opex,
+                 additional_opex_USD_kg
                  ):
     """
     Calculates operating costs, mostly according to Sinnott and Towler.
@@ -518,6 +530,10 @@ def nonaq_opex_sinnott(C_ISBL, # currently C_TBM
     
     # df_opex.loc['Depreciation', 'Cost ($/yr)'] = df_depreciation.loc['Total', 'Cost ($/yr)']
     # df_opex.loc['Depreciation', 'Description'] = 'See Depreciation - used Seider book'
+
+    if is_additional_opex:
+        df_opex.loc['Additional', 'Cost ($/yr)'] =  additional_opex_USD_kg * (product_rate_kg_day*365*capacity_factor)
+        df_opex.loc['Additional', 'Description'] =  '${}/kg {}'.format(additional_opex_USD_kg, product_name)
 
     if np.isclose(C_ISBL, 0.00): # if process does not exist (NaNs in FE/SPC for instance)
         df_opex['Cost ($/yr)'] = np.NaN
