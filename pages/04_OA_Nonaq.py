@@ -758,7 +758,7 @@ with st.sidebar:
     st.subheader('Supporting electrolyte')
     ######## SOLVENT SELECTION
     # Choose a solvent
-    solvent_name = st.radio(label = 'Non-aqueous catholyte supporting electrolyte', options= ['TEACl', 'TBAClO$_4$', 'TEAClO$_4$', 'TBABF$_4$'], 
+    supporting_electrolyte_name = st.radio(label = 'Non-aqueous catholyte supporting electrolyte', options= ['TEACl', 'TBAClO$_4$', 'TEAClO$_4$', 'TBABF$_4$'], 
                     index = 0, # default option
                     label_visibility='collapsed',
                     help = '''Choose the non-aqueous catholyte. The cell is a flow cell.
