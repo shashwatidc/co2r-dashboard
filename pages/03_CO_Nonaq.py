@@ -1480,7 +1480,7 @@ else:
 if not np.isnan(FE_product_checked): 
     df_capex_BM, df_capex_totals, df_costing_assumptions, df_depreciation, df_electrolyzer_assumptions, df_electrolyzer_streams_mol_s,\
             df_energy, df_feedstocks, df_general, df_maintenance, df_operations, df_opex, df_opex_totals, df_outlet_assumptions,\
-            df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities = cached_single_run(product_name = product_name, 
+            df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities = cached_single_run_nonaq(product_name = product_name, 
                         product_rate_kg_day = product_rate_kg_day, 
                         df_products = df_products, FE_CO2R_0 = FE_CO2R_0, 
                         FE_product_specified = FE_product_specified, 
@@ -1869,7 +1869,7 @@ with middle_column:
             ### Generate physical and costing model
             df_capex_BM, df_capex_totals, df_costing_assumptions, df_depreciation, df_electrolyzer_assumptions, df_electrolyzer_streams_mol_s,\
                 df_energy, df_feedstocks, df_general, df_maintenance, df_operations, df_opex, df_opex_totals, df_outlet_assumptions,\
-                df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities = cached_single_run(product_name = product_name, 
+                df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities = cached_single_run_nonaq(product_name = product_name, 
                                                                             product_rate_kg_day = product_rate_kg_day, 
                                                                             df_products = df_products, FE_CO2R_0 = FE_CO2R_0, 
                                                                             FE_product_specified = FE_product_specified, 
