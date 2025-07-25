@@ -870,63 +870,91 @@ st.sidebar.header('Model inputs' )
 with st.sidebar:
     st.subheader('Cell potential model')
     with st.expander(label = '**Simplified Butler-Volmer model assumptions**', expanded = False):
-    #     override_cell_voltage = st.checkbox('Manually specify full-cell voltage', value = False)
-    #     cell_E_V = st.slider(label = 'Cell voltage',
-    #                         min_value = 0.001, 
-    #                         max_value = 10.0, 
-    #                         step = 0.1, value = cell_E_V,
-    #                         format = '%.1f',
-    #                 help = '''Check the box above to set the full-cell voltage. No underlying voltage model will be used. 
-    #                 This means that current and voltage have no physical relationship.
-    #                   \n Default cell voltage: {} V'''.format(default_cell_E_V),
-    #                 disabled = not override_cell_voltage)
-    #     if override_cell_voltage:
-    #         st.write('*Using specified cell voltage*')
-    #     else:
-    #         st.write('*Modeling cell voltage from simplified Butler-Volmer model*')
-    #         override_eta_cat = st.checkbox('Specify cathode (CO$_2$R) overpotential', value = False)
-    #         BV_eta_cat_V = st.slider(label = 'Cathodic overpotential (V)',
-    #                         min_value = -10.0, 
-    #                         max_value = 0.0, 
-    #                         step = 0.1, value = BV_eta_cat_V,
-    #                         format = '%.1f',
-    #                         disabled = not override_eta_cat,
-    #                         help = '''Check the box above to set the cathodic overpotential. 
-    #                         Thermodynamics, cell resistance and anodic overpotential will be modeled. 
-    #                         Note that more negative overpotentials indicate slower kinetics.
-    #                           \n Default cathodic overpotential: {} V'''.format(default_BV_eta_cat_V),)
-    #         if override_eta_cat:
-    #             st.write('*Using manually specified cathodic overpotential*')
-    #         else:
-    #             st.write('*Modeling cathodic overpotential from Tafel slope, {:.0f} mV/dec*'.format(cat_Tafel_slope))
+        override_cell_voltage = st.checkbox('Manually specify full-cell voltage', value = False)
+        cell_E_V = st.slider(label = 'Cell voltage',
+                            min_value = 0.001, 
+                            max_value = 10.0, 
+                            step = 0.1, value = cell_E_V,
+                            format = '%.1f',
+                    help = '''Check the box above to set the full-cell voltage. No underlying voltage model will be used. 
+                    This means that current and voltage have no physical relationship.
+                      \n Default cell voltage: {} V'''.format(default_cell_E_V),
+                    disabled = not override_cell_voltage)
+        if override_cell_voltage:
+            st.write('*Using specified cell voltage*')
+        else:
+            st.write('*Modeling cell voltage from simplified Butler-Volmer model*')
+            override_eta_cat = st.checkbox('Specify cathode (CO$_2$R) overpotential', value = False)
+            BV_eta_cat_V = st.slider(label = 'Cathodic overpotential (V)',
+                            min_value = -10.0, 
+                            max_value = 0.0, 
+                            step = 0.1, value = BV_eta_cat_V,
+                            format = '%.1f',
+                            disabled = not override_eta_cat,
+                            help = '''Check the box above to set the cathodic overpotential. 
+                            Thermodynamics, cell resistance and anodic overpotential will be modeled. 
+                            Note that more negative overpotentials indicate slower kinetics.
+                              \n Default cathodic overpotential: {} V'''.format(default_BV_eta_cat_V),)
+            if override_eta_cat:
+                st.write('*Using manually specified cathodic overpotential*')
+            else:
+                st.write('*Modeling cathodic overpotential from Tafel slope, {:.0f} mV/dec*'.format(cat_Tafel_slope))
 
-    #         override_eta_an = st.checkbox('Specify anode (oxidation reaction) overpotential', value = False)
-    #         BV_eta_an_V = st.slider(label = 'Anodic overpotential (V)',
-    #                         min_value = 0.0, 
-    #                         max_value = 10.0, 
-    #                         step = 0.1, value = BV_eta_an_V,
-    #                         format = '%.1f',
-    #                         disabled = not override_eta_an,
-    #                         help = '''Check the box above to set the anodic overpotential. Thermodynamics, cell resistance and cathodic overpotential will be modeled. 
-    #                           \n Default anodic overpotential: {} V'''.format(default_BV_eta_an_V),) 
-    #         if override_eta_an:
-    #             st.write('*Using manually specified anodic overpotential*')
-    #         else:
-    #             st.write('*Modeling anodic overpotential from Tafel slope, {:.0f} mV/dec*'.format(an_Tafel_slope))
+            override_eta_an = st.checkbox('Specify anode (oxidation reaction) overpotential', value = False)
+            BV_eta_an_V = st.slider(label = 'Anodic overpotential (V)',
+                            min_value = 0.0, 
+                            max_value = 10.0, 
+                            step = 0.1, value = BV_eta_an_V,
+                            format = '%.1f',
+                            disabled = not override_eta_an,
+                            help = '''Check the box above to set the anodic overpotential. Thermodynamics, cell resistance and cathodic overpotential will be modeled. 
+                              \n Default anodic overpotential: {} V'''.format(default_BV_eta_an_V),) 
+            if override_eta_an:
+                st.write('*Using manually specified anodic overpotential*')
+            else:
+                st.write('*Modeling anodic overpotential from Tafel slope, {:.0f} mV/dec*'.format(an_Tafel_slope))
             
-            override_ohmic = st.checkbox('Specify full-cell area-specific resistance', value = False)
-            R_ohmcm2 = st.slider(label = 'Area-specific resistance ($ \Omega \cdot$ cm$^2$)',
+            override_membrane_ohmic = st.checkbox('Specify membrane area-specific resistance', value = False)
+            R_membrane_ohmcm2 = st.slider(label = 'Area-specific resistance ($ \Omega \cdot$ cm$^2$)',
                             min_value = 0.0, 
                             max_value = 25.0, 
-                            step = 0.1, value = R_ohmcm2,
+                            step = 0.1, value = R_membrane_ohmcm2,
                             format = '%.2f',
-                            disabled= not override_ohmic,
-                            help = '''Check the box above to set the area-specific ohmic resistance of the cell. Thermodynamics and kinetic overpotentials will be modeled. 
-                              \n Default specific resistance: {} $ \Omega \cdot$ cm$^2$'''.format(default_R_ohmcm2),)
-            if override_ohmic:
-                st.write('*Using manually specified cell specific resistance*')
+                            disabled= not override_membrane_ohmic,
+                            help = '''Check the box above to set the area-specific ohmic resistance of the membrane. Thermodynamics and kinetic overpotentials will be modeled. 
+                              \n Default specific resistance: {} $ \Omega \cdot$ cm$^2$'''.format(default_R_membrane_ohmcm2),)
+            if override_membrane_ohmic:
+                st.write('*Using manually specified membrane specific resistance*')
             else:
-                st.write('*Using default cell resistance for anion exchange membrane electrode assembly, {} $ \Omega \cdot$ cm$^2$*'.format(R_ohmcm2))
+                st.write('*Using default membrane resistance for Nafion, {} $ \Omega \cdot$ cm$^2$*'.format(R_membrane_ohmcm2))
+            
+            override_electrolyte = st.checkbox('Specify catholyte conductivity', value = False)
+            kappa_electrolyte_S_cm = st.slider(label = 'Catholyte conductivity (S/$ cm$^2$)',
+                            min_value = 0.0, 
+                            max_value = 1.0, 
+                            step = 0.01, value = kappa_electrolyte_S_cm,
+                            format = '%.2f',
+                            disabled= not override_electrolyte,
+                            help = '''Check the box above to set the conductivity of the electrolyte. Thermodynamics and kinetic overpotentials will be modeled. 
+                              \n Default specific resistance: {} S/cm$^2$'''.format(default_kappa_electrolyte_S_cm),)
+            if override_electrolyte:
+                st.write('*Using manually specified electrolyte conductivity*')
+            else:
+                st.write('*Using default electrolyte conductivity, {} S/cm$^2$*'.format(kappa_electrolyte_S_cm))
+            
+            override_electrolyte_thickness = st.checkbox('Specify catholyte thickness', value = False)
+            electrolyte_thickness_cm = st.slider(label = 'Catholyte thickness (cm$^2$)',
+                            min_value = 0.0, 
+                            max_value = 1.0, 
+                            step = 0.01, value = electrolyte_thickness_cm,
+                            format = '%.2f',
+                            disabled= not override_electrolyte_thickness,
+                            help = '''Check the box above to set the width of the catholyte chamber. Thermodynamics and kinetic overpotentials will be modeled. 
+                              \n Default specific resistance: {} cm$^2$'''.format(default_electrolyte_thickness_cm),)
+            if override_electrolyte_thickness:
+                st.write('*Using manually specified electrolyte thickness*')
+            else:
+                st.write('*Using default electrolyte thickness, {} S/cm$^2$*'.format(electrolyte_thickness_cm))
 
 with st.sidebar:
     st.subheader('Electrolyzer operation')
@@ -1658,41 +1686,93 @@ else:
 if not np.isnan(FE_product_checked): 
     df_capex_BM, df_capex_totals, df_costing_assumptions, df_depreciation, df_electrolyzer_assumptions, df_electrolyzer_streams_mol_s,\
             df_energy, df_feedstocks, df_general, df_maintenance, df_operations, df_opex, df_opex_totals, df_outlet_assumptions,\
-            df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities = cached_single_run_nonaq(product_name = product_name, 
-                        product_rate_kg_day = product_rate_kg_day, 
-                        df_products = df_products, FE_CO2R_0 = FE_CO2R_0, 
-                        FE_product_specified = FE_product_specified, 
-                        j_total_mA_cm2 = j_total_mA_cm2,SPC = SPC, 
-                        crossover_ratio = crossover_ratio, model_FE = model_FE,  
-                        is_additional_opex = is_additional_opex,
-                        is_additional_capex = is_additional_capex,
-                        additional_opex_USD_kg = additional_opex_USD_kg,
-                        additional_capex_USD = additional_capex_USD,
-                        overridden_vbl = overridden_vbl, overridden_value = overridden_value, overridden_unit = overridden_unit, 
-                        override_optimization =  override_optimization, P = P, T_streams = T_streams, 
-                        R_ohmcm2 = R_ohmcm2, an_E_eqm = an_E_eqm,MW_CO2 = MW_CO2, 
-                        MW_H2O = MW_H2O, MW_O2 = MW_O2,  MW_MX = MW_K2CO3,
-                        cathode_outlet_humidity = cathode_outlet_humidity,
-                        excess_water_ratio = excess_water_ratio,
-                        an_eta_ref = an_eta_ref, 
-                        an_Tafel_slope = an_Tafel_slope, 
-                        an_j_ref = an_j_ref, 
-                        electricity_emissions_kgCO2_kWh = electricity_emissions_kgCO2_kWh,
-                        heat_emissions_kgCO2_kWh = heat_emissions_kgCO2_kWh,
-                        electrolyte_conc = electrolyte_conc, 
-                        density_kgm3 = density_kgm3,
-                        PSA_second_law_efficiency = PSA_second_law_efficiency, 
-                        T_sep = T_sep, electricity_cost_USD_kWh = electricity_cost_USD_kWh, 
-                        heat_cost_USD_kWh = heat_cost_USD_kWh,product_cost_USD_kgprod = product_cost_USD_kgprod,
-                        H2_cost_USD_kgH2 = H2_cost_USD_kgH2,water_cost_USD_kg = water_cost_USD_kg,
-                        CO2_cost_USD_tCO2 = CO2_cost_USD_tCO2,lifetime_years = lifetime_years,
-                        stack_lifetime_years = stack_lifetime_years,
-                        electrolyzer_capex_USD_m2 = electrolyzer_capex_USD_m2,
-                        capacity_factor = capacity_factor,battery_capex_USD_kWh = battery_capex_USD_kWh,               
-                        battery_capacity = battery_capacity, exponent=exponent, scaling=scaling,
-                        carbon_capture_efficiency = carbon_capture_efficiency,
-                        R = R,
-                        F = F)
+            df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities = cached_single_run_nonaq(product_name = product_name,
+                solvent_name = solvent_name,
+                supporting_electrolyte_name = supporting_electrolyte_name,
+                df_products = df_products,
+
+                product_rate_kg_day = product_rate_kg_day,
+                model_FE = model_FE,
+                FE_CO2R_0 = FE_CO2R_0,
+                FE_product_specified = FE_product_specified,
+                j_total_mA_cm2 = j_total_mA_cm2,
+                SPC = SPC,
+                crossover_ratio = crossover_ratio,
+                P = P,
+                T_streams = T_streams,
+
+                R_membrane_ohmcm2 = R_membrane_ohmcm2,
+                electrolyte_thickness_cm = electrolyte_thickness_cm,
+                
+                an_E_eqm = an_E_eqm,
+                an_eta_ref = an_eta_ref,
+                an_Tafel_slope = an_Tafel_slope,
+                an_j_ref = an_j_ref,
+
+                cathode_outlet_humidity = cathode_outlet_humidity,
+                excess_water_ratio = excess_water_ratio,   
+                excess_solvent_ratio = excess_solvent_ratio,
+                catholyte_conc_M = catholyte_conc_M,  
+                anolyte_conc_M = anolyte_conc_M,
+                water_density_kg_m3 = water_density_kg_m3,
+                electrolyte_density_kg_m3 = electrolyte_density_kg_m3,
+                solvent_loss_fraction = solvent_loss_fraction,
+
+                LL_second_law_efficiency = LL_second_law_efficiency,
+                PSA_second_law_efficiency = PSA_second_law_efficiency,
+                T_sep = T_sep,         
+                CO2_solubility_mol_mol = CO2_solubility_mol_mol,
+
+                carbon_capture_efficiency = carbon_capture_efficiency,
+                electricity_emissions_kgCO2_kWh = electricity_emissions_kgCO2_kWh,
+                heat_emissions_kgCO2_kWh = heat_emissions_kgCO2_kWh,
+
+                electricity_cost_USD_kWh = electricity_cost_USD_kWh,
+                heat_cost_USD_kWh = heat_cost_USD_kWh,
+                product_cost_USD_kgprod = product_cost_USD_kgprod,
+                H2_cost_USD_kgH2 = H2_cost_USD_kgH2,
+                water_cost_USD_kg = water_cost_USD_kg,
+                CO2_cost_USD_tCO2 = CO2_cost_USD_tCO2,
+                electrolyzer_capex_USD_m2 = electrolyzer_capex_USD_m2,  
+                PSA_capex_USD_1000m3_hr = PSA_capex_USD_1000m3_hr,
+                LL_capex_USD_1000mol_hr = LL_capex_USD_1000mol_hr,     
+                solvent_cost_USD_kg = solvent_cost_USD_kg,
+                electrolyte_cost_USD_kg = electrolyte_cost_USD_kg,    
+
+                lifetime_years = lifetime_years,
+                stack_lifetime_years = stack_lifetime_years,
+                capacity_factor = capacity_factor,
+
+                battery_capex_USD_kWh = battery_capex_USD_kWh,               
+                battery_capacity = battery_capacity,
+
+                kappa_electrolyte_S_cm = kappa_electrolyte_S_cm,
+                viscosity_cP = viscosity_cP,  
+
+                overridden_vbl = overridden_vbl,
+                overridden_value = overridden_value,
+                overridden_unit = overridden_unit,
+                override_optimization = override_optimization,
+                exponent = exponent,
+                scaling = scaling,
+
+                is_additional_capex = is_additional_capex,
+                additional_capex_USD = additional_capex_USD,
+                is_additional_opex = is_additional_opex,  
+                additional_opex_USD_kg = additional_opex_USD_kg,
+
+                MW_CO2 = MW_CO2,
+                MW_H2O = MW_H2O,
+                MW_O2 = MW_O2,
+                MW_MX = MW_MX,
+                MW_solvent = MW_solvent,
+                MW_supporting = MW_supporting,
+                R = R, 
+                F = F,
+                
+                K_to_C = K_to_C,
+                kJ_per_kWh = kJ_per_kWh,
+        )
     df_emissions = pd.concat([ df_energy['Emissions (kg CO2/kg {})'.format(product_name)],pd.Series(df_outlet_assumptions.loc['Carbon capture loss', 'Value']) ])
     df_emissions.index = np.append(df_energy.index, 'Carbon capture')
 
@@ -2047,53 +2127,93 @@ with middle_column:
             ### Generate physical and costing model
             df_capex_BM, df_capex_totals, df_costing_assumptions, df_depreciation, df_electrolyzer_assumptions, df_electrolyzer_streams_mol_s,\
                 df_energy, df_feedstocks, df_general, df_maintenance, df_operations, df_opex, df_opex_totals, df_outlet_assumptions,\
-                df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities = cached_single_run_nonaq(product_name = product_name, 
-                                                                            product_rate_kg_day = product_rate_kg_day, 
-                                                                            df_products = df_products, FE_CO2R_0 = FE_CO2R_0, 
-                                                                            FE_product_specified = FE_product_specified, 
-                                                                            j_total_mA_cm2 = j_total_mA_cm2,SPC = SPC, 
-                                                                            crossover_ratio = crossover_ratio, 
-                                                                            model_FE = model_FE, 
-                                                                            is_additional_capex = is_additional_capex,
-                                                                            is_additional_opex = is_additional_opex,
-                                                                            additional_opex_USD_kg = additional_opex_USD_kg,
-                                                                            additional_capex_USD = additional_capex_USD,
-                                                                            overridden_vbl = vbl_name, 
-                                                                            overridden_value = vbl, overridden_unit = vbl_unit, 
-                                                                            override_optimization =  override_optimization, 
-                                                                            P = P, T_streams = T_streams, R_ohmcm2 = R_ohmcm2, 
-                                                                            an_E_eqm = an_E_eqm,
-                                                                            an_eta_ref = an_eta_ref,
-                                                                            an_Tafel_slope = an_Tafel_slope,
-                                                                            an_j_ref = an_j_ref,
-                                                                            MW_CO2 = MW_CO2, MW_H2O = MW_H2O, 
-                                                                            MW_O2 = MW_O2,  MW_MX = MW_K2CO3,
-                                                                            cathode_outlet_humidity = cathode_outlet_humidity,
-                                                                            excess_water_ratio = excess_water_ratio,
-                                                                            electrolyte_conc = electrolyte_conc, 
-                                                                            density_kgm3 = density_kgm3,
-                                                                            PSA_second_law_efficiency = PSA_second_law_efficiency, 
-                                                                            T_sep = T_sep, 
-                                                                            electricity_cost_USD_kWh = electricity_cost_USD_kWh, 
-                                                                            heat_cost_USD_kWh = heat_cost_USD_kWh,
-                                                                            electricity_emissions_kgCO2_kWh = electricity_emissions_kgCO2_kWh,
-                                                                            heat_emissions_kgCO2_kWh = heat_emissions_kgCO2_kWh,
-                                                                            product_cost_USD_kgprod = product_cost_USD_kgprod,
-                                                                            H2_cost_USD_kgH2 = H2_cost_USD_kgH2,
-                                                                            water_cost_USD_kg = water_cost_USD_kg,
-                                                                            CO2_cost_USD_tCO2 = CO2_cost_USD_tCO2,
-                                                                            electrolyzer_capex_USD_m2 = electrolyzer_capex_USD_m2,
-                                                                            lifetime_years = lifetime_years,
-                                                                            stack_lifetime_years = stack_lifetime_years,
-                                                                            capacity_factor = capacity_factor,
-                                                                            battery_capex_USD_kWh = battery_capex_USD_kWh,               
-                                                                            battery_capacity = battery_capacity,
-                                                                            carbon_capture_efficiency = carbon_capture_efficiency,
-                                                                            exponent=exponent, 
-                                                                            scaling=scaling,
-                                                                            R = R,
-                                                                            F = F)
+                df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities = cached_single_run_nonaq(product_name = product_name,
+                solvent_name = solvent_name,
+                supporting_electrolyte_name = supporting_electrolyte_name,
+                df_products = df_products,
 
+                product_rate_kg_day = product_rate_kg_day,
+                model_FE = model_FE,
+                FE_CO2R_0 = FE_CO2R_0,
+                FE_product_specified = FE_product_specified,
+                j_total_mA_cm2 = j_total_mA_cm2,
+                SPC = SPC,
+                crossover_ratio = crossover_ratio,
+                P = P,
+                T_streams = T_streams,
+
+                R_membrane_ohmcm2 = R_membrane_ohmcm2,
+                electrolyte_thickness_cm = electrolyte_thickness_cm,
+                
+                an_E_eqm = an_E_eqm,
+                an_eta_ref = an_eta_ref,
+                an_Tafel_slope = an_Tafel_slope,
+                an_j_ref = an_j_ref,
+
+                cathode_outlet_humidity = cathode_outlet_humidity,
+                excess_water_ratio = excess_water_ratio,   
+                excess_solvent_ratio = excess_solvent_ratio,
+                catholyte_conc_M = catholyte_conc_M,  
+                anolyte_conc_M = anolyte_conc_M,
+                water_density_kg_m3 = water_density_kg_m3,
+                electrolyte_density_kg_m3 = electrolyte_density_kg_m3,
+                solvent_loss_fraction = solvent_loss_fraction,
+
+                LL_second_law_efficiency = LL_second_law_efficiency,
+                PSA_second_law_efficiency = PSA_second_law_efficiency,
+                T_sep = T_sep,         
+                CO2_solubility_mol_mol = CO2_solubility_mol_mol,
+
+                carbon_capture_efficiency = carbon_capture_efficiency,
+                electricity_emissions_kgCO2_kWh = electricity_emissions_kgCO2_kWh,
+                heat_emissions_kgCO2_kWh = heat_emissions_kgCO2_kWh,
+
+                electricity_cost_USD_kWh = electricity_cost_USD_kWh,
+                heat_cost_USD_kWh = heat_cost_USD_kWh,
+                product_cost_USD_kgprod = product_cost_USD_kgprod,
+                H2_cost_USD_kgH2 = H2_cost_USD_kgH2,
+                water_cost_USD_kg = water_cost_USD_kg,
+                CO2_cost_USD_tCO2 = CO2_cost_USD_tCO2,
+                electrolyzer_capex_USD_m2 = electrolyzer_capex_USD_m2,  
+                PSA_capex_USD_1000m3_hr = PSA_capex_USD_1000m3_hr,
+                LL_capex_USD_1000mol_hr = LL_capex_USD_1000mol_hr,     
+                solvent_cost_USD_kg = solvent_cost_USD_kg,
+                electrolyte_cost_USD_kg = electrolyte_cost_USD_kg,    
+
+                lifetime_years = lifetime_years,
+                stack_lifetime_years = stack_lifetime_years,
+                capacity_factor = capacity_factor,
+
+                battery_capex_USD_kWh = battery_capex_USD_kWh,               
+                battery_capacity = battery_capacity,
+
+                kappa_electrolyte_S_cm = kappa_electrolyte_S_cm,
+                viscosity_cP = viscosity_cP,  
+
+                overridden_vbl = overridden_vbl,
+                overridden_value = overridden_value,
+                overridden_unit = overridden_unit,
+                override_optimization = override_optimization,
+                exponent = exponent,
+                scaling = scaling,
+
+                is_additional_capex = is_additional_capex,
+                additional_capex_USD = additional_capex_USD,
+                is_additional_opex = is_additional_opex,  
+                additional_opex_USD_kg = additional_opex_USD_kg,
+
+                MW_CO2 = MW_CO2,
+                MW_H2O = MW_H2O,
+                MW_O2 = MW_O2,
+                MW_MX = MW_MX,
+                MW_solvent = MW_solvent,
+                MW_supporting = MW_supporting,
+                R = R, 
+                F = F,
+                
+                K_to_C = K_to_C,
+                kJ_per_kWh = kJ_per_kWh,
+        )
             ### Store results of models                             
             # dict_stream_tables[vbl] = {
             #     df_streams_formatted.index.name: df_streams_formatted, 
