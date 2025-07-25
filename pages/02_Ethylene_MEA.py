@@ -94,11 +94,11 @@ def cached_single_run(product_name,
         capacity_factor,
         battery_capex_USD_kWh,               
         battery_capacity,
+        model_FE,
         is_additional_capex,
         is_additional_opex,
         additional_capex_USD,
         additional_opex_USD_kg,
-        model_FE,
         overridden_vbl,
         overridden_value,
         overridden_unit,
@@ -208,11 +208,13 @@ def cached_single_run(product_name,
 #         electrolyzer_capex_USD_m2,       
 #         lifetime_years,
 #         stack_lifetime_years,
-#         is_additional_capex, is_additional_opex,
-#         additional_capex_USD, additional_opex_USD_kg,
 #         capacity_factor,
 #         battery_capex_USD_kWh,               
 #         battery_capacity,
+#         additional_capex_USD,
+#         additional_opex_USD_kg,
+#         is_additional_capex,
+#         is_additional_opex,
 #         model_FE,
 #         overridden_vbl,
 #         overridden_value,
@@ -265,11 +267,13 @@ def cached_single_run(product_name,
 #         lifetime_years,
 #         stack_lifetime_years,
 #         capacity_factor,
-#         is_additional_capex, is_additional_opex,
-#         additional_capex_USD, additional_opex_USD_kg,
 #         battery_capex_USD_kWh,               
 #         battery_capacity,
 #         model_FE,
+#         is_additional_opex,
+#         is_additional_capex,
+#         additional_capex_USD,
+#         additional_opex_USD_kg,
 #         overridden_vbl,
 #         overridden_value,
 #         overridden_unit,
@@ -1139,7 +1143,7 @@ with st.sidebar:
                             min_value = 0.0001, 
                             max_value = 1.0, 
                             step = 0.01, value = SPC,
-                            format = '%.2f')        
+                            format = '%.2f')
         crossover_ratio = st.slider(label = 'Crossover ratio (mol CO$_2$/mol e$^-$)',
                             min_value = 0.0001, 
                             max_value = 1.0, 
@@ -1180,6 +1184,7 @@ with st.sidebar:
                     To manually override this error, choose to manually specify $FE$ and single-pass conversion.
                     If you are still seeing an error, it may be because the crossover is too high and limits the possible single-pass conversion.''',
                     icon = ":material/error:")
+
         st.latex(r'''
                  \footnotesize \implies  FE_{{{}}} = {:.2f}
                  '''.format(product_name, FE_product_checked))
@@ -1212,7 +1217,7 @@ with st.sidebar:
                               \n Default value: {} years
                             '''.format(product_rate_kg_day, lifetime_years))
         stack_lifetime_years = st.slider(label = 'Stack lifetime (years)',
-                            min_value = 0.0001, 
+                            min_value = 0.0001,
                             max_value = 30.0, 
                             step = 1.0, value = stack_lifetime_years,
                             format = '%.0f',
@@ -1322,11 +1327,11 @@ with st.sidebar:
                             step = 1.0, value = 0.0,
                             format = '%.0f', disabled = not is_additional_capex,
                             help = '''Optional additional capex. Default value: \${} million.
-                            '''.format(0)) *1e6
+                            '''.format(0))*1e6
     else:
         is_additional_capex = False
         additional_capex_USD = 0
-        
+
     answer = st.toggle('Add custom opex', value = False,
                          help = 'Optional operating cost')
     if answer:            
@@ -1341,11 +1346,11 @@ with st.sidebar:
                             $$$
                             \\\ \\frac{{\$ opex}}{{year}} = \\frac{{\$ opex}}{{day}} \cdot CF \cdot 365 \cdot plant lifetime
                             $$$
-                            ''')    
+                            ''')
     else:
         is_additional_opex = False
         additional_opex_USD_kg = 0 
-        
+
 with st.sidebar:
     st.subheader('Emissions assessment')
     electricity_emissions_kgCO2_kWh = st.slider(label = 'Grid CO$_2$ intensity (kg$_{CO_2}$/kWh)',
@@ -1368,8 +1373,11 @@ with st.sidebar:
 #                         FE_product_specified = default_FE_product_specified, 
 #                         j_total_mA_cm2 = default_j_total_mA_cm2,SPC = default_SPC, 
 #                         crossover_ratio = default_crossover_ratio, model_FE = 'Hawks',  
+#                         is_additional_opex = False, is_additional_capex = False,
+#                         additional_opex_USD_kg = 0,
+#                         additional_capex_USD = 0,
 #                         overridden_vbl = '', overridden_value = np.NaN, overridden_unit = '', 
-#                         override_optimization =  override_optimization, P = default_P, T_streams = default_T_streams, 
+#                         override_optimization =  False, P = default_P, T_streams = default_T_streams, 
 #                         R_ohmcm2 = default_R_ohmcm2, an_E_eqm = default_an_E_eqm, MW_CO2 = MW_CO2, 
 #                         MW_H2O = MW_H2O, MW_O2 = MW_O2,  MW_MX = MW_K2CO3,
 #                         cathode_outlet_humidity = default_cathode_outlet_humidity,
@@ -1386,9 +1394,7 @@ with st.sidebar:
 #                         heat_cost_USD_kWh = default_heat_cost_USD_kWh,product_cost_USD_kgprod = default_product_cost_USD_kgprod,
 #                         H2_cost_USD_kgH2 = default_H2_cost_USD_kgH2,water_cost_USD_kg = default_water_cost_USD_kg,
 #                         CO2_cost_USD_tCO2 = default_CO2_cost_USD_tCO2,lifetime_years = default_lifetime_years,
-#                         stack_lifetime_years = stack_lifetime_years,
-#                         is_additional_capex = False, is_additional_opex = False,
-#                         additional_capex_USD = 0, additional_opex_USD_kg = 0,
+#                         stack_lifetime_years = default_stack_lifetime_years,
 #                         electrolyzer_capex_USD_m2 = default_electrolyzer_capex_USD_m2,
 #                         capacity_factor = default_capacity_factor,battery_capex_USD_kWh = default_battery_capex_USD_kWh,               
 #                         battery_capacity = default_battery_capacity, exponent=default_exponent, scaling=default_scaling,
@@ -1544,7 +1550,7 @@ with middle_column:
                                         df_costing_assumptions['Cost']], axis = 1) # Store costing assumptions for plotting
             df_sales_vs_vbl = pd.concat([df_sales_vs_vbl, 
                                     df_sales['Earnings ($/yr)']], axis = 1) # Store costing assumptions for plotting
-  
+            
             ### Adjust FE_product, SPC, capacity_factor and variable back to their original values in globals()
             if vbl_name != 'Cell voltage' and vbl_name != 'Cathodic overpotential' and vbl_name != 'Anodic overpotential':
                 globals()[df_flags.loc[vbl_name,'Python variable']] = value_original
@@ -1557,7 +1563,8 @@ with middle_column:
 
         for df in [df_energy_vs_vbl, df_potentials_vs_vbl,  df_emissions_vs_vbl,
                         df_electrolyzer_assumptions_vs_vbl, df_outlet_assumptions_vs_vbl, df_costing_assumptions_vs_vbl, 
-                        df_capex_BM_vs_vbl, df_capex_totals_vs_vbl, df_opex_vs_vbl, df_opex_totals_vs_vbl, df_sales_vs_vbl,
+                        df_capex_BM_vs_vbl, df_capex_totals_vs_vbl, df_opex_vs_vbl, df_opex_totals_vs_vbl, 
+                        df_sales_vs_vbl
                         ]:
             df.columns = vbl_range_text # rename columns
 
@@ -1647,7 +1654,6 @@ if not st.session_state.is_active_error_ethylene:
 
     # Energy colors
     energy_colors = emissions_colors # [RdYlBu(i) for i in np.linspace(0, 1, sum(~df_energy_vs_vbl.iloc[:-3].T.isnull().all())  )  ] # len(df_energy_vs_vbl.index) - 2)] # last rows are totals
-
     
     x_axis_major_ticks = x_axis_formatting(x_axis_min, x_axis_max, x_axis_num)
 
@@ -1686,7 +1692,7 @@ if not st.session_state.is_active_error_ethylene:
             axs.set_ylim([y_axis_min_capex,y_axis_max_capex])
 
             ## Plot series
-            if df_flags.loc['Capacity factor', 'T/F?'] :
+            if df_flags.loc['Capacity factor', 'T/F?']:
                 axs.plot([0.23625,0.23625], [y_axis_min_capex, y_axis_max_capex], alpha = 1,
                     c = theme_colors[6]) # Plot line for cost 
                 axs.text(0.23625, y_axis_min_capex + (y_axis_max_capex - y_axis_min_capex)*0.025, 'Solar capacity', ha='right', va='bottom', #  (5.67 h/day)
@@ -1851,7 +1857,6 @@ if not st.session_state.is_active_error_ethylene:
             
             st.write(levelized_html, unsafe_allow_html=True)
 
-
     with right_column.container(height = 455, border = False): 
         pass
 
@@ -1947,7 +1952,7 @@ if not st.session_state.is_active_error_ethylene:
 
     ###### ENERGY BAR CHART 
     with middle_column.container(height = 300, border = False): 
-        if not vbl_name == 'Cell voltage':   
+        if not vbl_name == 'Cell voltage':
             st.subheader('Energy sensitivity')
             with _render_lock:
                 energy_bar_fig, axs = plt.subplots() # Set up plot
@@ -2078,7 +2083,7 @@ if not st.session_state.is_active_error_ethylene:
     
     st.subheader('Sales')
     df_sales_vs_vbl_2
-    
+
     st.subheader('Electrolyzer model')
     df_potentials_vs_vbl_2    
 

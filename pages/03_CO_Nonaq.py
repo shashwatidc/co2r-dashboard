@@ -719,6 +719,8 @@ df_constants, df_products, df_utility_imports, df_solvents, df_supporting = impo
 
 ############################# CONSTANTS AND PARAMETERS ############################
 
+### Extract constants to use for costing and emissions calculations
+
 with st.sidebar:
     st.subheader('Electrolyte')
     ######## SOLVENT SELECTION
@@ -731,7 +733,7 @@ with st.sidebar:
     )
 
     st.subheader('Supporting electrolyte')
-    ######## SOLVENT SELECTION
+    ######## SUPPORTING ELECTROLYTE SELECTION
     # Choose a solvent
     supporting_electrolyte_name = st.radio(label = 'Non-aqueous catholyte supporting electrolyte', options= ['TEACl', 'TBAClO$_4$', 'TEAClO$_4$', 'TBABF$_4$'], 
                     index = 0, # default option
@@ -999,7 +1001,7 @@ with st.sidebar:
                 options = [option_1,
                         option_2, 
                         option_3 ],
-                index = 0,
+                index = 2,
                 label_visibility= 'collapsed')
         if answer == option_1:
             model_FE = 'Hawks'
@@ -1020,8 +1022,7 @@ with st.sidebar:
                     max_value = 1.0,
                     step = 0.01, value = FE_CO2R_0,
                     help = 'Faradaic efficiency, independent of any other variables. \
-                          This is not a recommended or default option, since it neglects electrolyzer geometry. \
-                            Therefore, it artificialy lowers costs.')
+                          This is not the recommended default option in the absence of more detailed studies of electrolyzer geometry.')
 
         FE_CO2R_0 = st.slider(label = '$ FE_{CO_2R, \: 0}$, maximum Faradaic efficiency',
                             min_value = 0.0001, 
@@ -1033,7 +1034,7 @@ with st.sidebar:
                             lim_{{X_{{CO_2}} → 0}} FE_{{CO_2R}}
                             $$$
                             ''' +   '\n  Default $ FE_{{CO_2R, \: 0}}$: {}'.format(default_FE_CO2R_0),
-                            disabled=answer == option_3)
+                            disabled= answer == option_3)
         SPC = st.slider(label = 'Single-pass conversion',
                             min_value = 0.0001, 
                             max_value = 1.0, 
@@ -1079,7 +1080,7 @@ with st.sidebar:
                     To manually override this error, choose to manually specify $FE$ and single-pass conversion.
                     If you are still seeing an error, it may be because the crossover is too high and limits the possible single-pass conversion.''',
                     icon = ":material/error:")
-       
+
         st.latex(r'''
                  \footnotesize \implies  FE_{{{}}} = {:.2f}
                  '''.format(product_name, FE_product_checked))
@@ -1119,12 +1120,26 @@ with st.sidebar:
                             help = '''Stack replacement time in years. The entire electrolyzer must be replacemed at this interval.
                               \n Default value: {} years
                             '''.format(stack_lifetime_years))
-        PSA_second_law_efficiency = st.slider(label = 'Second-law separation efficiency',
+        PSA_second_law_efficiency = st.slider(label = 'PSA second-law separation efficiency',
                             min_value = 0.0001, 
                             max_value = 1.0, 
                             step = 0.01, value = PSA_second_law_efficiency,
                             format = '%.2f',
                             help = '''Second-law efficiency of gas separations between CO$_2$/O$_2$, CO$_2$/CO, and CO/H$_2$.
+                            This adjusts the ideal work of binary separation, 
+                            $$$
+                             \\\  W_{{sep \: (j)}}^{{ideal}} = R \cdot T \cdot (\sum_i x_i\cdot ln(x_i)) \cdot \displaystyle \dot{{N}} \\
+                              \\\  \implies W = R \cdot T \cdot (x_i\cdot ln(x_i)) + (1-x_i)\cdot ln(1-x_i)) \cdot \displaystyle \dot{{N}} \\
+                              \\\  W_{{sep \: (j)}}^{{real}} = \displaystyle \\frac{{W_{{sep\: (j)}}^{{ideal}}}}{{\zeta}}
+                            $$$
+                              \n Default value: {}
+                            '''.format(default_PSA_second_law_efficiency))
+        LL_second_law_efficiency = st.slider(label = 'GASP second-law separation efficiency',
+                            min_value = 0.0001, 
+                            max_value = 1.0, 
+                            step = 0.01, value = LL_second_law_efficiency,
+                            format = '%.2f',
+                            help = '''Second-law efficiency of liquid-liquid separation of oxalic acid.
                             This adjusts the ideal work of binary separation, 
                             $$$
                              \\\  W_{{sep \: (j)}}^{{ideal}} = R \cdot T \cdot (\sum_i x_i\cdot ln(x_i)) \cdot \displaystyle \dot{{N}} \\
@@ -1222,11 +1237,11 @@ with st.sidebar:
                             step = 1.0, value = 0.0,
                             format = '%.0f', disabled = not is_additional_capex,
                             help = '''Optional additional capex. Default value: \${} million.
-                            '''.format(0))*1e6
+                            '''.format(0)) *1e6
     else:
         is_additional_capex = False
-        additional_capex_USD = 0 
-
+        additional_capex_USD = 0
+        
     answer = st.toggle('Add custom opex', value = False,
                          help = 'Optional operating cost')
     if answer:            
@@ -2109,6 +2124,8 @@ if not np.isnan(FE_product_checked):
                     # Write the HTML
                     st.write(emissions_html, unsafe_allow_html=True)
 
+#___________________________________________________________________________________
+    
 ##########################  GENERATE MODEL OVER RANGE  ##########################
 
 with right_column.container(height = 455, border = False): 
@@ -2161,9 +2178,9 @@ with middle_column:
             
             ### Generate physical and costing model
             df_capex_BM, df_capex_totals, df_costing_assumptions, df_depreciation, df_electrolyzer_assumptions, df_electrolyzer_streams_mol_s,\
-                df_energy, df_feedstocks, df_general, df_maintenance, df_replacement, df_operations, df_opex, df_opex_totals, df_outlet_assumptions,\
-                df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities, df_cashflows, \
-                cashflows, NPV, IRR, breakeven_price_USD_kgprod = cached_single_run_nonaq(product_name = product_name,
+                    df_energy, df_feedstocks, df_general, df_maintenance, df_replacement, df_operations, df_opex, df_opex_totals, df_outlet_assumptions,\
+                    df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities, df_cashflows, \
+                    cashflows, NPV, IRR, breakeven_price_USD_kgprod = cached_single_run_nonaq(product_name = product_name,
                     solvent_name = solvent_name,
                     supporting_electrolyte_name = supporting_electrolyte_name,
                     df_products = df_products,
@@ -2250,6 +2267,7 @@ with middle_column:
                     K_to_C = K_to_C,
                     kJ_per_kWh = kJ_per_kWh,
             )
+
             ### Store results of models                             
             # dict_stream_tables[vbl] = {
             #     df_streams_formatted.index.name: df_streams_formatted, 
@@ -2312,8 +2330,7 @@ with middle_column:
 
         for df in [df_energy_vs_vbl, df_potentials_vs_vbl,  df_emissions_vs_vbl,
                         df_electrolyzer_assumptions_vs_vbl, df_outlet_assumptions_vs_vbl, df_costing_assumptions_vs_vbl, 
-                        df_capex_BM_vs_vbl, df_capex_totals_vs_vbl, df_opex_vs_vbl, df_opex_totals_vs_vbl, 
-                        df_sales_vs_vbl
+                        df_capex_BM_vs_vbl, df_capex_totals_vs_vbl, df_opex_vs_vbl, df_opex_totals_vs_vbl, df_sales_vs_vbl,
                         ]:
             df.columns = vbl_range_text # rename columns
 
@@ -2398,7 +2415,7 @@ if not st.session_state.is_active_error_CO_nonaq:
     opex_colors = [diverging(i) for i in np.linspace(0, 0.85, len(df_opex_vs_vbl.index) - flag[is_additional_opex]) ]
     if is_additional_opex:
         opex_colors.append((0.85, 0.85, 0.85, 1)) # add in battery 
-    #PuOr okay but low contrast at ends
+
     # Emissions colors
     emissions_colors = [RdYlBu(i) for i in np.linspace(0, 1, sum(~df_emissions_vs_vbl.T.isnull().all()) - 1 )  ] # len(df_energy_vs_vbl.index) - 2)] # last rows are totals
 
@@ -2610,7 +2627,6 @@ if not st.session_state.is_active_error_CO_nonaq:
             
             st.write(levelized_html, unsafe_allow_html=True)
 
-
     with right_column.container(height = 455, border = False): 
         pass
 
@@ -2670,8 +2686,8 @@ if not st.session_state.is_active_error_CO_nonaq:
 
     ###### FE-SPC SCATTERPLOT
     with right_column.container(height = 300, border = False): 
+        st.subheader('FE-$X_{CO_2}$ tradeoff')
         with _render_lock:
-            st.subheader('FE-$X_{CO_2}$ tradeoff')
             FE_SPC_bar_fig, axs = plt.subplots() # Set up plot
             
             ## Axis labels

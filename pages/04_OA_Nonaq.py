@@ -418,7 +418,6 @@ def default_single_run_nonaq(product_name,
                 
                 K_to_C = K_to_C,
                 kJ_per_kWh = kJ_per_kWh,
-    
         )
     capex_default = df_capex_totals_default.loc['Total permanent investment', 'Cost ($)']
     opex_default = df_opex_totals_default.loc['Production cost', 'Cost ($/kg {})'.format(product_name)]
@@ -426,6 +425,7 @@ def default_single_run_nonaq(product_name,
     potential_default = df_potentials_default.loc['Cell potential', 'Value'] 
     energy_default = df_energy_default.loc['Total', 'Energy (kJ/kg {})'.format(product_name)]
     emissions_default = sum(df_energy_default.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)])
+
     return capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default
 
 @st.cache_data(ttl = "1h")
@@ -721,6 +721,29 @@ df_constants, df_products, df_utility_imports, df_solvents, df_supporting = impo
 
 ### Extract constants to use for costing and emissions calculations
 
+with st.sidebar:
+    st.subheader('Electrolyte')
+    ######## SOLVENT SELECTION
+    # Choose a solvent
+    solvent_name = st.radio(label = 'Non-aqueous catholyte solvent', options= ['DMF', 'DMSO', 'Acetonitrile', 'Propylene carbonate',], 
+                    index = 1, # default option
+                    label_visibility='collapsed',
+                    help = '''Choose the non-aqueous catholyte. The cell is a flow cell.
+                      \n Default solvent: DMF'''
+    )
+
+    st.subheader('Supporting electrolyte')
+    ######## SUPPORTING ELECTROLYTE SELECTION
+    # Choose a solvent
+    supporting_electrolyte_name = st.radio(label = 'Non-aqueous catholyte supporting electrolyte', options= ['TEACl', 'TBAClO$_4$', 'TEAClO$_4$', 'TBABF$_4$'], 
+                    index = 0, # default option
+                    label_visibility='collapsed',
+                    help = '''Choose the non-aqueous catholyte. The cell is a flow cell.
+                      \n Default supporting electrolyte: TEACl'''
+    )
+
+### Extract constants to use for costing and emissions calculations
+
 ## Update constants as variables 
 ## NOTE: Modifying globals() is a very frowned on practice in Python - be VERY careful implementing this, it's easy to say 
 # overwrite variables that are carelessly named. Consider indexing directly from df_constants (set its index to 'variable name')
@@ -763,27 +786,6 @@ if 'minimum_value_input_OA_nonaq' not in st.session_state:
     st.session_state.minimum_value_input_OA_nonaq = str(0.001)
 if 'maximum_value_input_OA_nonaq' not in st.session_state:
     st.session_state.maximum_value_input_OA_nonaq = str(1500)
-
-with st.sidebar:
-    st.subheader('Electrolyte')
-    ######## SOLVENT SELECTION
-    # Choose a solvent
-    solvent_name = st.radio(label = 'Non-aqueous catholyte solvent', options= ['DMF', 'DMSO', 'Acetonitrile', 'Propylene carbonate',], 
-                    index = 1, # default option
-                    label_visibility='collapsed',
-                    help = '''Choose the non-aqueous catholyte. The cell is a flow cell.
-                      \n Default solvent: DMF'''
-    )
-
-    st.subheader('Supporting electrolyte')
-    ######## SOLVENT SELECTION
-    # Choose a solvent
-    supporting_electrolyte_name = st.radio(label = 'Non-aqueous catholyte supporting electrolyte', options= ['TEACl', 'TBAClO$_4$', 'TEAClO$_4$', 'TBABF$_4$'], 
-                    index = 0, # default option
-                    label_visibility='collapsed',
-                    help = '''Choose the non-aqueous catholyte. The cell is a flow cell.
-                      \n Default supporting electrolyte: TEACl'''
-    )
 
 ########## OTHER FIXED VALUES
 # PRODUCT COSTS
@@ -999,7 +1001,7 @@ with st.sidebar:
                 options = [option_1,
                         option_2, 
                         option_3 ],
-                index = 0,
+                index = 2,
                 label_visibility= 'collapsed')
         if answer == option_1:
             model_FE = 'Hawks'
@@ -1020,8 +1022,8 @@ with st.sidebar:
                     max_value = 1.0,
                     step = 0.01, value = FE_CO2R_0,
                     help = 'Faradaic efficiency, independent of any other variables. \
-                        This is not a recommended or default option, since it neglects electrolyzer geometry.\
-                        Therefore, it artificially lowers costs.')
+                          This is not a recommended or default option, since it neglects electrolyzer geometry. \
+                            Therefore, it artificially lowers costs.')
 
         FE_CO2R_0 = st.slider(label = '$ FE_{CO_2R, \: 0}$, maximum Faradaic efficiency',
                             min_value = 0.0001, 
@@ -1033,12 +1035,12 @@ with st.sidebar:
                             lim_{{X_{{CO_2}} → 0}} FE_{{CO_2R}}
                             $$$
                             ''' +   '\n  Default $ FE_{{CO_2R, \: 0}}$: {}'.format(default_FE_CO2R_0),
-                            disabled = answer == option_3)
+                            disabled= answer == option_3)
         SPC = st.slider(label = 'Single-pass conversion',
                             min_value = 0.0001, 
                             max_value = 1.0, 
                             step = 0.01, value = SPC,
-                            format = '%.2f')        
+                            format = '%.2f')
         crossover_ratio = st.slider(label = 'Crossover ratio (mol CO$_2$/mol e$^-$)',
                             min_value = 0.0001, 
                             max_value = 1.0, 
@@ -1053,7 +1055,7 @@ with st.sidebar:
                             \\\   CO_{{2}} + 2OH^{{-}} → HCO_{{3}}^{{-}} + OH^- ⇌ CO_{{3}}^{{2-}} + H_2O 
                             $$$
                             """,
-                            format = '%.2f')
+                            format = '%.2f')        
         FE_product_checked, __ = SPC_check(FE_product_specified=FE_product_specified, 
                 exponent= exponent,
                 scaling = scaling,
@@ -1079,6 +1081,7 @@ with st.sidebar:
                     To manually override this error, choose to manually specify $FE$ and single-pass conversion.
                     If you are still seeing an error, it may be because the crossover is too high and limits the possible single-pass conversion.''',
                     icon = ":material/error:")
+
         st.latex(r'''
                  \footnotesize \implies  FE_{{{}}} = {:.2f}
                  '''.format(product_name, FE_product_checked))
@@ -1111,19 +1114,33 @@ with st.sidebar:
                               \n Default value: {} years
                             '''.format(product_rate_kg_day, lifetime_years))
         stack_lifetime_years = st.slider(label = 'Stack lifetime (years)',
-                            min_value = 0.0001, 
+                            min_value = 0.0001,
                             max_value = 30.0, 
                             step = 1.0, value = stack_lifetime_years,
                             format = '%.0f',
                             help = '''Stack replacement time in years. The entire electrolyzer must be replacemed at this interval.
                               \n Default value: {} years
                             '''.format(stack_lifetime_years))
-        PSA_second_law_efficiency = st.slider(label = 'Second-law separation efficiency',
+        PSA_second_law_efficiency = st.slider(label = 'PSA second-law separation efficiency',
                             min_value = 0.0001, 
                             max_value = 1.0, 
                             step = 0.01, value = PSA_second_law_efficiency,
                             format = '%.2f',
                             help = '''Second-law efficiency of gas separations between CO$_2$/O$_2$, CO$_2$/CO, and CO/H$_2$.
+                            This adjusts the ideal work of binary separation, 
+                            $$$
+                             \\\  W_{{sep \: (j)}}^{{ideal}} = R \cdot T \cdot (\sum_i x_i\cdot ln(x_i)) \cdot \displaystyle \dot{{N}} \\
+                              \\\  \implies W = R \cdot T \cdot (x_i\cdot ln(x_i)) + (1-x_i)\cdot ln(1-x_i)) \cdot \displaystyle \dot{{N}} \\
+                              \\\  W_{{sep \: (j)}}^{{real}} = \displaystyle \\frac{{W_{{sep\: (j)}}^{{ideal}}}}{{\zeta}}
+                            $$$
+                              \n Default value: {}
+                            '''.format(default_PSA_second_law_efficiency))
+        LL_second_law_efficiency = st.slider(label = 'GASP second-law separation efficiency',
+                            min_value = 0.0001, 
+                            max_value = 1.0, 
+                            step = 0.01, value = LL_second_law_efficiency,
+                            format = '%.2f',
+                            help = '''Second-law efficiency of liquid-liquid separation of oxalic acid.
                             This adjusts the ideal work of binary separation, 
                             $$$
                              \\\  W_{{sep \: (j)}}^{{ideal}} = R \cdot T \cdot (\sum_i x_i\cdot ln(x_i)) \cdot \displaystyle \dot{{N}} \\
@@ -1240,11 +1257,11 @@ with st.sidebar:
                             $$$
                             \\\ \\frac{{\$ opex}}{{year}} = \\frac{{\$ opex}}{{day}} \cdot CF \cdot 365 \cdot plant lifetime
                             $$$
-                            ''')    
+                            ''')
     else:
         is_additional_opex = False
         additional_opex_USD_kg = 0 
-        
+
 with st.sidebar:
     st.subheader('Emissions assessment')
     electricity_emissions_kgCO2_kWh = st.slider(label = 'Grid CO$_2$ intensity (kg$_{CO_2}$/kWh)',
@@ -1255,15 +1272,15 @@ with st.sidebar:
                         help = '''Electricity emissions for partial life-cycle assessment.
                         \n Default value: {:.2f} kg$_{{CO_2}}$/kWh, based on the United States average.
                         '''.format(default_electricity_emissions_kgCO2_kWh))
-    
-### x-AXIS VARIABLE
+
+### x-AXIS VARIABLE FOR SENSITIVITY
 
 st.sidebar.header('x-axis variable' )
 
 # Cache creation of flags dataframe
 @st.cache_data(ttl = "1h")
 def flags(product_name):
-# Create flags for selecting variable
+    # Create flags for selecting variable
     dict_flags = {   # Formatted as 'override_parameter': 'parameter name', 'unit', 'variable name', 'default value', 'minimum value', 'maximum value'
             'override_cell_voltage':[ 'Cell voltage', 'V', 'cell_E_V',                                             cell_E_V,                          1.34, 15 ],
             'override_eta_cat': ['Cathodic overpotential', 'V', 'BV_eta_cat_V',                                    BV_eta_cat_V,                      0, -6],
@@ -1388,7 +1405,7 @@ def updated_radio_state(df_flags):
 df_flags = flags(product_name)
 
 with st.sidebar:
-    ## Initialize overridden_vbl_radio_ethylene widget
+    ## Initialize overridden_vbl_radio_OA widget
 
     override_vbl_selection = st.radio(label = 'Select variable to see cost sensitivity ', key='overridden_vbl_radio_OA_nonaq',
                     options= options_list, 
@@ -1987,7 +2004,7 @@ if not np.isnan(FE_product_checked):
 
             # Write the HTML
             st.write(levelized_html, unsafe_allow_html=True)
-            
+
     with right_column.container(height = 455, border = False): 
         pass
 
@@ -2164,94 +2181,94 @@ with middle_column:
             df_capex_BM, df_capex_totals, df_costing_assumptions, df_depreciation, df_electrolyzer_assumptions, df_electrolyzer_streams_mol_s,\
                     df_energy, df_feedstocks, df_general, df_maintenance, df_replacement, df_operations, df_opex, df_opex_totals, df_outlet_assumptions,\
                     df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities, df_cashflows, \
-                    cashflows, NPV, IRR, breakeven_price_USD_kgprod  = cached_single_run_nonaq(product_name = product_name,
-                solvent_name = solvent_name,
-                supporting_electrolyte_name = supporting_electrolyte_name,
-                df_products = df_products,
+                    cashflows, NPV, IRR, breakeven_price_USD_kgprod = cached_single_run_nonaq(product_name = product_name,
+                    solvent_name = solvent_name,
+                    supporting_electrolyte_name = supporting_electrolyte_name,
+                    df_products = df_products,
 
-                product_rate_kg_day = product_rate_kg_day,
-                model_FE = model_FE,
-                FE_CO2R_0 = FE_CO2R_0,
-                FE_product_specified = FE_product_specified,
-                j_total_mA_cm2 = j_total_mA_cm2,
-                SPC = SPC,
-                crossover_ratio = crossover_ratio,
-                P = P,
-                T_streams = T_streams,
+                    product_rate_kg_day = product_rate_kg_day,
+                    model_FE = model_FE,
+                    FE_CO2R_0 = FE_CO2R_0,
+                    FE_product_specified = FE_product_specified,
+                    j_total_mA_cm2 = j_total_mA_cm2,
+                    SPC = SPC,
+                    crossover_ratio = crossover_ratio,
+                    P = P,
+                    T_streams = T_streams,
 
-                R_membrane_ohmcm2 = R_membrane_ohmcm2,
-                electrolyte_thickness_cm = electrolyte_thickness_cm,
-                
-                an_E_eqm = an_E_eqm,
-                an_eta_ref = an_eta_ref,
-                an_Tafel_slope = an_Tafel_slope,
-                an_j_ref = an_j_ref,
+                    R_membrane_ohmcm2 = R_membrane_ohmcm2,
+                    electrolyte_thickness_cm = electrolyte_thickness_cm,
+                    
+                    an_E_eqm = an_E_eqm,
+                    an_eta_ref = an_eta_ref,
+                    an_Tafel_slope = an_Tafel_slope,
+                    an_j_ref = an_j_ref,
 
-                cathode_outlet_humidity = cathode_outlet_humidity,
-                excess_water_ratio = excess_water_ratio,   
-                excess_solvent_ratio = excess_solvent_ratio,
-                catholyte_conc_M = catholyte_conc_M,  
-                anolyte_conc_M = anolyte_conc_M,
-                water_density_kg_m3 = water_density_kg_m3,
-                electrolyte_density_kg_m3 = electrolyte_density_kg_m3,
-                solvent_loss_fraction = solvent_loss_fraction,
+                    cathode_outlet_humidity = cathode_outlet_humidity,
+                    excess_water_ratio = excess_water_ratio,   
+                    excess_solvent_ratio = excess_solvent_ratio,
+                    catholyte_conc_M = catholyte_conc_M,  
+                    anolyte_conc_M = anolyte_conc_M,
+                    water_density_kg_m3 = water_density_kg_m3,
+                    electrolyte_density_kg_m3 = electrolyte_density_kg_m3,
+                    solvent_loss_fraction = solvent_loss_fraction,
 
-                LL_second_law_efficiency = LL_second_law_efficiency,
-                PSA_second_law_efficiency = PSA_second_law_efficiency,
-                T_sep = T_sep,         
-                CO2_solubility_mol_mol = CO2_solubility_mol_mol,
+                    LL_second_law_efficiency = LL_second_law_efficiency,
+                    PSA_second_law_efficiency = PSA_second_law_efficiency,
+                    T_sep = T_sep,         
+                    CO2_solubility_mol_mol = CO2_solubility_mol_mol,
 
-                carbon_capture_efficiency = carbon_capture_efficiency,
-                electricity_emissions_kgCO2_kWh = electricity_emissions_kgCO2_kWh,
-                heat_emissions_kgCO2_kWh = heat_emissions_kgCO2_kWh,
+                    carbon_capture_efficiency = carbon_capture_efficiency,
+                    electricity_emissions_kgCO2_kWh = electricity_emissions_kgCO2_kWh,
+                    heat_emissions_kgCO2_kWh = heat_emissions_kgCO2_kWh,
 
-                electricity_cost_USD_kWh = electricity_cost_USD_kWh,
-                heat_cost_USD_kWh = heat_cost_USD_kWh,
-                product_cost_USD_kgprod = product_cost_USD_kgprod,
-                H2_cost_USD_kgH2 = H2_cost_USD_kgH2,
-                water_cost_USD_kg = water_cost_USD_kg,
-                CO2_cost_USD_tCO2 = CO2_cost_USD_tCO2,
-                electrolyzer_capex_USD_m2 = electrolyzer_capex_USD_m2,  
-                PSA_capex_USD_1000m3_hr = PSA_capex_USD_1000m3_hr,
-                LL_capex_USD_1000mol_hr = LL_capex_USD_1000mol_hr,     
-                solvent_cost_USD_kg = solvent_cost_USD_kg,
-                electrolyte_cost_USD_kg = electrolyte_cost_USD_kg,    
+                    electricity_cost_USD_kWh = electricity_cost_USD_kWh,
+                    heat_cost_USD_kWh = heat_cost_USD_kWh,
+                    product_cost_USD_kgprod = product_cost_USD_kgprod,
+                    H2_cost_USD_kgH2 = H2_cost_USD_kgH2,
+                    water_cost_USD_kg = water_cost_USD_kg,
+                    CO2_cost_USD_tCO2 = CO2_cost_USD_tCO2,
+                    electrolyzer_capex_USD_m2 = electrolyzer_capex_USD_m2,  
+                    PSA_capex_USD_1000m3_hr = PSA_capex_USD_1000m3_hr,
+                    LL_capex_USD_1000mol_hr = LL_capex_USD_1000mol_hr,     
+                    solvent_cost_USD_kg = solvent_cost_USD_kg,
+                    electrolyte_cost_USD_kg = electrolyte_cost_USD_kg,    
 
-                lifetime_years = lifetime_years,
-                stack_lifetime_years = stack_lifetime_years,
-                capacity_factor = capacity_factor,
+                    lifetime_years = lifetime_years,
+                    stack_lifetime_years = stack_lifetime_years,
+                    capacity_factor = capacity_factor,
 
-                battery_capex_USD_kWh = battery_capex_USD_kWh,               
-                battery_capacity = battery_capacity,
+                    battery_capex_USD_kWh = battery_capex_USD_kWh,               
+                    battery_capacity = battery_capacity,
 
-                kappa_electrolyte_S_cm = kappa_electrolyte_S_cm,
-                viscosity_cP = viscosity_cP,  
+                    kappa_electrolyte_S_cm = kappa_electrolyte_S_cm,
+                    viscosity_cP = viscosity_cP,  
 
-                overridden_vbl = vbl_name,
-                overridden_value = vbl,
-                overridden_unit = vbl_unit,
-                override_optimization = override_optimization,
-                exponent = exponent,
-                scaling = scaling,
+                    overridden_vbl = vbl_name,
+                    overridden_value = vbl,
+                    overridden_unit = vbl_unit,
+                    override_optimization = override_optimization,
+                    exponent = exponent,
+                    scaling = scaling,
 
-                is_additional_capex = is_additional_capex,
-                additional_capex_USD = additional_capex_USD,
-                is_additional_opex = is_additional_opex,  
-                additional_opex_USD_kg = additional_opex_USD_kg,
+                    is_additional_capex = is_additional_capex,
+                    additional_capex_USD = additional_capex_USD,
+                    is_additional_opex = is_additional_opex,  
+                    additional_opex_USD_kg = additional_opex_USD_kg,
 
-                MW_CO2 = MW_CO2,
-                MW_H2O = MW_H2O,
-                MW_O2 = MW_O2,
-                MW_MX = MW_K2CO3,
-                MW_solvent = MW_solvent,
-                MW_supporting = MW_supporting,
-                R = R, 
-                F = F,
-                
-                K_to_C = K_to_C,
-                kJ_per_kWh = kJ_per_kWh,
-        )
-            
+                    MW_CO2 = MW_CO2,
+                    MW_H2O = MW_H2O,
+                    MW_O2 = MW_O2,
+                    MW_MX = MW_K2CO3,
+                    MW_solvent = MW_solvent,
+                    MW_supporting = MW_supporting,
+                    R = R, 
+                    F = F,
+                    
+                    K_to_C = K_to_C,
+                    kJ_per_kWh = kJ_per_kWh,
+            )
+
             ### Store results of models                             
             # dict_stream_tables[vbl] = {
             #     df_streams_formatted.index.name: df_streams_formatted, 
@@ -2301,7 +2318,7 @@ with middle_column:
                                         df_costing_assumptions['Cost']], axis = 1) # Store costing assumptions for plotting
             df_sales_vs_vbl = pd.concat([df_sales_vs_vbl, 
                                     df_sales['Earnings ($/yr)']], axis = 1) # Store costing assumptions for plotting
-  
+
             ### Adjust FE_product, SPC, capacity_factor and variable back to their original values in globals()
             if vbl_name != 'Cell voltage' and vbl_name != 'Cathodic overpotential' and vbl_name != 'Anodic overpotential':
                 globals()[df_flags.loc[vbl_name,'Python variable']] = value_original
@@ -2409,7 +2426,6 @@ if not st.session_state.is_active_error_OA_nonaq:
     # Energy colors
     energy_colors = emissions_colors # [RdYlBu(i) for i in np.linspace(0, 1, sum(~df_energy_vs_vbl.iloc[:-3].T.isnull().all())  )  ] # len(df_energy_vs_vbl.index) - 2)] # last rows are totals
 
-    
     x_axis_major_ticks = x_axis_formatting(x_axis_min, x_axis_max, x_axis_num)
 
     if vbl_unit == '':
@@ -2447,7 +2463,7 @@ if not st.session_state.is_active_error_OA_nonaq:
             axs.set_ylim([y_axis_min_capex,y_axis_max_capex])
 
             ## Plot series
-            if df_flags.loc['Capacity factor', 'T/F?'] :
+            if df_flags.loc['Capacity factor', 'T/F?']:
                 axs.plot([0.23625,0.23625], [y_axis_min_capex, y_axis_max_capex], alpha = 1,
                     c = theme_colors[6]) # Plot line for cost 
                 axs.text(0.23625, y_axis_min_capex + (y_axis_max_capex - y_axis_min_capex)*0.025, 'Solar capacity', ha='right', va='bottom', #  (5.67 h/day)
@@ -2665,13 +2681,13 @@ if not st.session_state.is_active_error_OA_nonaq:
                 ## Legend
                 axs.legend(bbox_to_anchor=(1, 1), loc='upper left', reverse = True) # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
                 # st.pyplot(potentials_bar_fig, transparent = True, use_container_width = True)
-                capex_html = svg_write(potentials_bar_fig, center = True)
+                potentials_html = svg_write(potentials_bar_fig, center = True)
                 
-                st.write(capex_html, unsafe_allow_html=True)
+                st.write(potentials_html, unsafe_allow_html=True)
 
     ###### FE-SPC SCATTERPLOT
     with right_column.container(height = 300, border = False): 
-        st.subheader('FE-$X_{CO2}$ tradeoff')
+        st.subheader('FE-$X_{CO_2}$ tradeoff')
         with _render_lock:
             FE_SPC_bar_fig, axs = plt.subplots() # Set up plot
             
@@ -2700,11 +2716,14 @@ if not st.session_state.is_active_error_OA_nonaq:
         #                 marker = 'X', c = 'k', s = 200, alpha = 1, label = 'Limits')
             
             axs.legend(bbox_to_anchor = (1, 1), loc= 'upper left') # bbox_to_anchor = (1,1)
-            st.pyplot(FE_SPC_bar_fig, transparent = True, use_container_width = True,)    
+            # st.pyplot(FE_SPC_bar_fig, transparent = True, use_container_width = True,)    
+            FE_html = svg_write(FE_SPC_bar_fig, center = True)
+            
+            st.write(FE_html, unsafe_allow_html=True)
 
     ###### ENERGY BAR CHART 
     with middle_column.container(height = 300, border = False): 
-        if not vbl_name == 'Cell voltage':   
+        if not vbl_name == 'Cell voltage':
             st.subheader('Energy sensitivity')
             with _render_lock:
                 energy_bar_fig, axs = plt.subplots() # Set up plot
@@ -2743,7 +2762,10 @@ if not st.session_state.is_active_error_OA_nonaq:
                 axs.legend(bbox_to_anchor=(1, 1), loc='upper left', reverse = True) 
                 # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
 
-                st.pyplot(energy_bar_fig, transparent = True, use_container_width = True)   
+                # st.pyplot(energy_bar_fig, transparent = True, use_container_width = True)   
+                energy_html = svg_write(energy_bar_fig, center = True)
+                
+                st.write(energy_html, unsafe_allow_html=True)
 
     ###### EMISSIONS BAR CHART
     with right_column.container(height = 300, border = False): 
@@ -2809,12 +2831,12 @@ if not st.session_state.is_active_error_OA_nonaq:
                 ## Legend
                 axs.legend(bbox_to_anchor=(1, 1), loc='upper left', reverse = True) # -> bbox_to_anchor docks the legend to a position, loc specifies which corner of legend is that position
 
-                st.pyplot(emissions_bar_fig, transparent = True, use_container_width = True)   
-                
-    #___________________________________________________________________________________
+                # st.pyplot(emissions_bar_fig, transparent = True, use_container_width = True)   
+                emissions_html = svg_write(emissions_bar_fig, center = True)
             
-    with right_column.container(height = 455, border = False): 
-        pass
+                st.write(emissions_html, unsafe_allow_html=True)
+
+    #___________________________________________________________________________________
 
     st.divider()
 
@@ -2832,7 +2854,7 @@ if not st.session_state.is_active_error_OA_nonaq:
     
     st.subheader('Sales')
     df_sales_vs_vbl_2
-    
+
     st.subheader('Electrolyzer model')
     df_potentials_vs_vbl_2    
 

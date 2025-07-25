@@ -95,10 +95,10 @@ def cached_single_run(product_name,
         battery_capex_USD_kWh,               
         battery_capacity,
         model_FE,
-        is_additional_opex,
         is_additional_capex,
-        additional_opex_USD_kg,
+        is_additional_opex,
         additional_capex_USD,
+        additional_opex_USD_kg,
         overridden_vbl,
         overridden_value,
         overridden_unit,
@@ -153,8 +153,8 @@ def cached_single_run(product_name,
         battery_capex_USD_kWh = battery_capex_USD_kWh,               
         battery_capacity = battery_capacity,
         model_FE = model_FE,
-        is_additional_opex= is_additional_opex,
-        is_additional_capex= is_additional_capex,
+        is_additional_capex=is_additional_capex,
+        is_additional_opex=is_additional_opex,
         additional_opex_USD_kg = additional_opex_USD_kg,
         additional_capex_USD = additional_capex_USD,
         overridden_vbl = overridden_vbl,
@@ -543,7 +543,6 @@ with st.expander("**Help**", expanded = False):
 st.write("**Cite this work**: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647)")
 st.write("**Questions, collaborations, requests?** Contact [shashwatidc@utexas.edu](mailto:shashwatidc@utexas.edu).")
 
-
 #__________________________________________________________________________________
 
 ###############################  IMPORT SOURCE DATA ###############################
@@ -669,12 +668,12 @@ additional_opex_USD_kg = 0.0
 options_list  = ['Cell voltage (V)', 
                 'Cathodic overpotential (V)',
                 'Anodic overpotential (V)',
-                'Ohmic resistance ($\Omega$)',
+                'Membrane resistance ($\Omega$.cm$^2$)',
                 'Total current density (mA/cm$^2$)',
                 # 'FE$_{{{}}}$'.format(product_name),
                 '$FE_{CO_2R, \: 0}$',
                 'Single-pass conversion',
-                'Crossover ratio',
+                'Crossover ratio (mol CO$_2$ per mol e$^-$)',
                 'Production rate (kg/day)',
                 'Capacity factor',
                 'Lifetime (yrs)',
@@ -1126,8 +1125,8 @@ with st.sidebar:
                     max_value = 1.0,
                     step = 0.01, value = FE_CO2R_0,
                     help = 'Faradaic efficiency, independent of any other variables. \
-                          This is not a recommended or default option, since it neglects electrolyzer geometry. \
-                            Therefore, it artificialy lowers costs.')
+                        This is not a recommended or default option, since it neglects electrolyzer geometry.\
+                        Therefore, it artificially lowers costs.')
 
         FE_CO2R_0 = st.slider(label = '$ FE_{CO_2R, \: 0}$, maximum Faradaic efficiency',
                             min_value = 0.0001, 
@@ -1139,7 +1138,7 @@ with st.sidebar:
                             lim_{{X_{{CO_2}} → 0}} FE_{{CO_2R}}
                             $$$
                             ''' +   '\n  Default $ FE_{{CO_2R, \: 0}}$: {}'.format(default_FE_CO2R_0),
-                            disabled=answer == option_3)
+                            disabled = answer == option_3)
         SPC = st.slider(label = 'Single-pass conversion',
                             min_value = 0.0001, 
                             max_value = 1.0, 
@@ -1159,7 +1158,7 @@ with st.sidebar:
                             \\\   CO_{{2}} + 2OH^{{-}} → HCO_{{3}}^{{-}} + OH^- ⇌ CO_{{3}}^{{2-}} + H_2O 
                             $$$
                             """,
-                            format = '%.2f')        
+                            format = '%.2f')
         FE_product_checked, __ = SPC_check(FE_product_specified=FE_product_specified, 
                 exponent= exponent,
                 scaling = scaling,
@@ -1185,7 +1184,7 @@ with st.sidebar:
                     To manually override this error, choose to manually specify $FE$ and single-pass conversion.
                     If you are still seeing an error, it may be because the crossover is too high and limits the possible single-pass conversion.''',
                     icon = ":material/error:")
-        
+
         st.latex(r'''
                  \footnotesize \implies  FE_{{{}}} = {:.2f}
                  '''.format(product_name, FE_product_checked))
@@ -1331,7 +1330,7 @@ with st.sidebar:
                             '''.format(0))*1e6
     else:
         is_additional_capex = False
-        additional_capex_USD = 0 
+        additional_capex_USD = 0
 
     answer = st.toggle('Add custom opex', value = False,
                          help = 'Optional operating cost')
@@ -1646,7 +1645,7 @@ if not st.session_state.is_active_error_CO:
     opex_colors = [diverging(i) for i in np.linspace(0, 0.85, len(df_opex_vs_vbl.index) - flag[is_additional_opex]) ]
     if is_additional_opex:
         opex_colors.append((0.85, 0.85, 0.85, 1)) # add in battery 
-    #PuOr okay but low contrast at ends
+
     # Emissions colors
     emissions_colors = [RdYlBu(i) for i in np.linspace(0, 1, sum(~df_emissions_vs_vbl.T.isnull().all()) - 1 )  ] # len(df_energy_vs_vbl.index) - 2)] # last rows are totals
 
@@ -1917,8 +1916,8 @@ if not st.session_state.is_active_error_CO:
 
     ###### FE-SPC SCATTERPLOT
     with right_column.container(height = 300, border = False): 
+        st.subheader('FE-$X_{CO_2}$ tradeoff')
         with _render_lock:
-            st.subheader('FE-$X_{CO_2}$ tradeoff')
             FE_SPC_bar_fig, axs = plt.subplots() # Set up plot
             
             ## Axis labels
