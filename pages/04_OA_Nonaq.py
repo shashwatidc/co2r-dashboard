@@ -2153,8 +2153,9 @@ with middle_column:
             
             ### Generate physical and costing model
             df_capex_BM, df_capex_totals, df_costing_assumptions, df_depreciation, df_electrolyzer_assumptions, df_electrolyzer_streams_mol_s,\
-                df_energy, df_feedstocks, df_general, df_maintenance, df_operations, df_opex, df_opex_totals, df_outlet_assumptions,\
-                df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities = cached_single_run_nonaq(product_name = product_name,
+                    df_energy, df_feedstocks, df_general, df_maintenance, df_replacement, df_operations, df_opex, df_opex_totals, df_outlet_assumptions,\
+                    df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities, df_cashflows, \
+                    cashflows, NPV, IRR, breakeven_price_USD_kgprod  = cached_single_run_nonaq(product_name = product_name,
                 solvent_name = solvent_name,
                 supporting_electrolyte_name = supporting_electrolyte_name,
                 df_products = df_products,
@@ -2839,7 +2840,7 @@ st.write('\n \n \n')
 
 st.subheader('MEA design schematic')
 st.write('\n')
-electrolyzer_svg = open("figures/SI 2b non-aqueous half flow cell", 
+electrolyzer_svg = open("figures/SI 2b non-aqueous half flow cell.svg", 
                'r', 
                encoding='utf-8')
 source_code = electrolyzer_svg.read() 
