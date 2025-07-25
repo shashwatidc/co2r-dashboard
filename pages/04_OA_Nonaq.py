@@ -644,11 +644,6 @@ with st.expander("**Help**", expanded = False):
             Please note that it can take some time to run the model for a large number of datapoints. If possible, start with a few points and add more once you have the settings you want. 
            \n By default, the cell voltage will be modeled using Tafel equations, and the Faradaic efficiency based on the single-pass conversion and the maximum Faradaic efficiency.
            \n Mouse over the :grey[**?**] next to each input to see the default values for each parameter. Refresh the page to reset all values to their defaults.      
-           \n This dashboard will not exactly match the paper, since costs have been updated since its publication. You can get close to reproducing it
-            by adjusting the electrolyzer capex to \$5000/m$^2$, electricity price to \$0.076/kWh, single-pass conversion for CO
-            to 11.5%, total current density for CO to 472 mA/cm$^2$, single-pass conversion for ethylene to 2.7%, 
-            and total current density for ethylene to 436 mA/cm$^2$, CO market price to \$0.6/kg, and ethylene market price to \$0.96. 
-            However, the PSA capex and labor costs will still differ from the original, so the resulting price will still be slightly higher. 
         """)
 
 st.write("**Cite this work**: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647), [10.26434/chemrxiv-2025-k071x](https://doi.org/10.26434/chemrxiv-2025-k071x)")
@@ -734,20 +729,20 @@ overridde_multivbl = False
 override_optimization = False
 override_animation = False
 override_single = False
-model_FE = 'Kas'
+model_FE = None
 is_battery = False
 is_additional_capex = False
 is_additional_opex = False
-st.session_state.is_active_error_ethylene = False
-product_name = 'Ethylene' # default
+st.session_state.is_active_error_OA_nonaq = False
+product_name = 'Oxalic acid' # default
 range_selection = 'Linear' # default
 override_vbl_selection = 'Total current density' # default
 vbl_name = 'Current density' # default
 vbl_unit = 'mA/cm$^2$' # default
-if 'minimum_value_input_ethylene' not in st.session_state:
-    st.session_state.minimum_value_input_ethylene = str(0.001)
-if 'maximum_value_input_ethylene' not in st.session_state:
-    st.session_state.maximum_value_input_ethylene = str(1500)
+if 'minimum_value_input_OA_nonaq' not in st.session_state:
+    st.session_state.minimum_value_input_OA_nonaq = str(0.001)
+if 'maximum_value_input_OA_nonaq' not in st.session_state:
+    st.session_state.maximum_value_input_OA_nonaq = str(1500)
 
 ########## OTHER FIXED VALUES
 # PRODUCT COSTS
@@ -757,13 +752,13 @@ H2_cost_USD_kgH2 = float(df_products.loc['H2', 'Cost ($/kg product)']) # assume 
 default_H2_cost_USD_kgH2 = H2_cost_USD_kgH2
 
 # RAW INPUTS
-crossover_ratio = crossover_neutral
+crossover_ratio = crossover_acid
 default_crossover_ratio = crossover_ratio
 FE_product_specified = df_products.loc[product_name, 'FECO2R at SPC = 0']  # 0.9 # 0.90 # %/100
 default_FE_product_specified = FE_product_specified
-j_total_mA_cm2 = float(df_products.loc[product_name, 'Optimal j @ 8.2 c/kWh, Hawks model']) # 300 # mA/cm2
+j_total_mA_cm2 = float(df_products.loc[product_name, 'Chosen total current density (mA/cm2)']) # 300 # mA/cm2
 default_j_total_mA_cm2 = j_total_mA_cm2
-cell_E_V = 3.0  # default cell voltage
+cell_E_V = 5.0  # default cell voltage
 default_cell_E_V = cell_E_V
 BV_eta_cat_V = -0.6
 default_BV_eta_cat_V = BV_eta_cat_V
@@ -771,7 +766,7 @@ BV_eta_an_V = 0.25
 default_BV_eta_an_V = BV_eta_an_V
 FE_CO2R_0 = df_products.loc[product_name, 'FECO2R at SPC = 0']
 default_FE_CO2R_0  = FE_CO2R_0
-SPC = df_products.loc[product_name, 'Optimal SPC @ 8.2 c/kWh, Hawks model']  #0.3 # 0.5 # %/100
+SPC = df_products.loc[product_name, 'Chosen SPC, no tradeoff']  #0.3 # 0.5 # %/100
 default_SPC = SPC
 cat_Tafel_slope = df_products.loc[product_name, 'Tafel slope (mV/dec)']
 default_cat_Tafel_slope = cat_Tafel_slope
@@ -917,18 +912,18 @@ def y_axis_formatting(y_axis_min, y_axis_max, y_axis_num):
     return(y_axis_major_ticks)
 
 def updated_radio_state(df_flags):
-    vbl_row = options_list.index(st.session_state['overridden_vbl_radio_ethylene']) # convert input into integer
+    vbl_row = options_list.index(st.session_state['overridden_vbl_radio_OA_nonaq']) # convert input into integer
     vbl_name = df_flags.index[vbl_row] # set vbl_name from that row
     vbl_unit = df_flags.loc[vbl_name, 'Unit']
-    st.session_state.minimum_value_input_ethylene = str(df_flags.loc[vbl_name, 'Range min'])
-    st.session_state.maximum_value_input_ethylene = str(df_flags.loc[vbl_name, 'Range max'])
+    st.session_state.minimum_value_input_OA_nonaq = str(df_flags.loc[vbl_name, 'Range min'])
+    st.session_state.maximum_value_input_OA_nonaq = str(df_flags.loc[vbl_name, 'Range max'])
 
 df_flags = flags(product_name)
 
 with st.sidebar:
     ## Initialize overridden_vbl_radio_ethylene widget
 
-    override_vbl_selection = st.radio(label = 'Select variable to see cost sensitivity ', key='overridden_vbl_radio_ethylene',
+    override_vbl_selection = st.radio(label = 'Select variable to see cost sensitivity ', key='overridden_vbl_radio_OA_nonaq',
                           options= options_list, 
                     index = 4, # default option
                     label_visibility='visible',
@@ -941,22 +936,22 @@ with st.sidebar:
     try:
         st.write('Minimum value')
         vbl_min = float(st.text_input(label = 'Minimum value',
-                    key = 'minimum_value_input_ethylene', # value = str(df_flags.loc[vbl_name, 'Range min']),  
+                    key = 'minimum_value_input_OA_nonaq', # value = str(df_flags.loc[vbl_name, 'Range min']),  
                     label_visibility='collapsed'))
         st.write('Maximum value')
         vbl_max = float(st.text_input(label = 'Maximum value',
-                    key = 'maximum_value_input_ethylene',#  value = str(df_flags.loc[vbl_name, 'Range max']),
+                    key = 'maximum_value_input_OA_nonaq',#  value = str(df_flags.loc[vbl_name, 'Range max']),
                     label_visibility='collapsed'))
         
         st.write('Number of points (integer)')
         vbl_num = int(st.text_input(label = 'Number of points',
                     value = 11, 
                     label_visibility='collapsed'))
-        st.session_state.is_active_error_ethylene = False
+        st.session_state.is_active_error_OA_nonaq = False
     except:
         st.error('One of your x-variable values is invalid. Please check that they are all numbers and \
                   that the number of points is an integer.')
-        st.session_state.is_active_error_ethylene = True
+        st.session_state.is_active_error_OA_nonaq = True
         st.header('*:red[There is an error in the model inputs.]*')
 
     st.write('Spacing for points')
@@ -1001,11 +996,11 @@ with st.sidebar:
             x_axis_min = float(x_axis_min)
             x_axis_max = float(x_axis_max)
             x_axis_num = int(x_axis_num)
-            st.session_state.is_active_error_ethylene = False
+            st.session_state.is_active_error_OA_nonaq = False
         except:
             st.error('One of your x-axis values is invalid. Please check that they are all numbers and \
                     that the number of x-ticks is an integer.')
-            st.session_state.is_active_error_ethylene = True
+            st.session_state.is_active_error_OA_nonaq = True
             st.header('*:red[There is an error in the model inputs.]*')
 
     with st.expander('**y-axes formatting**', expanded = False):
@@ -1024,11 +1019,11 @@ with st.sidebar:
             y_axis_min_capex = float(y_axis_min_capex)
             y_axis_max_capex = float(y_axis_max_capex)
             y_axis_num_capex = int(y_axis_num_capex)
-            st.session_state.is_active_error_ethylene = False
+            st.session_state.is_active_error_OA_nonaq = False
         except:
             st.error('One of your capex y-axis values is invalid. Please check that they are all numbers and \
                     that the number of y-ticks is an integer.')
-            st.session_state.is_active_error_ethylene = True
+            st.session_state.is_active_error_OA_nonaq = True
             st.header('*:red[There is an error in the model inputs..]*')
 
         st.divider()
@@ -1046,11 +1041,11 @@ with st.sidebar:
             y_axis_min_opex = float(y_axis_min_opex)
             y_axis_max_opex = float(y_axis_max_opex)
             y_axis_num_opex = int(y_axis_num_opex)
-            st.session_state.is_active_error_ethylene = False
+            st.session_state.is_active_error_OA_nonaq = False
         except:
             st.error('One of your opex y-axis values is invalid. Please check that they are all numbers and \
                     that the number of y-ticks is an integer.')
-            st.session_state.is_active_error_ethylene = True
+            st.session_state.is_active_error_OA_nonaq = True
             st.header('*:red[There is an error in the model inputs..]*')
     
         st.divider()
@@ -1068,11 +1063,11 @@ with st.sidebar:
             y_axis_min_levelized = float(y_axis_min_levelized)
             y_axis_max_levelized = float(y_axis_max_levelized)
             y_axis_num_levelized = int(y_axis_num_levelized)
-            st.session_state.is_active_error_ethylene = False
+            st.session_state.is_active_error_OA_nonaq = False
         except:
             st.error('One of your levelized cost y-axis values is invalid. Please check that they are all numbers and \
                     that the number of y-ticks is an integer.')
-            st.session_state.is_active_error_ethylene = True
+            st.session_state.is_active_error_OA_nonaq = True
             st.header('*:red[There is an error in the model inputs..]*')
 
         st.write('**Cell potential**')
@@ -1089,11 +1084,11 @@ with st.sidebar:
             y_axis_min_potential = float(y_axis_min_potential)
             y_axis_max_potential = float(y_axis_max_potential)
             y_axis_num_potential = int(y_axis_num_potential)
-            st.session_state.is_active_error_ethylene = False
+            st.session_state.is_active_error_OA_nonaq = False
         except:
             st.error('One of your opex y-axis values is invalid. Please check that they are all numbers and \
                     that the number of y-ticks is an integer.')
-            st.session_state.is_active_error_ethylene = True
+            st.session_state.is_active_error_OA_nonaq = True
             st.header('*:red[There is an error in the model inputs..]*')
 
         st.divider()
@@ -1111,11 +1106,11 @@ with st.sidebar:
             y_axis_min_energy = float(y_axis_min_energy)
             y_axis_max_energy = float(y_axis_max_energy)
             y_axis_num_energy = int(y_axis_num_energy)
-            st.session_state.is_active_error_ethylene = False
+            st.session_state.is_active_error_OA_nonaq = False
         except:
             st.error('One of your energy y-axis values is invalid. Please check that they are all numbers and \
                     that the number of y-ticks is an integer.')
-            st.session_state.is_active_error_ethylene = True
+            st.session_state.is_active_error_OA_nonaq = True
             st.header('*:red[There is an error in the model inputs..]*')
     
         st.divider()
@@ -1133,11 +1128,11 @@ with st.sidebar:
             y_axis_min_emissions = float(y_axis_min_emissions)
             y_axis_max_emissions = float(y_axis_max_emissions)
             y_axis_num_emissions = int(y_axis_num_emissions)
-            st.session_state.is_active_error_ethylene = False
+            st.session_state.is_active_error_OA_nonaq = False
         except:
             st.error('One of your emissions y-axis values is invalid. Please check that they are all numbers and \
                     that the number of y-ticks is an integer.')
-            st.session_state.is_active_error_ethylene = True
+            st.session_state.is_active_error_OA_nonaq = True
             st.header('*:red[There is an error in the model inputs..]*')
 
 
@@ -1291,9 +1286,9 @@ with st.sidebar:
                 df_products=df_products,
                 crossover_ratio=crossover_ratio)
         if not np.isnan(FE_product_checked): 
-            st.session_state.is_active_error_ethylene = False
+            st.session_state.is_active_error_OA_nonaq = False
         else:
-            st.session_state.is_active_error_ethylene = True
+            st.session_state.is_active_error_OA_nonaq = True
             error_dialog(FE_product_checked, SPC, crossover_ratio)
             # st.header(':red[Model is physically unviable. Please check $ FE_{CO_2R, \: 0}$,  $ X_{CO_2}$ and crossover ratio.]')
             
@@ -1935,7 +1930,7 @@ if not np.isnan(FE_product_checked):
     
 ##########################  GENERATE MODEL OVER RANGE  ##########################
 with middle_column:
-    if not st.session_state.is_active_error_ethylene:
+    if not st.session_state.is_active_error_OA_nonaq:
         progress_bar = st.progress(0, text= "Running model over range. Please wait.")
 
         ### Generate modeling results for variable range 
@@ -2141,10 +2136,10 @@ with middle_column:
         df_emissions_vs_vbl_2.insert(0, 'Units', 'kg CO2/kg {}'.format(product_name))
 
         if df_capex_BM_vs_vbl.isnull().values.all():
-            st.session_state.is_active_error_ethylene = True
+            st.session_state.is_active_error_OA_nonaq = True
             st.header('*:red[There is an error in the model inputs. Please check the sidebar for error messages.]*')
         else:
-            st.session_state.is_active_error_ethylene = False
+            st.session_state.is_active_error_OA_nonaq = False
 
     else:
         st.header('*:red There is an error in the model inputs. Please check the sidebar for error messages.*')
@@ -2153,7 +2148,7 @@ with middle_column:
 
 ############################### FIGURE OUTPUTS #####################################
 
-if not st.session_state.is_active_error_ethylene:
+if not st.session_state.is_active_error_OA_nonaq:
     ###### BAR CHART FORMATTING
     flag = {True: 1,
             False: 0}
