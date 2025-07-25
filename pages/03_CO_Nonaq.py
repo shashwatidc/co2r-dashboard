@@ -629,12 +629,17 @@ RdBu = LinearSegmentedColormap.from_list('diverging_cmap', colors)
 
 st.title("CO$_2$R Costing Dashboard: non-aqueous CO$_2$R costs to CO")
 st.write("*Developed by [Shashwati da Cunha](https://shashwatidc.github.io/) in the [Resasco Catalysis Lab](https://www.resascolab.com/)*")
-st.write('''Visualize how the capex and opex respond to changes in parameters for non-aqueous CO₂R to CO.
+st.write('''Visualize the [base-case capex](#capital-cost), [opex](#operating-cost) and [levelized cost](#levelized-cost) for non-aqueous CO₂R to CO. 
+         Additionally, visualize how the [capex](#capex-sensitivity) and [opex](#opex-sensitivity) respond to changes in parameters.
          Pick a parameter and modify the settings on the left to see how the results change. 
          ''')
 
+st.header(":red[WARNING: This page is currently being updated! Some functionality may be broken.]")
+
 with st.expander("**Update history**", expanded = False):
-    st.write('''**March 12, 2025:** Capital costs are now adjusted to the approximate average CEPCI for 2024 (800). 
+    st.write('''**July 25, 2025:** New pages have been added for techno-economic assesssment of non-aqueous CO₂R to CO and oxalic acid.
+             \n 
+             **March 12, 2025:** Capital costs are now adjusted to the approximate average CEPCI for 2024 (800). 
          Industrial electricity prices are now the average for 2024 (\$0.082/kWh). The base case single-pass conversion and total current density have been adjusted to the optimal in the Hawks model at these new costs.
          The market price of ethylene is updated to the 2024 global average. Pure CO is a difficult chemical to price since it is rarely sold, usually used within a facility where it is generated.
          The base price for CO (\$0.6/kg in 2001) has also been updated with an arbitrary 1% inflation rate. Note that it may be more likely to track natural gas prices, which slightly dipped from 2001 to 2024 on the Henry Hub.   
@@ -903,7 +908,7 @@ with st.sidebar:
                             format = '%.1f',
                     help = '''Check the box above to set the full-cell voltage. No underlying voltage model will be used. 
                     This means that current and voltage have no physical relationship.
-                      \n Default cell voltage: {} V'''.format(default_cell_E_V),
+                      \n Default cell voltage: {:.1f} V'''.format(default_cell_E_V),
                     disabled = not override_cell_voltage)
         if override_cell_voltage:
             st.write('*Using specified cell voltage*')
@@ -919,7 +924,7 @@ with st.sidebar:
                             help = '''Check the box above to set the cathodic overpotential. 
                             Thermodynamics, cell resistance and anodic overpotential will be modeled. 
                             Note that more negative overpotentials indicate slower kinetics.
-                              \n Default cathodic overpotential: {} V'''.format(default_BV_eta_cat_V),)
+                              \n Default cathodic overpotential: {:.1f} V'''.format(default_BV_eta_cat_V),)
             if override_eta_cat:
                 st.write('*Using manually specified cathodic overpotential*')
             else:
@@ -933,7 +938,7 @@ with st.sidebar:
                             format = '%.1f',
                             disabled = not override_eta_an,
                             help = '''Check the box above to set the anodic overpotential. Thermodynamics, cell resistance and cathodic overpotential will be modeled. 
-                              \n Default anodic overpotential: {} V'''.format(default_BV_eta_an_V),) 
+                              \n Default anodic overpotential: {:.1f} V'''.format(default_BV_eta_an_V),) 
             if override_eta_an:
                 st.write('*Using manually specified anodic overpotential*')
             else:
@@ -947,11 +952,11 @@ with st.sidebar:
                             format = '%.2f',
                             disabled= not override_membrane_ohmic,
                             help = '''Check the box above to set the area-specific ohmic resistance of the membrane. Thermodynamics and kinetic overpotentials will be modeled. 
-                              \n Default specific resistance: {} $ \Omega \cdot$ cm$^2$'''.format(default_R_membrane_ohmcm2),)
+                              \n Default specific resistance: {:.2f} $ \Omega \cdot$ cm$^2$'''.format(default_R_membrane_ohmcm2),)
             if override_membrane_ohmic:
                 st.write('*Using manually specified membrane specific resistance*')
             else:
-                st.write('*Using default membrane resistance for Nafion, {} $ \Omega \cdot$ cm$^2$*'.format(R_membrane_ohmcm2))
+                st.write('*Using default membrane resistance for Nafion, {:.2f} $ \Omega \cdot$ cm$^2$*'.format(R_membrane_ohmcm2))
             
             override_electrolyte = st.checkbox('Specify catholyte conductivity', value = False)
             kappa_electrolyte_S_cm = st.slider(label = 'Catholyte conductivity (S/$ cm$^2$)',
@@ -961,11 +966,11 @@ with st.sidebar:
                             format = '%.2f',
                             disabled= not override_electrolyte,
                             help = '''Check the box above to set the conductivity of the electrolyte. Thermodynamics and kinetic overpotentials will be modeled. 
-                              \n Default specific resistance: {} S/cm$^2$'''.format(default_kappa_electrolyte_S_cm),)
+                              \n Default specific resistance: {:.2f} S/cm$^2$'''.format(default_kappa_electrolyte_S_cm),)
             if override_electrolyte:
                 st.write('*Using manually specified electrolyte conductivity*')
             else:
-                st.write('*Using default electrolyte conductivity, {} S/cm$^2$*'.format(kappa_electrolyte_S_cm))
+                st.write('*Using default electrolyte conductivity, {:.2f} S/cm$^2$*'.format(kappa_electrolyte_S_cm))
             
             override_electrolyte_thickness = st.checkbox('Specify catholyte thickness', value = False)
             electrolyte_thickness_cm = st.slider(label = 'Catholyte thickness (cm$^2$)',
@@ -975,11 +980,11 @@ with st.sidebar:
                             format = '%.2f',
                             disabled= not override_electrolyte_thickness,
                             help = '''Check the box above to set the width of the catholyte chamber. Thermodynamics and kinetic overpotentials will be modeled. 
-                              \n Default specific resistance: {} cm$^2$'''.format(default_electrolyte_thickness_cm),)
+                              \n Default specific resistance: {:.2f} cm$^2$'''.format(default_electrolyte_thickness_cm),)
             if override_electrolyte_thickness:
                 st.write('*Using manually specified electrolyte thickness*')
             else:
-                st.write('*Using default electrolyte thickness, {} S/cm$^2$*'.format(electrolyte_thickness_cm))
+                st.write('*Using default electrolyte thickness, {:.2f} S/cm$^2$*'.format(electrolyte_thickness_cm))
 
 with st.sidebar:
     st.subheader('Electrolyzer operation')
@@ -990,7 +995,7 @@ with st.sidebar:
                             step = 1.0, value = j_total_mA_cm2,
                             format = '%.0f',
                             help = '''Total current density of the cell. This will determine the size and voltage of the cell.
-                              \n Default total current density: {} mA/cm$^2$'''.format(default_j_total_mA_cm2),)
+                              \n Default total current density: {:.0f} mA/cm$^2$'''.format(default_j_total_mA_cm2),)
 
         ##### FE-SPC TRADEOFF  
         option_1 = 'Plug flow in gas channel'
@@ -1623,8 +1628,8 @@ with st.sidebar:
 ##########################  RUN MODEL AT DEFAULT VALUES  ###########################
 
 capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default = default_single_run_nonaq(product_name = product_name,
-                solvent_name = solvent_name,
-                supporting_electrolyte_name = supporting_electrolyte_name,
+                solvent_name = 'DMF',
+                supporting_electrolyte_name = 'TEACl',
                 df_products = df_products,
 
                 product_rate_kg_day = default_product_rate_kg_day,
