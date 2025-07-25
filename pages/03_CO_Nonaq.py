@@ -1393,7 +1393,7 @@ with st.sidebar:
 
     override_vbl_selection = st.radio(label = 'Select variable to see cost sensitivity ', key='overridden_vbl_radio_CO_nonaq',
                           options= options_list, 
-                    index = 4, # default option
+                    index = 9, # default option
                     label_visibility='visible',
                     help = '''Choose a variable as the x-axis (category) for the bar charts. 
                       \n Then choose its range below by defining the minimum, maximum, and number of bars to generate between them.
@@ -1445,7 +1445,7 @@ with st.sidebar:
     # )
 
 vbl_name, vbl_unit, vbl_range, vbl_range_text, vbl_min, vbl_max = generate_range(df_flags, override_vbl_selection, vbl_min, vbl_max, vbl_num)
-default_y_axis_max_opex = 2.0 if product_name == 'CO' else 12.0
+default_y_axis_max_opex = 5.0
 
 ## Define axis limits and ticks - see note below for options
 with st.sidebar:
@@ -1479,7 +1479,7 @@ with st.sidebar:
                             value = 0, label_visibility='collapsed',)
         st.write('Capex y-axis maximum (millions)')
         y_axis_max_capex = st.text_input(label = 'capex y-axis maximum',
-                            value = 100, label_visibility='collapsed')
+                            value = 10, label_visibility='collapsed')
         st.write('Number of capex y-ticks, including endpoints (integer)')
         y_axis_num_capex = st.text_input(label = 'capex y-axis ticks',
                             value = 6, label_visibility='collapsed')
@@ -1544,10 +1544,10 @@ with st.sidebar:
                             value = 0, label_visibility='collapsed',)
         st.write('Cell potential y-axis maximum')
         y_axis_max_potential = st.text_input(label = 'E y-axis maximum',
-                            value = 4, label_visibility='collapsed')
+                            value = 6, label_visibility='collapsed')
         st.write('Number of potential y-ticks, including endpoints (integer)')
         y_axis_num_potential = st.text_input(label = 'E y-axis ticks',
-                            value = 5, label_visibility='collapsed')
+                            value = 7, label_visibility='collapsed')
         try:
             y_axis_min_potential = float(y_axis_min_potential)
             y_axis_max_potential = float(y_axis_max_potential)
@@ -1566,10 +1566,10 @@ with st.sidebar:
                             value = 0, label_visibility='collapsed',)
         st.write('Energy y-axis maximum')
         y_axis_max_energy = st.text_input(label = 'energy y-axis maximum',
-                            value = 1200, label_visibility='collapsed')
+                            value = 5000, label_visibility='collapsed')
         st.write('Number of energy y-ticks, including endpoints (integer)')
         y_axis_num_energy = st.text_input(label = 'energy y-axis ticks',
-                            value = 7, label_visibility='collapsed')
+                            value = 6, label_visibility='collapsed')
         try:
             y_axis_min_energy = float(y_axis_min_energy)
             y_axis_max_energy = float(y_axis_max_energy)
@@ -1588,10 +1588,10 @@ with st.sidebar:
                             value = 0, label_visibility='collapsed',)
         st.write('Emissions y-axis maximum')
         y_axis_max_emissions = st.text_input(label = 'emissions y-axis maximum',
-                            value = 5, label_visibility='collapsed')
+                            value = 10, label_visibility='collapsed')
         st.write('Number of emissions y-ticks, including endpoints (integer)')
         y_axis_num_emissions = st.text_input(label = 'emissions y-axis ticks',
-                            value = 5, label_visibility='collapsed')
+                            value = 6, label_visibility='collapsed')
         try:
             y_axis_min_emissions = float(y_axis_min_emissions)
             y_axis_max_emissions = float(y_axis_max_emissions)
