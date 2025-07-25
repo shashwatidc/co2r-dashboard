@@ -686,8 +686,6 @@ options_list  = ['Cell voltage (V)',
 
 middle_column, right_column = st.columns(2, gap = 'large')
 st.sidebar.header('x-axis variable' )
-middle_column.header('Results')
-right_column.header('_')
 
 # Cache creation of flags dataframe
 @st.cache_data(ttl = "1h")
@@ -1401,6 +1399,10 @@ with st.sidebar:
 #___________________________________________________________________________________
     
 ##########################  GENERATE MODEL OVER RANGE  ##########################
+
+middle_column.header('Techno-economics')
+right_column.header('_')
+
 with middle_column:
     if not st.session_state.is_active_error_ethylene:
         progress_bar = st.progress(0, text= "Running model over range. Please wait.")
@@ -1662,6 +1664,7 @@ if not st.session_state.is_active_error_ethylene:
 
     ###### CAPEX BAR CHART
     with middle_column.container(height = 300, border = False):  
+        st.subheader('Capex sensitivity')
         with _render_lock:
             capex_bar_fig, axs = plt.subplots() # Set up plot
             #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
@@ -1718,6 +1721,7 @@ if not st.session_state.is_active_error_ethylene:
 
     ###### OPEX BAR CHART 
     with right_column.container(height = 300, border = False): 
+        st.subheader('Opex sensitivity')
         with _render_lock:
             opex_bar_fig, axs = plt.subplots() # Set up plot
 
@@ -1771,6 +1775,7 @@ if not st.session_state.is_active_error_ethylene:
 
     ###### LEVELIZED BAR CHART
     with middle_column.container(height = 300, border = False): 
+        st.subheader('Levelized cost sensitivity')
         with _render_lock:
             levelized_bar_fig, axs = plt.subplots() # Set up plot
             #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
@@ -1846,12 +1851,17 @@ if not st.session_state.is_active_error_ethylene:
             
             st.write(levelized_html, unsafe_allow_html=True)
 
-    with right_column.container(height = 300, border = False): 
+
+    with right_column.container(height = 455, border = False): 
         pass
+
+    middle_column.header('Energy')
+    right_column.header('_')
 
     ###### POTENTIALS BAR CHART
     with middle_column.container(height = 300, border = False): 
         if not vbl_name == 'Cell voltage':
+            st.subheader('Potential sensitivity')
             with _render_lock:
                 potentials_bar_fig, axs = plt.subplots() # Set up plot
                 #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
@@ -1901,6 +1911,7 @@ if not st.session_state.is_active_error_ethylene:
 
     ###### FE-SPC SCATTERPLOT
     with right_column.container(height = 300, border = False): 
+        st.subheader('FE-$X_{CO_2}$ tradeoff')
         with _render_lock:
             FE_SPC_bar_fig, axs = plt.subplots() # Set up plot
             
@@ -1937,6 +1948,7 @@ if not st.session_state.is_active_error_ethylene:
     ###### ENERGY BAR CHART 
     with middle_column.container(height = 300, border = False): 
         if not vbl_name == 'Cell voltage':   
+            st.subheader('Energy sensitivity')
             with _render_lock:
                 energy_bar_fig, axs = plt.subplots() # Set up plot
                 #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
@@ -1982,6 +1994,7 @@ if not st.session_state.is_active_error_ethylene:
     ###### EMISSIONS BAR CHART
     with right_column.container(height = 300, border = False): 
         if not vbl_name == 'Cell voltage':
+            st.subheader('Emissions sensitivity')
             with _render_lock:
                 emissions_bar_fig, axs = plt.subplots() # Set up plot
                 #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)

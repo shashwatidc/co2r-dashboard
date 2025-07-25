@@ -886,8 +886,6 @@ options_list  = ['Cell voltage (V)',
  ] # Order must exactly match df_flags
 
 middle_column, right_column = st.columns(2, gap = 'large')
-middle_column.header('Results')
-right_column.header('_')
 
 # SLIDERS 
 st.sidebar.header('Model inputs' )
@@ -1707,6 +1705,9 @@ if is_battery:
 else:
     battery_capacity = 0
 
+middle_column.header('Techno-economics')
+right_column.header('_')
+
 # ### Generate physical and costing model
 if not np.isnan(FE_product_checked): 
     df_capex_BM, df_capex_totals, df_costing_assumptions, df_depreciation, df_electrolyzer_assumptions, df_electrolyzer_streams_mol_s,\
@@ -1987,9 +1988,12 @@ if not np.isnan(FE_product_checked):
 
             # Write the HTML
             st.write(levelized_html, unsafe_allow_html=True)
-            
+
     with right_column.container(height = 455, border = False): 
         pass
+
+    middle_column.header('Energy')
+    right_column.header('_')
 
     @st.cache_data(ttl = "1h")
     def potential_delta_color_checker(df_potentials, potential_default):
@@ -2105,9 +2109,14 @@ if not np.isnan(FE_product_checked):
                     # Write the HTML
                     st.write(emissions_html, unsafe_allow_html=True)
 
-    st.divider()
-
 ##########################  GENERATE MODEL OVER RANGE  ##########################
+
+with right_column.container(height = 455, border = False): 
+    pass
+
+middle_column.header('Sensitivity assessment')
+right_column.header('_')
+
 with middle_column:
     if not st.session_state.is_active_error_CO_nonaq:
         progress_bar = st.progress(0, text= "Running model over range. Please wait.")
@@ -2370,6 +2379,10 @@ with middle_column:
 ############################### FIGURE OUTPUTS #####################################
 
 if not st.session_state.is_active_error_CO_nonaq:
+
+    middle_column.header('Techno-economics')
+    right_column.header('_')
+
     ###### BAR CHART FORMATTING
     flag = {True: 1,
             False: 0}
@@ -2410,6 +2423,7 @@ if not st.session_state.is_active_error_CO_nonaq:
 
     ###### CAPEX BAR CHART
     with middle_column.container(height = 300, border = False):  
+        st.subheader('Capex sensitivity')
         with _render_lock:
             capex_bar_fig, axs = plt.subplots() # Set up plot
             #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
@@ -2466,6 +2480,7 @@ if not st.session_state.is_active_error_CO_nonaq:
 
     ###### OPEX BAR CHART 
     with right_column.container(height = 300, border = False): 
+        st.subheader('Opex sensitivity')
         with _render_lock:
             opex_bar_fig, axs = plt.subplots() # Set up plot
 
@@ -2519,6 +2534,7 @@ if not st.session_state.is_active_error_CO_nonaq:
 
     ###### LEVELIZED BAR CHART
     with middle_column.container(height = 300, border = False): 
+        st.subheader('Levelized cost sensitivity')
         with _render_lock:
             levelized_bar_fig, axs = plt.subplots() # Set up plot
             #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
@@ -2594,12 +2610,17 @@ if not st.session_state.is_active_error_CO_nonaq:
             
             st.write(levelized_html, unsafe_allow_html=True)
 
-    with right_column.container(height = 300, border = False): 
+
+    with right_column.container(height = 455, border = False): 
         pass
+
+    middle_column.header('Energy')
+    right_column.header('_')
 
     ###### POTENTIALS BAR CHART
     with middle_column.container(height = 300, border = False): 
         if not vbl_name == 'Cell voltage':
+            st.subheader('Potential sensitivity')
             with _render_lock:
                 potentials_bar_fig, axs = plt.subplots() # Set up plot
                 #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
@@ -2650,6 +2671,7 @@ if not st.session_state.is_active_error_CO_nonaq:
     ###### FE-SPC SCATTERPLOT
     with right_column.container(height = 300, border = False): 
         with _render_lock:
+            st.subheader('FE-$X_{CO_2}$ tradeoff')
             FE_SPC_bar_fig, axs = plt.subplots() # Set up plot
             
             ## Axis labels
@@ -2685,6 +2707,7 @@ if not st.session_state.is_active_error_CO_nonaq:
     ###### ENERGY BAR CHART 
     with middle_column.container(height = 300, border = False): 
         if not vbl_name == 'Cell voltage':
+            st.subheader('Energy sensitivity')
             with _render_lock:
                 energy_bar_fig, axs = plt.subplots() # Set up plot
                 #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)
@@ -2730,6 +2753,7 @@ if not st.session_state.is_active_error_CO_nonaq:
     ###### EMISSIONS BAR CHART
     with right_column.container(height = 300, border = False): 
         if not vbl_name == 'Cell voltage':
+            st.subheader('Emissions sensitivity')
             with _render_lock:
                 emissions_bar_fig, axs = plt.subplots() # Set up plot
                 #fig.subplots_adjust(left=0.9, bottom=0.9, right=1, top=1, wspace=None, hspace=None)

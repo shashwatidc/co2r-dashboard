@@ -627,8 +627,6 @@ is_additional_capex = False
 is_additional_opex = False
 middle_column, right_column = st.columns(2, gap = 'large')
 st.sidebar.header('Model inputs' )
-middle_column.header('Results')
-right_column.header('_')
 
 with st.sidebar:
     st.subheader('CO₂R product')
@@ -1066,6 +1064,9 @@ if is_battery:
 else:
     battery_capacity = 0
 
+middle_column.header('Techno-economics')
+right_column.header('_')
+
 # ### Generate physical and costing model
 if not np.isnan(FE_product_checked): 
     df_capex_BM, df_capex_totals, df_costing_assumptions, df_depreciation, df_electrolyzer_assumptions, df_electrolyzer_streams_mol_s,\
@@ -1297,6 +1298,9 @@ if not np.isnan(FE_product_checked):
     with right_column.container(height = 455, border = False): 
         pass
 
+    middle_column.header('Energy')
+    right_column.header('_')
+
     @st.cache_data(ttl = "1h")
     def potential_delta_color_checker(df_potentials, potential_default):
         if np.isclose(df_potentials.loc['Cell potential', 'Value'], potential_default, rtol = 1e-6, equal_nan = True):
@@ -1410,6 +1414,9 @@ if not np.isnan(FE_product_checked):
    
                     # Write the HTML
                     st.write(emissions_html, unsafe_allow_html=True)
+            
+    with right_column.container(height = 455, border = False): 
+        pass
 
     st.divider()
             
