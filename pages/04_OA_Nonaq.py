@@ -881,7 +881,7 @@ options_list  = ['Cell voltage (V)',
         'Electrolyzer capital cost (\$/m$^2$)',
         'PSA capital cost (\$/1000 m$^3_{{gas}}$/hr)', 
         'Liquid separation capital cost (\$/1000 mol$_{{inlet}}$/hr)', 
-        # 'Grid CO$_2$ intensity', 
+        'Grid CO$_2$ intensity', 
         # 'Renewables capacity factor' , 
  ] # Order must exactly match df_flags
 
@@ -1304,7 +1304,7 @@ def flags(product_name):
             'override_PSA_capex': ['PSA capital cost', '\$/1000 m$^3_{{gas}}$/hr', 'PSA_capex_USD_1000m3_hr', PSA_capex_USD_1000m3_hr,                 1e5, 10e6],
             'override_LL_capex': ['Liquid separation capital cost', '\$/1000 mol$_{{inlet}}$/hr', 'LL_capex_USD_1000mol_hr', LL_capex_USD_1000mol_hr,10000, 100000],
 
-            # 'override_carbon_intensity': ['Grid CO$_2$ intensity', 'kg CO$_2$/kWh', 'electricity_emissions_kgCO2_kWh',electricity_emissions_kgCO2_kWh, 0, 0.5],
+            'override_carbon_intensity': ['Grid CO$_2$ intensity', 'kg CO$_2$/kWh', 'electricity_emissions_kgCO2_kWh',electricity_emissions_kgCO2_kWh, 0, 0.5],
 
             # 'override_battery_capacity': ['Renewables capacity factor' , '', 'avbl_renewables',                    avbl_renewables,                    1e-4, 1 ],
             }
@@ -2154,7 +2154,7 @@ with middle_column:
             ### Generate physical and costing model
             df_capex_BM, df_capex_totals, df_costing_assumptions, df_depreciation, df_electrolyzer_assumptions, df_electrolyzer_streams_mol_s,\
                 df_energy, df_feedstocks, df_general, df_maintenance, df_operations, df_opex, df_opex_totals, df_outlet_assumptions,\
-                df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities = cached_single_run(product_name = product_name,
+                df_overhead, df_potentials, df_sales, df_streams, df_streams_formatted, df_taxes, df_utilities = cached_single_run_nonaq(product_name = product_name,
                 solvent_name = solvent_name,
                 supporting_electrolyte_name = supporting_electrolyte_name,
                 df_products = df_products,

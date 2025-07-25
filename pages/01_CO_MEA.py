@@ -685,7 +685,7 @@ options_list  = ['Cell voltage (V)',
                 'H$_2$ cost ($/kg)',
                 'Water cost ($/kg)',
                 'Electrolyzer capex (\$/m$^2$)',
-                # 'Grid CO$_2$ intensity',
+                'Grid CO$_2$ intensity',
                 # 'Renewables capacity factor'
                 ] # Order must exactly match df_flags
 
@@ -721,7 +721,7 @@ def flags(product_name):
         'override_H2_cost': ['H$_2$ cost'  , '\$/kg H$_2$', 'H2_cost_USD_kgH2',                   H2_cost_USD_kgH2, 0, 10],
         'override_water_cost': ['Water cost' , '\$/kg', 'water_cost_USD_kg',                      water_cost_USD_kg, 0, 0.30],
         'override_electrolyzer_capex': ['Electrolyzer capital cost' , '\$/m$^2$', 'electrolyzer_capex_USD_m2', electrolyzer_capex_USD_m2, 3000, 10000],
-        # 'override_carbon_intensity': ['Grid CO$_2$ intensity', 'kg CO$_2$/kWh', 'electricity_emissions_kgCO2_kWh',electricity_emissions_kgCO2_kWh, 0, 0.5],
+        'override_carbon_intensity': ['Grid CO$_2$ intensity', 'kg CO$_2$/kWh', 'electricity_emissions_kgCO2_kWh',electricity_emissions_kgCO2_kWh, 0, 0.5],
         
         # 'override_battery_capacity': ['Renewables capacity factor' , '', 'avbl_renewables',        avbl_renewables, 1e-4, 1 ],
         }
