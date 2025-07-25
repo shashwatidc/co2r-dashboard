@@ -225,7 +225,6 @@ def cached_single_run_nonaq(product_name,
                 
                 K_to_C = K_to_C,
                 kJ_per_kWh = kJ_per_kWh,
-    
         )
 
 # Cache single run of model
@@ -299,6 +298,11 @@ def default_single_run_nonaq(product_name,
                 override_optimization,
                 exponent,
                 scaling,
+
+                is_additional_capex,
+                additional_capex_USD,
+                is_additional_opex,  
+                additional_opex_USD_kg,
 
                 MW_CO2,
                 MW_H2O,
@@ -386,6 +390,11 @@ def default_single_run_nonaq(product_name,
                 override_optimization = override_optimization,
                 exponent = exponent,
                 scaling = scaling,
+
+                is_additional_capex = is_additional_capex,
+                additional_capex_USD = additional_capex_USD,
+                is_additional_opex = is_additional_opex,  
+                additional_opex_USD_kg = additional_opex_USD_kg,
 
                 MW_CO2 = MW_CO2,
                 MW_H2O = MW_H2O,

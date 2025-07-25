@@ -20,6 +20,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from scipy import optimize
+from ElectrolyzerModel import *
 
 # %% [markdown]
 # ## 1. Polarization curve model
