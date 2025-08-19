@@ -36,6 +36,7 @@ def costing_assumptions(
     lifetime_years ,
     stack_lifetime_years,
     electrolyzer_capex_USD_m2,
+    PSA_capex_USD_1000m3_hr,
     capacity_factor
 ): 
     """
@@ -57,6 +58,7 @@ def costing_assumptions(
         'Plant lifetime': [lifetime_years, 'years'],
         'Stack lifetime': [stack_lifetime_years, 'years'],
         'Electrolyzer capex': [electrolyzer_capex_USD_m2, '$/m^2'],
+        'PSA capex': [PSA_capex_USD_1000m3_hr, '$/1000 m^3/hr'],
         "Capacity factor" : [capacity_factor, ''],
     },
     ).transpose()
@@ -82,6 +84,7 @@ def capex(
     product_rate_kg_day,
     battery_capex_USD_kWh ,
     electrolyzer_capex_USD_m2, # electrolyzer_capex_USD_kW
+    PSA_capex_USD_1000m3_hr,
     battery_capacity,
     kJ_per_kWh,
     is_additional_capex,
@@ -97,9 +100,9 @@ def capex(
     Returns: dataframe of bare-module costs per unit, and summary capital costs
     """
     
-    # Price index to adjust reference values
-    CEPCI_2024 = 800
-    CEPCI_2020 = 596.2
+    # # Price index to adjust reference values
+    # CEPCI_2024 = 800
+    # CEPCI_2020 = 596.2
     
     ## Battery limits ("on-site") are the electrolysis and separations only. 
     # => There are no off-site units included, i.e. feedstocks (CO2, DI water) and utilities (electricity) come from external vendors 
@@ -134,10 +137,10 @@ def capex(
 
     ## TODO: Are these FOB costs  (without delivery)? Or including delivery, installation, material factors (including bare-module factor) to give bare-module costs?
     # PSA - reference cost with scaling factor
-    df_capex_BM.loc['Cathode PSA - CO$_2$/products', 'Cost ($)']  = 1989043 * CEPCI_2024/CEPCI_2020 * (df_streams.loc['Cathode PSA1 inlet', 'Volumetric flow rates (m3/s)']*(60*60)/1000)**0.7 # relative to 1000 m3/hr 
-    df_capex_BM.loc['Cathode PSA - Products/H$_2$', 'Cost ($)']  = 1989043 * CEPCI_2024/CEPCI_2020 * (df_streams.loc['Cathode PSA1 outlet', 'Volumetric flow rates (m3/s)']*(60*60)/1000)**0.7 # relative to 1000 m3/hr 
+    df_capex_BM.loc['Cathode PSA - CO$_2$/products', 'Cost ($)']  = PSA_capex_USD_1000m3_hr * (df_streams.loc['Cathode PSA1 inlet', 'Volumetric flow rates (m3/s)']*(60*60)/1000)**0.7 # relative to 1000 m3/hr 
+    df_capex_BM.loc['Cathode PSA - Products/H$_2$', 'Cost ($)']  = PSA_capex_USD_1000m3_hr * (df_streams.loc['Cathode PSA1 outlet', 'Volumetric flow rates (m3/s)']*(60*60)/1000)**0.7 # relative to 1000 m3/hr 
     if df_streams.loc['Anode PSA inlet', 'x_CO2'] != 0: # Check if there is any crossover, if none then unit cost is 0
-        df_capex_BM.loc['Anode PSA - CO$_2$/O$_2$', 'Cost ($)']  = 1989043 * CEPCI_2024/CEPCI_2020 * (df_streams.loc['Anode PSA inlet', 'Volumetric flow rates (m3/s)']*(60*60)/1000)**0.7 # relative to 1000 m3/hr 
+        df_capex_BM.loc['Anode PSA - CO$_2$/O$_2$', 'Cost ($)']  = PSA_capex_USD_1000m3_hr * (df_streams.loc['Anode PSA inlet', 'Volumetric flow rates (m3/s)']*(60*60)/1000)**0.7 # relative to 1000 m3/hr 
     else:
         df_capex_BM.loc['Anode PSA - CO$_2$/O$_2$', 'Cost ($)']  = 0
     if is_additional_capex:

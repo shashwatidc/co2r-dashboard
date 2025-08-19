@@ -1263,7 +1263,7 @@ with st.sidebar:
         PSA_capex_USD_1000m3_hr = st.slider(label = 'Gas separations capital cost (\$/1000 m$^3_{{gas}}$/hr)' , 
                             min_value = 0.0, 
                             max_value = 15000.0, 
-                            step = 100.0, value = electrolyzer_capex_USD_m2,
+                            step = 100.0, value = PSA_capex_USD_1000m3_hr,
                             format = '%.0f',
                             help = '''Default value: \${}/\$/1000 m$^3_{{gas}}$/hr
                             '''.format(default_PSA_capex_USD_1000m3_hr))
@@ -2454,7 +2454,6 @@ with middle_column:
 
 if not st.session_state.is_active_error_OA_nonaq:
 
-    middle_column.header('Techno-economics')
     right_column.header('_')
 
     ###### BAR CHART FORMATTING
