@@ -693,7 +693,7 @@ current_time = time_now.strftime("%I-%M%p") # format string
 
 # Cache Excel sheet reading
 @st.cache_data(ttl = "1h")
-def import_data(file_imports):
+def import_data_nonaq(file_imports):
     df_constants = pd.DataFrame # Create dataframe for constants
     xlsx = pd.ExcelFile(file_imports) # Read each data Excel file
     df_constants = xlsx.parse(sheet_name = sheet_constants) # Read the sheet with the constants
@@ -718,7 +718,7 @@ def import_data(file_imports):
 
     return(df_constants, df_products, df_utility_imports, df_solvents, df_supporting)
 
-df_constants, df_products, df_utility_imports, df_solvents, df_supporting = import_data(file_imports)
+df_constants, df_products, df_utility_imports, df_solvents, df_supporting = import_data_nonaq(file_imports)
 
 #_________________________________________________________________________________
 
@@ -1027,7 +1027,7 @@ with st.sidebar:
                     max_value = 1.0,
                     step = 0.01, value = FE_CO2R_0,
                     help = 'Faradaic efficiency, independent of any other variables. \
-                          This is not the recommended default option in the absence of more detailed studies of electrolyzer geometry.')
+                          This is the recommended default option in the absence of more detailed studies of electrolyzer geometry.')
 
         FE_CO2R_0 = st.slider(label = '$ FE_{CO_2R, \: 0}$, maximum Faradaic efficiency',
                             min_value = 0.0001, 
@@ -1044,22 +1044,34 @@ with st.sidebar:
                             min_value = 0.0001, 
                             max_value = 1.0, 
                             step = 0.01, value = SPC,
-                            format = '%.2f')
+                            format = '%.2f',
+                            help = '''Default value: {:.2f}
+                            '''.format(default_SPC))
+        excess_solvent_ratio = st.slider(label = 'Excess solvent ratio',
+                            min_value = 0.0001, 
+                            max_value = 2500, 
+                            step = 10, value = excess_solvent_ratio,
+                            format = '%.2f',
+                            help = '''Ratio of catholyte fed to CO$_2$ fed into cathode.
+                              \n Default value: {:.2f}, based on 350/365 days per year
+                            '''.format(default_excess_solvent_ratio))
+        solvent_loss_fraction = st.slider(label = 'Solvent loss fraction',
+                    min_value = 0.000001, 
+                    max_value = 0.01, 
+                    step = 0.00001, value = solvent_loss_fraction,
+                    format = '%.2f',
+                    help = '''Fraction of fed solvent lost to evaporation, degradataion, etc.
+                        \n Default value: {:.2f}, based on 350/365 days per year
+                    '''.format(default_solvent_loss_fraction))
         crossover_ratio = st.slider(label = 'Crossover ratio (mol CO$_2$/mol e$^-$)',
                             min_value = 0.0001, 
                             max_value = 1.0, 
                             step = 0.01, value = crossover_ratio,
                             help = """The amount of CO$_2$ converted into carbonate ions that then crosses the membrane into the anode gas stream. 
-                              \n Default crossover ratio: 0.5
-                              \n This is based on the carbonate equilibrium: 
-                            $$$
-                            \\\  CO_2 + H_2O + 2e^- → CO + 2OH^-  
-                            \\\  2CO_2 + 8H_2O + 12e^- → C_2H_4 + 12OH^-
-                            \\\  2H_2O + 2e^- → H_2 + 2OH^-
-                            \\\   CO_{{2}} + 2OH^{{-}} → HCO_{{3}}^{{-}} + OH^- ⇌ CO_{{3}}^{{2-}} + H_2O 
-                            $$$
+                              \n Default crossover ratio: 0
+                              \n This is based on the use of Nafion.
                             """,
-                            format = '%.2f')        
+                            format = '%.2f')
         FE_product_checked, __ = SPC_check(FE_product_specified=FE_product_specified, 
                 exponent= exponent,
                 scaling = scaling,
@@ -1139,20 +1151,6 @@ with st.sidebar:
                             $$$
                               \n Default value: {}
                             '''.format(default_PSA_second_law_efficiency))
-        LL_second_law_efficiency = st.slider(label = 'GASP second-law separation efficiency',
-                            min_value = 0.0001, 
-                            max_value = 1.0, 
-                            step = 0.01, value = LL_second_law_efficiency,
-                            format = '%.2f',
-                            help = '''Second-law efficiency of liquid-liquid separation of oxalic acid.
-                            This adjusts the ideal work of binary separation, 
-                            $$$
-                             \\\  W_{{sep \: (j)}}^{{ideal}} = R \cdot T \cdot (\sum_i x_i\cdot ln(x_i)) \cdot \displaystyle \dot{{N}} \\
-                              \\\  \implies W = R \cdot T \cdot (x_i\cdot ln(x_i)) + (1-x_i)\cdot ln(1-x_i)) \cdot \displaystyle \dot{{N}} \\
-                              \\\  W_{{sep \: (j)}}^{{real}} = \displaystyle \\frac{{W_{{sep\: (j)}}^{{ideal}}}}{{\zeta}}
-                            $$$
-                              \n Default value: {}
-                            '''.format(default_PSA_second_law_efficiency))
 
     ##### BATTERY  
     answer = st.toggle('Include energy storage', value = False,
@@ -1215,6 +1213,20 @@ with st.sidebar:
                             format = '%.1f',
                             help = '''Default value: \${}/kg
                             '''.format(default_water_cost_USD_kg))
+        solvent_cost_USD_kg = st.slider(label = 'Solvent cost (\$/kg)' , 
+                            min_value = 0.0, 
+                            max_value = 10.0, 
+                            step = 0.5, value = solvent_cost_USD_kg,
+                            format = '%.1f',
+                            help = '''Default value: \${}/kg
+                            '''.format(default_solvent_cost_USD_kg))
+        electrolyte_cost_USD_kg = st.slider(label = 'Supporting electrolyte cost (\$/kg)' , 
+                            min_value = 0.0, 
+                            max_value = 2500.0, 
+                            step = 10, value = electrolyte_cost_USD_kg,
+                            format = '%.0f',
+                            help = '''Default value: \${}/kg
+                            '''.format(default_electrolyte_cost_USD_kg))
         electrolyzer_capex_USD_m2 = st.slider(label = 'Electrolyzer capital cost (\$/m$^2$)' , 
                             min_value = 0.0, 
                             max_value = 15000.0, 
@@ -1222,6 +1234,13 @@ with st.sidebar:
                             format = '%.0f',
                             help = '''Default value: \${}/m$^2$
                             '''.format(default_electrolyzer_capex_USD_m2))
+        PSA_capex_USD_1000m3_hr = st.slider(label = 'Gas separations capital cost (\$/1000 m$^3_{{gas}}$/hr)' , 
+                            min_value = 0.0, 
+                            max_value = 15000.0, 
+                            step = 100.0, value = electrolyzer_capex_USD_m2,
+                            format = '%.0f',
+                            help = '''Default value: \${}/\$/1000 m$^3_{{gas}}$/hr
+                            '''.format(default_PSA_capex_USD_1000m3_hr))
         battery_capex_USD_kWh = st.slider(label = 'Battery capital cost (\$/kWh)' , 
                             min_value = 0.0, 
                             max_value = 500.0, 
@@ -1627,7 +1646,7 @@ with st.sidebar:
 
 ##########################  RUN MODEL AT DEFAULT VALUES  ###########################
 
-capex_default, opex_default, levelized_default, potential_default, energy_default, emissions_default = default_single_run_nonaq(product_name = product_name,
+capex_default_nonaq_CO, opex_default_nonaq_CO, levelized_default_nonaq_CO, potential_default_nonaq_CO, energy_default_nonaq_CO, emissions_default_nonaq_CO = default_single_run_nonaq(product_name = product_name,
                 solvent_name = 'DMF',
                 supporting_electrolyte_name = 'TEACl',
                 df_products = df_products,
@@ -1863,7 +1882,7 @@ if not np.isnan(FE_product_checked):
             delta_color = 'inverse'       
         return delta_color
 
-    capex_delta_color = capex_delta_color_checker(df_capex_totals = df_capex_totals, capex_default = capex_default)    
+    capex_delta_color = capex_delta_color_checker(df_capex_totals = df_capex_totals, capex_default = capex_default_nonaq_CO)    
 
     alternating = 1
     flag = False
@@ -1874,7 +1893,7 @@ if not np.isnan(FE_product_checked):
         st.subheader('Capital cost')
         # st.write('Capex: \${:.2f} million'.format(df_capex_totals.loc['Total permanent investment', 'Cost ($)']/1e6) )
         st.metric(label = 'Capex', value = '${:.2f} million'.format(df_capex_totals.loc['Total permanent investment', 'Cost ($)']/1e6), 
-                delta = '{:.2f}%'.format(100*(df_capex_totals.loc['Total permanent investment', 'Cost ($)'] - capex_default)/capex_default),
+                delta = '{:.2f}%'.format(100*(df_capex_totals.loc['Total permanent investment', 'Cost ($)'] - capex_default_nonaq_CO)/capex_default_nonaq_CO),
                 delta_color = capex_delta_color, label_visibility='collapsed') 
         with _render_lock:
             capex_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
@@ -1908,14 +1927,14 @@ if not np.isnan(FE_product_checked):
             delta_color = 'inverse'       
         return delta_color
 
-    opex_delta_color = opex_delta_color_checker(df_opex_totals = df_opex_totals, opex_default = opex_default)    
+    opex_delta_color = opex_delta_color_checker(df_opex_totals = df_opex_totals, opex_default = opex_default_nonaq_CO)    
 
     ###### OPEX PIE CHART 
     with right_column.container(height = 455, border = False): 
         st.subheader('Operating cost')
         # st.write('Opex: \${:.2f}/kg$_{{{}}}$'.format(df_opex_totals.loc['Production cost', 'Cost ($/kg {})'.format(product_name)], product_name) )
         st.metric(label = 'Opex', value = r'${:.2f}/kg {} '.format(df_opex_totals.loc['Production cost', 'Cost ($/kg {})'.format(product_name)], product_name),
-                delta = '{:.2f}%'.format(100*(df_opex_totals.loc['Production cost', 'Cost ($/kg {})'.format(product_name)] - opex_default)/opex_default),
+                delta = '{:.2f}%'.format(100*(df_opex_totals.loc['Production cost', 'Cost ($/kg {})'.format(product_name)] - opex_default_nonaq_CO)/opex_default_nonaq_CO),
                 delta_color = opex_delta_color, label_visibility = 'collapsed') 
 
         with _render_lock:
@@ -1953,7 +1972,7 @@ if not np.isnan(FE_product_checked):
         st.subheader('Levelized cost')
         # st.write('Levelized cost: ${:.2f}/kg$_{{{}}}$'.format(df_opex_totals.loc['Levelized cost', 'Cost ($/kg {})'.format(product_name)], product_name ) )
         st.metric(label = 'Levelized', value = r'${:.2f}/kg {}'.format(df_opex_totals.loc['Levelized cost', 'Cost ($/kg {})'.format(product_name)], product_name),
-                delta = '{:.2f}%'.format(100*(df_opex_totals.loc['Levelized cost', 'Cost ($/kg {})'.format(product_name)] - levelized_default)/levelized_default),
+                delta = '{:.2f}%'.format(100*(df_opex_totals.loc['Levelized cost', 'Cost ($/kg {})'.format(product_name)] - levelized_default_nonaq_CO)/levelized_default_nonaq_CO),
                 delta_color = levelized_delta_color, label_visibility='collapsed') 
         levelized_pie_fig, axs = plt.subplots(figsize = (5, 5*aspect_ratio)) # Set up plot
         
@@ -2023,14 +2042,14 @@ if not np.isnan(FE_product_checked):
             delta_color = 'inverse'       
         return delta_color
 
-    potential_delta_color = potential_delta_color_checker(df_potentials = df_potentials, potential_default = potential_default)    
+    potential_delta_color = potential_delta_color_checker(df_potentials = df_potentials, potential_default = potential_default_nonaq_CO)    
     
     ###### POTENTIALS PIE CHART
     with middle_column.container(height = 455, border = False):  
         st.subheader('Cell potential')
         # st.write('Full cell potential: {:.2f} V'.format(df_potentials.loc['Cell potential', 'Value']) )
         st.metric(label = 'Cell potential', value = '{:.2f} V'.format(df_potentials.loc['Cell potential', 'Value']),
-                delta = '{:.2f}%'.format(100*(df_potentials.loc['Cell potential', 'Value'] - potential_default)/potential_default),
+                delta = '{:.2f}%'.format(100*(df_potentials.loc['Cell potential', 'Value'] - potential_default_nonaq_CO)/potential_default_nonaq_CO),
                 delta_color = potential_delta_color, label_visibility='collapsed') 
         if not override_cell_voltage:
             with _render_lock:
@@ -2063,14 +2082,14 @@ if not np.isnan(FE_product_checked):
             delta_color = 'inverse'       
         return delta_color
 
-    energy_delta_color = energy_delta_color_checker(df_energy= df_energy, energy_default = energy_default)    
+    energy_delta_color = energy_delta_color_checker(df_energy= df_energy, energy_default = energy_default_nonaq_CO)    
  
      ###### ENERGY PIE CHART 
     with right_column.container(height = 455, border = False): 
         st.subheader('Process energy')
         # st.write('Energy required: {:.0f} kJ/kg$_{{{}}}}$'.format(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)], product_name) )
         st.metric(label = 'Energy', value = r'{:.2f} MJ/kg {}'.format(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)]/1000, product_name),
-                delta = '{:.2f}%'.format(100*(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)] - energy_default)/energy_default),
+                delta = '{:.2f}%'.format(100*(df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)] - energy_default_nonaq_CO)/energy_default_nonaq_CO),
                 delta_color = energy_delta_color, label_visibility='collapsed') 
         with _render_lock:
             if not override_cell_voltage:
@@ -2101,7 +2120,7 @@ if not np.isnan(FE_product_checked):
         if electricity_emissions_kgCO2_kWh > 0:
             # st.write('Total emissions: {:.2f} kg$_{CO_2}$/kg$_{{{}}}$'.format(sum(df_energy.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)]), product_name ) )
             st.metric(label = 'Emissions', value = r'{:.2f} kg CO2/kg {}'.format(df_energy.loc['Total', 'Emissions (kg CO2/kg {})'.format(product_name)], product_name),
-                delta = '{:.2f}%'.format(100*(df_energy.loc['Total', 'Emissions (kg CO2/kg {})'.format(product_name)]  - emissions_default)/emissions_default),
+                delta = '{:.2f}%'.format(100*(df_energy.loc['Total', 'Emissions (kg CO2/kg {})'.format(product_name)]  - emissions_default_nonaq_CO)/emissions_default_nonaq_CO),
                 delta_color = energy_delta_color, label_visibility='collapsed') 
             if not override_cell_voltage:
                 with _render_lock:
@@ -2322,7 +2341,7 @@ with middle_column:
                                         df_costing_assumptions['Cost']], axis = 1) # Store costing assumptions for plotting
             df_sales_vs_vbl = pd.concat([df_sales_vs_vbl, 
                                     df_sales['Earnings ($/yr)']], axis = 1) # Store costing assumptions for plotting
-            
+
             ### Adjust FE_product, SPC, capacity_factor and variable back to their original values in globals()
             if vbl_name != 'Cell voltage' and vbl_name != 'Cathodic overpotential' and vbl_name != 'Anodic overpotential':
                 globals()[df_flags.loc[vbl_name,'Python variable']] = value_original
