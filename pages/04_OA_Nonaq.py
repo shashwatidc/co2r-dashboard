@@ -1054,12 +1054,12 @@ with st.sidebar:
                               \n Default value: {:.2f}, based on 350/365 days per year
                             '''.format(default_excess_solvent_ratio))
         solvent_loss_fraction = st.slider(label = 'Solvent loss fraction',
-                    min_value = 0.000001, 
+                    min_value = 0.0, 
                     max_value = 0.01, 
                     step = 0.00001, value = solvent_loss_fraction,
                     format = '%.2f',
                     help = '''Fraction of fed solvent lost to evaporation, degradataion, etc.
-                        \n Default value: {:.2f}, based on 350/365 days per year
+                        \n Default value: {}, based on 350/365 days per year
                     '''.format(default_solvent_loss_fraction))
         crossover_ratio = st.slider(label = 'Crossover ratio (mol CO$_2$/mol e$^-$)',
                             min_value = 0.0001, 
@@ -1249,7 +1249,7 @@ with st.sidebar:
         electrolyte_cost_USD_kg = st.slider(label = 'Supporting electrolyte cost (\$/kg)' , 
                             min_value = 0.0, 
                             max_value = 2500.0, 
-                            step = 10.0, value = electrolyte_cost_USD_kg,
+                            step = 10.0, value = float(electrolyte_cost_USD_kg),
                             format = '%.0f',
                             help = '''Default value: \${}/kg
                             '''.format(default_electrolyte_cost_USD_kg))
