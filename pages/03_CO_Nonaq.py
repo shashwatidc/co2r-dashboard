@@ -1049,8 +1049,8 @@ with st.sidebar:
                             '''.format(default_SPC))
         excess_solvent_ratio = st.slider(label = 'Excess solvent ratio',
                             min_value = 0.0001, 
-                            max_value = 2500, 
-                            step = 10, value = excess_solvent_ratio,
+                            max_value = 2500.0, 
+                            step = 10.0, value = excess_solvent_ratio,
                             format = '%.2f',
                             help = '''Ratio of catholyte fed to CO$_2$ fed into cathode.
                               \n Default value: {:.2f}, based on 350/365 days per year
@@ -1223,7 +1223,7 @@ with st.sidebar:
         electrolyte_cost_USD_kg = st.slider(label = 'Supporting electrolyte cost (\$/kg)' , 
                             min_value = 0.0, 
                             max_value = 2500.0, 
-                            step = 10, value = electrolyte_cost_USD_kg,
+                            step = 10.0, value = electrolyte_cost_USD_kg,
                             format = '%.0f',
                             help = '''Default value: \${}/kg
                             '''.format(default_electrolyte_cost_USD_kg))
