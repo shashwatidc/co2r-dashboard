@@ -798,9 +798,9 @@ product_cost_USD_kgprod = df_products.loc[product_name, 'Cost ($/kg product)']
 default_product_cost_USD_kgprod = product_cost_USD_kgprod
 H2_cost_USD_kgH2 = float(df_products.loc['H2', 'Cost ($/kg product)']) # assume H2 is not sold
 default_H2_cost_USD_kgH2 = H2_cost_USD_kgH2
-electrolyte_cost_USD_kg = df_supporting.loc[supporting_electrolyte_name, 'Cost ($/kg supporting)']
+electrolyte_cost_USD_kg = float(df_supporting.loc[supporting_electrolyte_name, 'Cost ($/kg supporting)'])
 default_electrolyte_cost_USD_kg = electrolyte_cost_USD_kg
-solvent_cost_USD_kg = df_solvents.loc[solvent_name, 'Cost ($/kg solvent)']
+solvent_cost_USD_kg = float(df_solvents.loc[solvent_name, 'Cost ($/kg solvent)'])
 default_solvent_cost_USD_kg = solvent_cost_USD_kg
 
 ## SOLVENT
@@ -1214,14 +1214,14 @@ with st.sidebar:
         solvent_cost_USD_kg = st.slider(label = 'Solvent cost (\$/kg)' , 
                             min_value = 0.0, 
                             max_value = 10.0, 
-                            step = 0.5, value = float(solvent_cost_USD_kg),
+                            step = 0.5, value = solvent_cost_USD_kg,
                             format = '%.1f',
                             help = '''Default value: \${}/kg
                             '''.format(default_solvent_cost_USD_kg))
         electrolyte_cost_USD_kg = st.slider(label = 'Supporting electrolyte cost (\$/kg)' , 
                             min_value = 0.0, 
                             max_value = 2500.0, 
-                            step = 10.0, value = float(electrolyte_cost_USD_kg),
+                            step = 10.0, value = electrolyte_cost_USD_kg,
                             format = '%.0f',
                             help = '''Default value: \${}/kg
                             '''.format(default_electrolyte_cost_USD_kg))
