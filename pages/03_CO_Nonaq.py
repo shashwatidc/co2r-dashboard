@@ -1214,7 +1214,7 @@ with st.sidebar:
         solvent_cost_USD_kg = st.slider(label = 'Solvent cost (\$/kg)' , 
                             min_value = 0.0, 
                             max_value = 10.0, 
-                            step = 0.5, value = solvent_cost_USD_kg,
+                            step = 0.5, value = float(solvent_cost_USD_kg),
                             format = '%.1f',
                             help = '''Default value: \${}/kg
                             '''.format(default_solvent_cost_USD_kg))
