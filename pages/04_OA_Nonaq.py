@@ -645,10 +645,10 @@ with st.expander("**Update history**", expanded = False):
         ''')
 
 with st.expander("**:red[Known issues]**", expanded = False):
-    st.write('Note that changing the solvent will reset the base case price, against which percent changes are measured. \
-         Currently, there is no warning if you enter a numeric value in any text box that is out of  \
+    st.write('Currently, there is no warning if you enter a numeric value in any text box that is out of  \
          physical range, e.g. capacity factor > 1, single-pass conversion > 1. The displayed results will be physically unreasonable. \
-         User is responsible for checking that their inputs are reasonable.')
+         User is responsible for checking that their inputs are reasonable. \n \
+         Note that changing the solvent will reset the base case price, against which percent changes are measured.')
 
 # st.write(
 #     '<img width=100 src="https://emojipedia-us.s3.amazonaws.com/source/skype/289/squid_1f991.png" style="margin-left: 5px; filter: hue-rotate(230deg) brightness(1.1);">',
