@@ -634,8 +634,6 @@ st.write('''Visualize the [base-case capex](#capital-cost), [opex](#operating-co
          Pick a parameter and modify the settings on the left to see how the results change. 
          ''')
 
-st.header(":red[WARNING: This page is currently being updated! Some functionality may be broken.]")
-
 with st.expander("**Update history**", expanded = False):
     st.write('''
         **July 25, 2025:** New pages have been added for techno-economic assesssment of non-aqueous CO₂R to CO and oxalic acid.
@@ -647,7 +645,8 @@ with st.expander("**Update history**", expanded = False):
         ''')
 
 with st.expander("**:red[Known issues]**", expanded = False):
-    st.write('Currently, there is no warning if you enter a numeric value in any text box that is out of  \
+    st.write('Note that changing the solvent will reset the base case price, against which percent changes are measured. \
+         Currently, there is no warning if you enter a numeric value in any text box that is out of  \
          physical range, e.g. capacity factor > 1, single-pass conversion > 1. The displayed results will be physically unreasonable. \
          User is responsible for checking that their inputs are reasonable.')
 
@@ -670,6 +669,7 @@ with st.expander("**Help**", expanded = False):
             Please note that it can take some time to run the model for a large number of datapoints. If possible, start with a few points and add more once you have the settings you want. 
            \n By default, the cell voltage will be modeled using Tafel equations, and the Faradaic efficiency based on the single-pass conversion and the maximum Faradaic efficiency.
            \n Mouse over the :grey[**?**] next to each input to see the default values for each parameter. Refresh the page to reset all values to their defaults.      
+           \n Note that changing the solvent will reset the base case price, against which percent changes are measured.
         """)
 
 st.write("**Cite this work**: [10.1021/acsenergylett.4c02647](https://pubs.acs.org/doi/10.1021/acsenergylett.4c02647), [10.26434/chemrxiv-2025-k071x](https://doi.org/10.26434/chemrxiv-2025-k071x)")
