@@ -2146,13 +2146,15 @@ if not np.isnan(FE_product_checked):
    
                     # Write the HTML
                     st.write(emissions_html, unsafe_allow_html=True)
+    
+    with right_column.container(height = 300, border = False): 
+        pass
+
+    st.divider()
 
 #___________________________________________________________________________________
-    
+ 
 ##########################  GENERATE MODEL OVER RANGE  ##########################
-
-with right_column.container(height = 455, border = False): 
-    pass
 
 middle_column.header('Sensitivity assessment')
 right_column.header('_')
@@ -2649,7 +2651,7 @@ if not st.session_state.is_active_error_CO_nonaq:
             
             st.write(levelized_html, unsafe_allow_html=True)
 
-    with right_column.container(height = 455, border = False): 
+    with right_column.container(height = 300, border = False): 
         pass
 
     middle_column.header('Energy')
