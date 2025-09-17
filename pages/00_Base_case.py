@@ -513,13 +513,14 @@ st.write('''This is a techno-economic assessment (TEA) of low-temperature CO₂ 
          ''')
 
 with st.expander("**Update history**", expanded = False):
-    st.write('''**July 25, 2025:** New pages have been added for techno-economic assesssment of non-aqueous CO₂R to CO and oxalic acid.
-             \n
-             **March 12, 2025:** Capital costs are now adjusted to the approximate average CEPCI for 2024 (800). 
-         Industrial electricity prices are now the average for 2024 (\$0.082/kWh). The base case single-pass conversion and total current density have been adjusted to the optimal in the Hawks model at these new costs.
-         The market price of ethylene is updated to the 2024 global average. Pure CO is a difficult chemical to price since it is rarely sold, usually used within a facility where it is generated.
-         The base price for CO (\$0.6/kg in 2001) has also been updated with an arbitrary 1% inflation rate. Note that it may be more likely to track natural gas prices, which slightly dipped from 2001 to 2024 on the Henry Hub.   
-         ''')
+    st.write('''
+        **July 25, 2025:** New pages have been added for techno-economic assesssment of non-aqueous CO₂R to CO and oxalic acid.
+        \n
+        **March 12, 2025:** Capital costs are now adjusted to the approximate average CEPCI for 2024 (800). 
+        Industrial electricity prices are now the average for 2024 (\$0.082/kWh). The base case single-pass conversion and total current density have been adjusted to the optimal in the Hawks model at these new costs.
+        The market price of ethylene is updated to the 2024 global average. Pure CO is a difficult chemical to price since it is rarely sold, usually used within a facility where it is generated.
+        The base price for CO (\$0.6/kg in 2001) has also been updated with an arbitrary 1% inflation rate. Note that it may be more likely to track natural gas prices, which slightly dipped from 2001 to 2024 on the Henry Hub.   
+        ''')
 with st.expander("**:red[Known issues]**", expanded = False):
     st.write(' Currently, there is no warning if you enter a numeric value in any text box that is out of  \
             physical range, e.g. capacity factor > 1, single-pass conversion > 1. The displayed results will be physically unreasonable. \
@@ -762,7 +763,7 @@ with st.sidebar:
         j_total_mA_cm2 = st.slider(label = 'Total current density (mA/cm$^2$)',
                             min_value = 0.0001, 
                             max_value = 1500.0, 
-                            step = 1.0, value = j_total_mA_cm2,
+                            step = 2.0, value = j_total_mA_cm2,
                             format = '%.0f',
                             help = '''Total current density of the cell. This will determine the size and voltage of the cell.
                               \n Default total current density: {} mA/cm$^2$'''.format(default_j_total_mA_cm2),)
@@ -866,8 +867,8 @@ with st.sidebar:
                             '''.format(default_capacity_factor))
         lifetime_years = st.slider(label = 'Plant lifetime (years)',
                             min_value = 0.0001, 
-                            max_value = 100.0, 
-                            step = 1.0, value = lifetime_years,
+                            max_value = 80.0, 
+                            step = 2.0, value = lifetime_years,
                             format = '%.0f',
                             help = '''Plant lifetime in years. The process operates to produce {} kg/day of product for this many years.
                               \n Default value: {} years
@@ -928,8 +929,8 @@ with st.sidebar:
                             '''.format(default_electricity_cost_USD_kWh))
         CO2_cost_USD_tCO2 = st.slider(label = 'CO₂ cost (\$/t CO₂)',
                             min_value = 0.0, 
-                            max_value = 500.0, 
-                            step = 1.0, value = CO2_cost_USD_tCO2,
+                            max_value = 300.0, 
+                            step = 5.0, value = CO2_cost_USD_tCO2,
                             format = '%.0f',
                             help = '''Default value: \${}/t$_{{CO_2}}$
                             '''.format(default_CO2_cost_USD_tCO2))
@@ -942,7 +943,7 @@ with st.sidebar:
                             '''.format(default_H2_cost_USD_kgH2))
         product_cost_USD_kgprod = st.slider(label = '{} market price (\$/kg$_{{{}}}$)'.format(product_name, product_name),
                             min_value = 0.0, 
-                            max_value = 10.0, 
+                            max_value = 5.0, 
                             step = 0.1, value = product_cost_USD_kgprod,
                             format = '%.1f',
                             help = '''Default value: \${}/kg
@@ -963,15 +964,15 @@ with st.sidebar:
                             '''.format(default_electrolyzer_capex_USD_m2))
         PSA_capex_USD_1000m3_hr = st.slider(label = 'Gas separations capital cost (\$/1000 m$^3_{{gas}}$/hr)' , 
                             min_value = 0.0, 
-                            max_value = 15000.0, 
-                            step = 100.0, value = PSA_capex_USD_1000m3_hr,
+                            max_value = 15.0e6, 
+                            step = 0.5e6, value = PSA_capex_USD_1000m3_hr,
                             format = '%.0f',
                             help = '''Default value: \${}/\$/1000 m$^3_{{gas}}$/hr
                             '''.format(default_PSA_capex_USD_1000m3_hr))
         battery_capex_USD_kWh = st.slider(label = 'Battery capital cost (\$/kWh)' , 
                             min_value = 0.0, 
                             max_value = 500.0, 
-                            step = 1.0, value = battery_capex_USD_kWh,
+                            step = 2.0, value = battery_capex_USD_kWh,
                             format = '%.0f', disabled = not is_battery,
                             help = '''Default value: \${}/kWh, based on 4-hour storage.
                             '''.format(default_battery_capex_USD_kWh))
@@ -1018,7 +1019,7 @@ with st.sidebar:
     electricity_emissions_kgCO2_kWh = st.slider(label = 'Grid CO₂ intensity (kg$_{CO_2}$/kWh)',
                         min_value = 0.0, 
                         max_value = 1.0, 
-                        step = 0.01, value = electricity_emissions_kgCO2_kWh,
+                        step = 0.05, value = electricity_emissions_kgCO2_kWh,
                         format = '%.2f',
                         help = '''Electricity emissions for partial life-cycle assessment.
                         \n Default value: {:.2f} kg$_{{CO_2}}$/kWh, based on the United States average.
@@ -1399,7 +1400,7 @@ if not np.isnan(FE_product_checked):
         st.subheader('Emissions')
         if electricity_emissions_kgCO2_kWh > 0:
             # st.write('Total emissions: {:.2f} kg$_{CO_2}$/kg$_{{{}}}$'.format(sum(df_energy.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)]), product_name ) )
-            st.metric(label = 'Emissions', value = r'{:.2f} kg CO2/kg {}'.format(df_energy.loc['Total', 'Emissions (kg CO2/kg {})'.format(product_name)], product_name),
+            st.metric(label = 'Emissions', value = r'{:.2f} kg CO2/kg {}'.format(sum(df_emissions.fillna(0).drop(['Total', 'Cell potential', 'Efficiency vs LHV'], inplace = False, errors = 'ignore')), product_name),
                 delta = '{:.2f}%'.format(100*(df_energy.loc['Total', 'Emissions (kg CO2/kg {})'.format(product_name)]  - emissions_default)/emissions_default),
                 delta_color = energy_delta_color, label_visibility='collapsed') 
             if not override_cell_voltage:

@@ -637,13 +637,14 @@ st.write('''Visualize the [base-case capex](#capital-cost), [opex](#operating-co
 st.header(":red[WARNING: This page is currently being updated! Some functionality may be broken.]")
 
 with st.expander("**Update history**", expanded = False):
-    st.write('''**July 25, 2025:** New pages have been added for techno-economic assesssment of non-aqueous CO₂R to CO and oxalic acid.
-             \n
+    st.write('''
+        **July 25, 2025:** New pages have been added for techno-economic assesssment of non-aqueous CO₂R to CO and oxalic acid.
+        \n
         **March 12, 2025:** Capital costs are now adjusted to the approximate average CEPCI for 2024 (800). 
-         Industrial electricity prices are now the average for 2024 (\$0.082/kWh). The base case single-pass conversion and total current density have been adjusted to the optimal in the Hawks model at these new costs.
-         The market price of ethylene is updated to the 2024 global average. Pure CO is a difficult chemical to price since it is rarely sold, usually used within a facility where it is generated.
-         The base price for CO (\$0.6/kg in 2001) has also been updated with an arbitrary 1% inflation rate. Note that it may be more likely to track natural gas prices, which slightly dipped from 2001 to 2024 on the Henry Hub.   
-         ''')
+        Industrial electricity prices are now the average for 2024 (\$0.082/kWh). The base case single-pass conversion and total current density have been adjusted to the optimal in the Hawks model at these new costs.
+        The market price of ethylene is updated to the 2024 global average. Pure CO is a difficult chemical to price since it is rarely sold, usually used within a facility where it is generated.
+        The base price for CO (\$0.6/kg in 2001) has also been updated with an arbitrary 1% inflation rate. Note that it may be more likely to track natural gas prices, which slightly dipped from 2001 to 2024 on the Henry Hub.   
+        ''')
 
 with st.expander("**:red[Known issues]**", expanded = False):
     st.write('Currently, there is no warning if you enter a numeric value in any text box that is out of  \
@@ -900,8 +901,8 @@ with st.sidebar:
     with st.expander(label = '**Simplified Butler-Volmer model assumptions**', expanded = False):
         override_cell_voltage = st.checkbox('Manually specify full-cell voltage', value = False)
         cell_E_V = st.slider(label = 'Cell voltage',
-                            min_value = 0.001, 
-                            max_value = 10.0, 
+                            min_value = -10.0, 
+                            max_value = 0.0001, 
                             step = 0.1, value = cell_E_V,
                             format = '%.1f',
                     help = '''Check the box above to set the full-cell voltage. No underlying voltage model will be used. 
@@ -945,8 +946,8 @@ with st.sidebar:
             override_membrane_ohmic = st.checkbox('Specify membrane area-specific resistance', value = False)
             R_membrane_ohmcm2 = st.slider(label = 'Area-specific resistance ($ \Omega \cdot$ cm$^2$)',
                             min_value = 0.0, 
-                            max_value = 25.0, 
-                            step = 0.1, value = R_membrane_ohmcm2,
+                            max_value = 5.0, 
+                            step = 0.05, value = R_membrane_ohmcm2,
                             format = '%.2f',
                             disabled= not override_membrane_ohmic,
                             help = '''Check the box above to set the area-specific ohmic resistance of the membrane. Thermodynamics and kinetic overpotentials will be modeled. 
@@ -959,9 +960,9 @@ with st.sidebar:
             override_electrolyte = st.checkbox('Specify catholyte conductivity', value = False)
             kappa_electrolyte_S_cm = st.slider(label = 'Catholyte conductivity (S/$ cm$^2$)',
                             min_value = 0.0, 
-                            max_value = 1.0, 
-                            step = 0.01, value = kappa_electrolyte_S_cm,
-                            format = '%.2f',
+                            max_value = 0.5, 
+                            step = 0.001, value = kappa_electrolyte_S_cm,
+                            format = '%.3f',
                             disabled= not override_electrolyte,
                             help = '''Check the box above to set the conductivity of the electrolyte. Thermodynamics and kinetic overpotentials will be modeled. 
                               \n Default specific resistance: {:.2f} S/cm$^2$'''.format(default_kappa_electrolyte_S_cm),)
@@ -971,7 +972,7 @@ with st.sidebar:
                 st.write('*Using default electrolyte conductivity, {:.2f} S/cm$^2$*'.format(kappa_electrolyte_S_cm))
             
             override_electrolyte_thickness = st.checkbox('Specify catholyte thickness', value = False)
-            electrolyte_thickness_cm = st.slider(label = 'Catholyte thickness (cm$^2$)',
+            electrolyte_thickness_cm = st.slider(label = 'Catholyte thickness (cm)',
                             min_value = 0.0, 
                             max_value = 1.0, 
                             step = 0.01, value = electrolyte_thickness_cm,
@@ -989,8 +990,8 @@ with st.sidebar:
     with st.expander(label = '**Reactor model**', expanded = False):
         j_total_mA_cm2 = st.slider(label = 'Total current density (mA/cm$^2$)',
                             min_value = 0.0001, 
-                            max_value = 1500.0, 
-                            step = 1.0, value = j_total_mA_cm2,
+                            max_value = 1000.0, 
+                            step = 2.0, value = j_total_mA_cm2,
                             format = '%.0f',
                             help = '''Total current density of the cell. This will determine the size and voltage of the cell.
                               \n Default total current density: {:.0f} mA/cm$^2$'''.format(default_j_total_mA_cm2),)
@@ -1055,9 +1056,9 @@ with st.sidebar:
                             '''.format(default_excess_solvent_ratio))
         solvent_loss_fraction = st.slider(label = 'Solvent loss fraction',
                     min_value = 0.0, 
-                    max_value = 0.01, 
+                    max_value = 0.001, 
                     step = 0.00001, value = solvent_loss_fraction,
-                    format = '%.2f',
+                    format = '%.5f',
                     help = '''Fraction of fed solvent lost to evaporation, degradataion, etc.
                         \n Default value: {}, based on 350/365 days per year
                     '''.format(default_solvent_loss_fraction))
@@ -1105,7 +1106,7 @@ with st.sidebar:
     with st.expander(label = '**Plant and separation parameters**', expanded = False):
         product_rate_kg_day = 1000 * st.slider(label = '{} production rate (ton/day)'.format(product_name),
                             min_value = 0.0001 / 1000, 
-                            max_value = 1.5e6 / 1000, 
+                            max_value = 1.5e5 / 1000, 
                             step = 10.0, value = product_rate_kg_day / 1000,
                             format = '%.0f',
                             help = '''Daily production rate. This is fixed for the entire plant lifetime and sets the total CO$_2$R current required.
@@ -1121,8 +1122,8 @@ with st.sidebar:
                             '''.format(default_capacity_factor))
         lifetime_years = st.slider(label = 'Plant lifetime (years)',
                             min_value = 0.0001, 
-                            max_value = 100.0, 
-                            step = 1.0, value = lifetime_years,
+                            max_value = 80.0, 
+                            step = 2.0, value = lifetime_years,
                             format = '%.0f',
                             help = '''Plant lifetime in years. The process operates to produce {} kg/day of product for this many years.
                               \n Default value: {} years
@@ -1168,7 +1169,7 @@ with st.sidebar:
                             max_value = 1.0, 
                             step = 0.01, value = CO2_solubility_mol_mol,
                             format = '%.2f',
-                            help = '''Second-law efficiency of liquid-liquid separation of oxalic acid, based on gas antisolvent precipitation.
+                            help = '''Second-law efficiency of liquid-liquid separation of oxalic acid, based on gas antisolvent precipitation. Base case assumes separation, and therefore solubility, at 10 bar.
                             This adjusts the ideal work of binary separation, 
                             $$$
                              \\\  W_{{sep \: (j)}}^{{ideal}} = R \cdot T \cdot (\sum_i x_i\cdot ln(x_i)) \cdot \displaystyle \dot{{N}} \\
@@ -1213,8 +1214,8 @@ with st.sidebar:
                             '''.format(default_electricity_cost_USD_kWh))
         CO2_cost_USD_tCO2 = st.slider(label = 'CO$_2$ cost (\$/t CO$_2$)',
                             min_value = 0.0, 
-                            max_value = 500.0, 
-                            step = 1.0, value = CO2_cost_USD_tCO2,
+                            max_value = 300.0, 
+                            step = 5.0, value = CO2_cost_USD_tCO2,
                             format = '%.0f',
                             help = '''Default value: \${}/t$_{{CO_2}}$
                             '''.format(default_CO2_cost_USD_tCO2))
@@ -1227,7 +1228,7 @@ with st.sidebar:
                             '''.format(default_H2_cost_USD_kgH2))
         product_cost_USD_kgprod = st.slider(label = '{} market price (\$/kg {})'.format(product_name, product_name),
                             min_value = 0.0, 
-                            max_value = 10.0, 
+                            max_value = 5.0, 
                             step = 0.1, value = product_cost_USD_kgprod,
                             format = '%.1f',
                             help = '''Default value: \${}/kg
@@ -1248,36 +1249,36 @@ with st.sidebar:
                             '''.format(default_solvent_cost_USD_kg))
         electrolyte_cost_USD_kg = st.slider(label = 'Supporting electrolyte cost (\$/kg)' , 
                             min_value = 0.0, 
-                            max_value = 2500.0, 
+                            max_value = 1000.0, 
                             step = 10.0, value = electrolyte_cost_USD_kg,
                             format = '%.0f',
                             help = '''Default value: \${}/kg
                             '''.format(default_electrolyte_cost_USD_kg))
         electrolyzer_capex_USD_m2 = st.slider(label = 'Electrolyzer capital cost (\$/m$^2$)' , 
                             min_value = 0.0, 
-                            max_value = 15000.0, 
+                            max_value = 12500.0, 
                             step = 100.0, value = electrolyzer_capex_USD_m2,
                             format = '%.0f',
                             help = '''Default value: \${}/m$^2$
                             '''.format(default_electrolyzer_capex_USD_m2))
         PSA_capex_USD_1000m3_hr = st.slider(label = 'Gas separations capital cost (\$/1000 m$^3_{{gas}}$/hr)' , 
                             min_value = 0.0, 
-                            max_value = 15000.0, 
-                            step = 100.0, value = PSA_capex_USD_1000m3_hr,
+                            max_value = 15.0e6, 
+                            step = 0.5e6, value = PSA_capex_USD_1000m3_hr,
                             format = '%.0f',
                             help = '''Default value: \${}/\$/1000 m$^3_{{gas}}$/hr
                             '''.format(default_PSA_capex_USD_1000m3_hr))
         LL_capex_USD_1000mol_hr = st.slider(label = 'Liquid separations capital cost (\$/1000 mol/hr)' , 
                             min_value = 0.0, 
-                            max_value = 10000000.0, 
-                            step = 10000.0, value = LL_capex_USD_1000mol_hr,
+                            max_value = 15.0e5, 
+                            step = 0.5e5, value = LL_capex_USD_1000mol_hr,
                             format = '%.0f',
                             help = '''Default value: \${}/\$/1000 m$^3_{{gas}}$/hr, based on gas antisolvent precipitation
                             '''.format(default_LL_capex_USD_1000mol_hr))
         battery_capex_USD_kWh = st.slider(label = 'Battery capital cost (\$/kWh)' , 
                             min_value = 0.0, 
                             max_value = 500.0, 
-                            step = 1.0, value = battery_capex_USD_kWh,
+                            step = 2.0, value = battery_capex_USD_kWh,
                             format = '%.0f', disabled = not is_battery,
                             help = '''Default value: \${}/kWh, based on 4-hour storage.
                             '''.format(default_battery_capex_USD_kWh))
@@ -1323,7 +1324,7 @@ with st.sidebar:
     electricity_emissions_kgCO2_kWh = st.slider(label = 'Grid CO$_2$ intensity (kg$_{CO_2}$/kWh)',
                         min_value = 0.0, 
                         max_value = 1.0, 
-                        step = 0.01, value = electricity_emissions_kgCO2_kWh,
+                        step = 0.05, value = electricity_emissions_kgCO2_kWh,
                         format = '%.2f',
                         help = '''Electricity emissions for partial life-cycle assessment.
                         \n Default value: {:.2f} kg$_{{CO_2}}$/kWh, based on the United States average.
@@ -2152,7 +2153,7 @@ if not np.isnan(FE_product_checked):
         st.subheader('Emissions')
         if electricity_emissions_kgCO2_kWh > 0:
             # st.write('Total emissions: {:.2f} kg$_{CO_2}$/kg$_{{{}}}$'.format(sum(df_energy.fillna(0).iloc[:-2].loc[:, 'Emissions (kg CO2/kg {})'.format(product_name)]), product_name ) )
-            st.metric(label = 'Emissions', value = r'{:.2f} kg CO2/kg {}'.format(df_energy.loc['Total', 'Emissions (kg CO2/kg {})'.format(product_name)], product_name),
+            st.metric(label = 'Emissions', value = r'{:.2f} kg CO2/kg {}'.format(sum(df_emissions.fillna(0).drop(['Total', 'Cell potential', 'Efficiency vs LHV'], inplace = False, errors = 'ignore')), product_name),
                 delta = '{:.2f}%'.format(100*(df_energy.loc['Total', 'Emissions (kg CO2/kg {})'.format(product_name)]  - emissions_default_nonaq_OA)/emissions_default_nonaq_OA),
                 delta_color = energy_delta_color, label_visibility='collapsed') 
             if not override_cell_voltage:
