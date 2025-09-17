@@ -2455,8 +2455,6 @@ with middle_column:
 
 if not st.session_state.is_active_error_OA_nonaq:
 
-    right_column.header('_')
-
     ###### BAR CHART FORMATTING
     flag = {True: 1,
             False: 0}
