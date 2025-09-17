@@ -1683,7 +1683,7 @@ if not st.session_state.is_active_error_CO:
     linewidth_calc = 1.4 # 1.4769 
 
     ###### CAPEX BAR CHART
-    with middle_column.container(height = 300, border = False):  
+    with middle_column.container(height = 455, border = False):  
         st.subheader('Capex sensitivity')
         with _render_lock:
             capex_bar_fig, axs = plt.subplots() # Set up plot
@@ -1740,7 +1740,7 @@ if not st.session_state.is_active_error_CO:
             st.write(capex_html, unsafe_allow_html=True)
 
     ###### OPEX BAR CHART 
-    with right_column.container(height = 300, border = False): 
+    with right_column.container(height = 455, border = False): 
         st.subheader('Opex sensitivity')
         with _render_lock:
             opex_bar_fig, axs = plt.subplots() # Set up plot
@@ -1794,7 +1794,7 @@ if not st.session_state.is_active_error_CO:
             st.write(opex_html, unsafe_allow_html=True)
 
     ###### LEVELIZED BAR CHART
-    with middle_column.container(height = 300, border = False): 
+    with middle_column.container(height = 455, border = False): 
         st.subheader('Levelized cost sensitivity')
         with _render_lock:
             levelized_bar_fig, axs = plt.subplots() # Set up plot
@@ -1878,7 +1878,7 @@ if not st.session_state.is_active_error_CO:
     right_column.header('_')
 
     ###### POTENTIALS BAR CHART
-    with middle_column.container(height = 300, border = False): 
+    with middle_column.container(height = 455, border = False): 
         if not vbl_name == 'Cell voltage':
             st.subheader('Potential sensitivity')
             with _render_lock:
@@ -1929,7 +1929,7 @@ if not st.session_state.is_active_error_CO:
                 st.write(potentials_html, unsafe_allow_html=True)
 
     ###### FE-SPC SCATTERPLOT
-    with right_column.container(height = 300, border = False): 
+    with right_column.container(height = 455, border = False): 
         st.subheader('FE-$X_{CO_2}$ tradeoff')
         with _render_lock:
             FE_SPC_bar_fig, axs = plt.subplots() # Set up plot
@@ -1965,7 +1965,7 @@ if not st.session_state.is_active_error_CO:
             st.write(FE_html, unsafe_allow_html=True)
 
     ###### ENERGY BAR CHART 
-    with middle_column.container(height = 300, border = False): 
+    with middle_column.container(height = 455, border = False): 
         if not vbl_name == 'Cell voltage':
             st.subheader('Energy sensitivity')
             with _render_lock:
@@ -2011,7 +2011,7 @@ if not st.session_state.is_active_error_CO:
                 st.write(energy_html, unsafe_allow_html=True)
 
     ###### EMISSIONS BAR CHART
-    with right_column.container(height = 300, border = False): 
+    with right_column.container(height = 455, border = False): 
         if not vbl_name == 'Cell voltage':
             st.subheader('Emissions sensitivity')
             with _render_lock:

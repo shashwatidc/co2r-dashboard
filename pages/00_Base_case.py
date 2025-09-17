@@ -1429,10 +1429,8 @@ if not np.isnan(FE_product_checked):
                     # Write the HTML
                     st.write(emissions_html, unsafe_allow_html=True)
             
-    with right_column.container(height = 300, border = False): 
+    with right_column.container(height = 455, border = False): 
         pass
-
-    st.divider()
             
     #___________________________________________________________________________________
 
