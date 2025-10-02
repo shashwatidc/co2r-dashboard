@@ -511,7 +511,7 @@ def energy_table(product_name,
     # Account for cases where the cell potential is "overwritten", i.e. a cell potential is specified but no equilibrium potentials/ ohmic resistances/ etc
     if np.isnan(df_energy.loc['Cathode equilibrium potential', 'Energy (kJ/kg {})'.format(product_name)]) and ~np.isnan(df_energy.loc['Cell potential', 'Energy (kJ/kg {})'.format(product_name)]): # if cell voltage is overridden directly
         # Recalculate the total, this time including the cell potential in the total
-        df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)] = abs(df_energy.loc[:, 'Energy (kJ/kg {})'.format(product_name)]).sum(axis=0)
+        df_energy.loc['Total', 'Energy (kJ/kg {})'.format(product_name)] +=  abs(df_energy.loc['Cell potential', 'Energy (kJ/kg {})'.format(product_name)])
         # Actually consider the cell potential as an electric outlay
         df_energy.loc['Cell potential', 'Description'] = 'Electricity'
     
